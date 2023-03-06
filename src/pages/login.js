@@ -1,9 +1,15 @@
 import FormInput from "@/components/FormInput";
+import { login } from "@/server/api";
+import clsx from "clsx";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 const Login = () => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const methods = useForm();
   const {
     reset,
@@ -18,8 +24,36 @@ const Login = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitSuccessful]);
 
-  const onSubmit = (data) => {
-    console.log("data, ", data);
+  const onSubmit = async (data) => {
+    if (data) {
+      try {
+        setLoading(true);
+        // TODO remove this
+        await sleep(1000);
+        const res = await login(data.email, data.password);
+        console.log(res);
+
+        toast(`Welcome ${res.data.user.name}!`, {
+          type: "success",
+          position: "top-right",
+        });
+        // router.push("/");
+      } catch (err) {
+        console.error(err);
+
+        toast(`${err}!`, {
+          type: "error",
+          position: "top-right",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // TODO test to remove
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
   };
 
   const emailConstraints = {
@@ -28,6 +62,10 @@ const Login = () => {
   const passwordConstraints = {
     required: { value: true, message: "Password is required" },
   };
+  const btnClass = clsx(
+    "w-full btn",
+    `${loading ? "loading" : ""}`,
+  );
 
   return (
     <section className="grid min-h-screen place-items-center bg-primary">
@@ -62,7 +100,7 @@ const Login = () => {
               </Link>
             </div>
             <div>
-              <button className="btn-primary btn w-full">Login</button>
+              <button className={btnClass}>Login</button>
             </div>
             <span className="block">
               Need an account?{" "}
