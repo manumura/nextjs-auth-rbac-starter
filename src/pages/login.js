@@ -1,4 +1,5 @@
 import FormInput from "@/components/FormInput";
+import { useAuth } from "@/lib/AuthContext";
 import { login } from "@/server/api";
 import clsx from "clsx";
 import Link from "next/link";
@@ -7,8 +8,18 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
+// export const getServerSideProps = async () => {
+//   return {
+//     props: {
+//       requireAuth: false,
+//       enableAuth: false,
+//     },
+//   };
+// };
+
 const Login = () => {
   const router = useRouter();
+  const { user, setUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const methods = useForm();
   const {
@@ -33,15 +44,18 @@ const Login = () => {
         const res = await login(data.email, data.password);
         console.log(res);
 
-        toast(`Welcome ${res.data.user.name}!`, {
-          type: "success",
-          position: "top-right",
-        });
-        // router.push("/");
+        if (res) {
+          toast(`Welcome ${res.data.user.name}!`, {
+            type: "success",
+            position: "top-right",
+          });
+          setUser(res.data.user);
+          router.push("/");
+        }
       } catch (err) {
         console.error(err);
 
-        toast(`${err}!`, {
+        toast('Login failed! Please check your email and password.', {
           type: "error",
           position: "top-right",
         });
@@ -52,7 +66,7 @@ const Login = () => {
 
     // TODO test to remove
     function sleep(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
+      return new Promise((resolve, reject) => setTimeout(resolve, ms));
     }
   };
 
@@ -62,10 +76,7 @@ const Login = () => {
   const passwordConstraints = {
     required: { value: true, message: "Password is required" },
   };
-  const btnClass = clsx(
-    "w-full btn",
-    `${loading ? "loading" : ""}`,
-  );
+  const btnClass = clsx("w-full btn", `${loading ? "loading" : ""}`);
 
   return (
     <section className="grid min-h-screen place-items-center bg-primary">
@@ -113,15 +124,6 @@ const Login = () => {
       </div>
     </section>
   );
-};
-
-export const getServerSideProps = async () => {
-  return {
-    props: {
-      requireAuth: false,
-      enableAuth: false,
-    },
-  };
 };
 
 export default Login;

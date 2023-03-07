@@ -1,8 +1,13 @@
+import { useAuth } from "@/lib/AuthContext";
 import Head from "next/head";
 import Script from "next/script";
 import React from "react";
 
 export default function Home() {
+  // TODO test
+  const { user, setUser } = useAuth();
+  console.log('user ', user);
+
   return (
     <div>
       <Head>
