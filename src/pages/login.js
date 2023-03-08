@@ -1,5 +1,6 @@
 import FormInput from "@/components/FormInput";
 import { useAuth } from "@/lib/AuthContext";
+import { saveAccessToken, saveRefreshToken } from "@/lib/storage";
 import { login } from "@/server/api";
 import clsx from "clsx";
 import Link from "next/link";
@@ -7,15 +8,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-
-// export const getServerSideProps = async () => {
-//   return {
-//     props: {
-//       requireAuth: false,
-//       enableAuth: false,
-//     },
-//   };
-// };
 
 const Login = () => {
   const router = useRouter();
@@ -50,6 +42,8 @@ const Login = () => {
             position: "top-right",
           });
           setUser(res.data.user);
+          saveAccessToken(res.data.accessToken);
+          saveRefreshToken(res.data.refreshToken);
           router.push("/");
         }
       } catch (err) {
@@ -86,12 +80,6 @@ const Login = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-secondary p-8 shadow-lg"
           >
-            <h1 className="text-ct-yellow-600 mb-4 text-center text-4xl font-[600] xl:text-6xl">
-              MyApp
-            </h1>
-            <h2 className="text-ct-dark-200 mb-4 text-center text-lg">
-              Please Login
-            </h2>
             <FormInput
               label="Email"
               name="email"
