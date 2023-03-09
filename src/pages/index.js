@@ -1,11 +1,17 @@
 import { welcome } from "@/server/api";
 
 export const getServerSideProps = async () => {
-  const res = await welcome();
+  let message = 'Welcome fallback!';
+  try {
+    const res = await welcome();
+    message = res.data;
+  } catch (err) {
+    console.error(err);
+  }
 
   return {
     props: {
-      message: res.data,
+      message,
     },
   };
 };

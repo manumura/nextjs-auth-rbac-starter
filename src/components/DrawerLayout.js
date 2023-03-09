@@ -25,7 +25,7 @@ const DrawerLayout = ({ children }) => {
         className="drawer-toggle"
         // checked property will now reflect our open state
         checked={open}
-        onClick={toggleDrawer}
+        onChange={toggleDrawer}
       />
 
       <div className="drawer-content flex flex-col">

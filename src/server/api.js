@@ -1,7 +1,7 @@
 import axios from "axios";
 import { headers } from "../../next.config";
 
-// TODO env config + abort
+// TODO env config + abort + token
 const axiosInstance = axios.create({
   baseURL: "http://localhost:9002/api",
   headers: {
@@ -9,12 +9,16 @@ const axiosInstance = axios.create({
   },
 });
 
+export const welcome = async () => {
+  return axiosInstance.get("/index");
+};
+
 export const login = async (email, password) => {
   return axiosInstance.post("/v1/login", { email, password });
 };
 
-export const welcome = async () => {
-  return axiosInstance.get("/index");
+export const register = async (email, password, name) => {
+  return axiosInstance.post("/v1/register", { email, password, name });
 };
 
 export const getProfile = async (accessToken) => {
