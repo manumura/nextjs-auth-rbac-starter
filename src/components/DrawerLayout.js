@@ -1,6 +1,7 @@
 //components/DrawerLayout.tsx
 import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
+import { clearToken } from "@/lib/storage";
 import Link from "next/link";
 import Navbar from "./Navbar";
 
@@ -12,6 +13,7 @@ const DrawerLayout = ({ children }) => {
 
   const handleLogout = () => {
     // TODO logout api
+    console.log("logout");
     // logoutUser();
     clearToken();
     setUser(null);
@@ -38,12 +40,12 @@ const DrawerLayout = ({ children }) => {
         <ul className="menu w-80 overflow-y-auto bg-secondary p-4">
           {!user && (
             <>
-              <li>
+              <li onClick={toggleDrawer}>
                 <Link href="/register" className="text-neutral">
                   Register
                 </Link>
               </li>
-              <li>
+              <li onClick={toggleDrawer}>
                 <Link href="/login" className="text-neutral">
                   Login
                 </Link>
@@ -52,12 +54,12 @@ const DrawerLayout = ({ children }) => {
           )}
           {user && (
             <>
-              <li>
+              <li onClick={toggleDrawer}>
                 <Link href="/profile" className="text-neutral">
                   Profile
                 </Link>
               </li>
-              <li>
+              <li onClick={toggleDrawer}>
                 <button className="btn btn-outline" onClick={handleLogout}>
                   Logout
                 </button>

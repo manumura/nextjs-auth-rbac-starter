@@ -1,5 +1,4 @@
 import axios from "axios";
-import { headers } from "../../next.config";
 
 // TODO env config + abort + token
 const axiosInstance = axios.create({

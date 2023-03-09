@@ -1,4 +1,4 @@
-import { welcome } from "@/server/api";
+import { welcome } from "@/lib/api";
 
 export const getServerSideProps = async () => {
   let message = 'Welcome fallback!';

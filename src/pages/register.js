@@ -1,5 +1,5 @@
 import FormInput from "@/components/FormInput";
-import { register } from "@/server/api";
+import { register } from "@/lib/api";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/router";

@@ -1,4 +1,4 @@
-import { getProfile } from "@/server/api";
+import { getProfile } from "./api";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAccessToken } from "./storage";
 
@@ -17,8 +17,8 @@ export const AuthProvider = ({ children }) => {
     const accessToken = getAccessToken();
     const doGetProfile = async (accessToken) => {
       try {
-        const u = await getProfile(accessToken);
-        setUser(u);
+        const currentUser = await getProfile(accessToken);
+        setUser(currentUser);
       } catch (error) {
         console.error(error.message);
       }

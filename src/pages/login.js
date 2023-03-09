@@ -1,7 +1,7 @@
 import FormInput from "@/components/FormInput";
 import { useAuth } from "@/lib/AuthContext";
 import { saveAccessToken, saveRefreshToken } from "@/lib/storage";
-import { login } from "@/server/api";
+import { login } from "@/lib/api";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/router";
