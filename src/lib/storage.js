@@ -1,6 +1,16 @@
 const KEY = {
   ACCESS_TOKEN: 'accessToken',
   REFRESH_TOKEN: 'refreshToken',
+  USER: 'user',
+};
+
+export const saveUser = (user) => {
+  window.localStorage.setItem(KEY.USER, user);
+};
+
+export const getSavedUser = () => {
+  const user = window.localStorage.getItem(KEY.USER);
+  return user;
 };
 
 export const saveAccessToken = (accessToken) => {

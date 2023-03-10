@@ -1,7 +1,7 @@
 import FormInput from "@/components/FormInput";
-import { useAuth } from "@/lib/AuthContext";
-import { saveAccessToken, saveRefreshToken } from "@/lib/storage";
 import { login } from "@/lib/api";
+import { useAuth } from "@/lib/AuthContext";
+import { saveUser } from "@/lib/storage";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -41,8 +41,9 @@ const Login = () => {
             position: "top-right",
           });
           setUser(res.data.user);
-          saveAccessToken(res.data.accessToken);
-          saveRefreshToken(res.data.refreshToken);
+          saveUser(res.data.user);
+          // saveAccessToken(res.data.accessToken);
+          // saveRefreshToken(res.data.refreshToken);
           router.push("/");
         }
       } catch (err) {

@@ -19,15 +19,12 @@ const Register = () => {
   } = methods;
 
   const onSubmit = async (data) => {
-    console.log(data);
-
     if (data) {
       try {
         setLoading(true);
         // TODO remove this
         await sleep(1000);
         const res = await register(data.email, data.password, data.name);
-        console.log(res.data);
 
         if (res) {
           toast(`You are successfully registered ${res.data.name}!`, {

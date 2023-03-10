@@ -1,5 +1,6 @@
 //components/Navbar.tsx
 
+import { logout } from "@/lib/api";
 import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
 import { clearToken } from "@/lib/storage";
@@ -8,22 +9,22 @@ import Link from "next/link";
 import logo from "../../public/next.svg";
 
 const Navbar = () => {
-  // TODO test
   const { user, setUser } = useAuth();
-  console.log("user ", user);
 
-  const handleLogout = () => {
-    // TODO logout api
-    // logoutUser();
-    clearToken();
-    setUser(null);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      clearToken();
+      setUser(null);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   // https://reacthustle.com/blog/how-to-create-a-responsive-navbar-in-react-with-tailwindcss-daisyui
   // toggle our drawer using useSessionStorage global state
   const { open, setOpen } = useDrawerOpen();
   const toggleDrawer = () => setOpen(!open);
-  console.log('open ', open);
 
   return (
     <div className="navbar w-full bg-secondary">

@@ -1,6 +1,5 @@
-import { getProfile } from "./api";
 import { createContext, useContext, useEffect, useState } from "react";
-import { getAccessToken } from "./storage";
+import { getSavedUser } from "./storage";
 
 export const AuthContext = createContext({
   user: undefined,
@@ -10,24 +9,16 @@ export const AuthContext = createContext({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
 
-    // Try to auto-login the user
   useEffect(() => {
-    const accessToken = getAccessToken();
-    const doGetProfile = async (accessToken) => {
-      try {
-        const currentUser = await getProfile(accessToken);
-        setUser(currentUser);
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-
-    if (!user && accessToken) {
-      doGetProfile(accessToken);
+    // hydrate on mount
+    const user = getSavedUser();
+    console.log('user ', user);
+    if (user) {
+      setUser(user);
     }
-  }, [user, setUser]);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>

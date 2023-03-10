@@ -1,4 +1,5 @@
 //components/DrawerLayout.tsx
+import { logout } from "@/lib/api";
 import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
 import { clearToken } from "@/lib/storage";
@@ -11,12 +12,14 @@ const DrawerLayout = ({ children }) => {
   const { open, setOpen } = useDrawerOpen();
   const toggleDrawer = () => setOpen(!open);
 
-  const handleLogout = () => {
-    // TODO logout api
-    console.log("logout");
-    // logoutUser();
-    clearToken();
-    setUser(null);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      clearToken();
+      setUser(null);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -60,7 +63,7 @@ const DrawerLayout = ({ children }) => {
                 </Link>
               </li>
               <li onClick={toggleDrawer}>
-                <button className="btn btn-outline" onClick={handleLogout}>
+                <button className="btn-outline btn" onClick={handleLogout}>
                   Logout
                 </button>
               </li>
