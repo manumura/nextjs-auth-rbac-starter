@@ -14,6 +14,10 @@ const Navbar = () => {
   const router = useRouter();
   const { user, setUser } = useAuth();
 
+  const handleLogin = () => {
+    router.push("/login");
+  };
+
   const handleLogout = async () => {
     const res = await fetch("/api/logout", {
       method: "POST",
@@ -31,7 +35,7 @@ const Navbar = () => {
       setUser(null);
       router.push("/");
     } else {
-      toast('Logout failed!', {
+      toast("Logout failed!", {
         type: "error",
         position: "top-right",
       });
@@ -83,7 +87,7 @@ const Navbar = () => {
       </div>
       {/* Desktop menu only shows for lg and up devices */}
       <div className="hidden flex-none lg:block">
-        <ul className="menu menu-horizontal rounded-box p-2">
+        <ul className="menu rounded-box menu-horizontal p-2">
           {!user && (
             <>
               <li>
@@ -92,9 +96,12 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="text-neutral">
+                <button
+                  className="btn-outline btn"
+                  onClick={handleLogin}
+                >
                   Login
-                </Link>
+                </button>
               </li>
             </>
           )}
@@ -106,7 +113,7 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <button className="btn btn-outline" onClick={handleLogout}>
+                <button className="btn-outline btn" onClick={handleLogout}>
                   Logout
                 </button>
               </li>

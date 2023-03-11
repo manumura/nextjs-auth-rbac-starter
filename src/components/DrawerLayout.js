@@ -15,6 +15,10 @@ const DrawerLayout = ({ children }) => {
   const { open, setOpen } = useDrawerOpen();
   const toggleDrawer = () => setOpen(!open);
 
+  const handleLogin = () => {
+    router.push("/login");
+  };
+
   const handleLogout = async () => {
     try {
       const res = await logout();
@@ -50,29 +54,32 @@ const DrawerLayout = ({ children }) => {
 
       <div className="drawer-side">
         <label htmlFor="app-drawer" className="drawer-overlay"></label>
-        <ul className="menu w-80 overflow-y-auto bg-secondary p-4">
+        <ul
+          className="menu w-80 overflow-y-auto bg-secondary p-4"
+          onClick={toggleDrawer}
+        >
           {!user && (
             <>
-              <li onClick={toggleDrawer}>
+              <li>
                 <Link href="/register" className="text-neutral">
                   Register
                 </Link>
               </li>
-              <li onClick={toggleDrawer}>
-                <Link href="/login" className="text-neutral">
+              <li>
+                <button className="btn-outline btn" onClick={handleLogin}>
                   Login
-                </Link>
+                </button>
               </li>
             </>
           )}
           {user && (
             <>
-              <li onClick={toggleDrawer}>
+              <li>
                 <Link href="/profile" className="text-neutral">
                   Profile
                 </Link>
               </li>
-              <li onClick={toggleDrawer}>
+              <li>
                 <button className="btn-outline btn" onClick={handleLogout}>
                   Logout
                 </button>

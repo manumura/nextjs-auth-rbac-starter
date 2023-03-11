@@ -85,7 +85,7 @@ const Register = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-secondary p-8 shadow-lg"
           >
-            <h1 className="text-ct-yellow-600 mb-4 text-center text-4xl font-[600] xl:text-6xl">
+            <h1 className="mb-4 text-center text-4xl font-[600]">
               Register to MyApp!
             </h1>
             <FormInput label="Full Name" name="name" constraints={nameConstraints} />
