@@ -4,9 +4,12 @@ import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
 import { clearToken } from "@/lib/storage";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 import Navbar from "./Navbar";
 
 const DrawerLayout = ({ children }) => {
+  const router = useRouter();
   const { user, setUser } = useAuth();
   //initialize state here. we use a key and a default state
   const { open, setOpen } = useDrawerOpen();
@@ -14,9 +17,16 @@ const DrawerLayout = ({ children }) => {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      const res = await logout();
+      const user = res?.data;
+      toast(`Logout successfull ${user?.name}!`, {
+        type: "success",
+        position: "top-right",
+      });
+
       clearToken();
       setUser(null);
+      router.push("/");
     } catch (err) {
       console.error(err);
     }

@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // hydrate on mount
     const user = getSavedUser();
-    console.log('user ', user);
     if (user) {
       setUser(user);
     }

@@ -48,7 +48,6 @@ const Login = () => {
         }
       } catch (err) {
         console.error(err);
-
         toast('Login failed! Please check your email and password.', {
           type: "error",
           position: "top-right",

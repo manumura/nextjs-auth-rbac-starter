@@ -6,18 +6,35 @@ import { useDrawerOpen } from "@/lib/DrawerOpenContext";
 import { clearToken } from "@/lib/storage";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 import logo from "../../public/next.svg";
 
 const Navbar = () => {
+  const router = useRouter();
   const { user, setUser } = useAuth();
 
   const handleLogout = async () => {
-    try {
-      await logout();
+    const res = await fetch("/api/logout", {
+      method: "POST",
+      // body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      const user = await res.json();
+      toast(`Logout successfull ${user.name}!`, {
+        type: "success",
+        position: "top-right",
+      });
+
       clearToken();
       setUser(null);
-    } catch (err) {
-      console.error(err);
+      router.push("/");
+    } else {
+      toast('Logout failed!', {
+        type: "error",
+        position: "top-right",
+      });
     }
   };
 

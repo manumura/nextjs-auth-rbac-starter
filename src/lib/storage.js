@@ -5,11 +5,11 @@ const KEY = {
 };
 
 export const saveUser = (user) => {
-  window.localStorage.setItem(KEY.USER, user);
+  window.localStorage.setItem(KEY.USER, JSON.stringify(user));
 };
 
 export const getSavedUser = () => {
-  const user = window.localStorage.getItem(KEY.USER);
+  const user = JSON.parse(window.localStorage.getItem(KEY.USER));
   return user;
 };
 
