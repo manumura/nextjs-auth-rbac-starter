@@ -2,25 +2,30 @@ import { axiosInstance } from "@/lib/api";
 import { useRouter } from "next/router";
 
 export async function getServerSideProps({ req }) {
-  const res = await axiosInstance.get("/v1/profile", {
-    headers: {
-      Cookie: req.headers.cookie,
-    },
-  });
-  const data = await res.data;
-  return { props: { user: data } };
+  try {
+    const res = await axiosInstance.get("/v1/profile", {
+      headers: {
+        Cookie: req.headers.cookie,
+      },
+    });
+    const data = await res.data;
+    return { props: { user: data } };
+  } catch (err) {
+    console.error(err);
+    return { props: { user: {} } };
+  }
 }
 
 const Profile = ({ user }) => {
   const router = useRouter();
 
   const handleEdit = () => {
-    router.push('/edit-profile');
+    router.push("/edit-profile");
   };
 
   return (
-    <section className="bg-primary py-20">
-      <div className="flex flex-col items-center justify-center">
+    <section className="min-h-screen bg-primary">
+      <div className="flex flex-col items-center py-20">
         <div
           className="card m-5 w-3/4 max-w-screen-lg bg-secondary shadow-xl"
           key={user.id}
@@ -30,7 +35,9 @@ const Profile = ({ user }) => {
             <p>{user.email}</p>
             <h3>{user.role}</h3>
             <div className="card-actions justify-end">
-              <button className="btn" onClick={handleEdit}>Edit</button>
+              <button className="btn" onClick={handleEdit}>
+                Edit
+              </button>
             </div>
           </div>
         </div>

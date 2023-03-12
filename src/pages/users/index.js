@@ -72,7 +72,7 @@ const Users = () => {
 
   return (
     <section className="min-h-max bg-primary">
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center py-10">
         {cards.length > 0 ? cards : noResults}
       </div>
     </section>
