@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // TODO env config
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: "http://localhost:9002/api",
   headers: {
     "Content-Type": "application/json",
@@ -36,4 +36,8 @@ export const register = async (email, password, name) => {
 
 export const getProfile = async () => {
   return axiosInstance.get("/v1/profile");
+};
+
+export const getUsers = async (role, page, pageSize, signal) => {
+  return axiosInstance.get("/v1/users", { params: { role, page, pageSize }, signal });
 };
