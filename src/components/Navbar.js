@@ -48,7 +48,7 @@ const Navbar = () => {
   const toggleDrawer = () => setOpen(!open);
 
   return (
-    <div className="navbar w-full bg-secondary">
+    <div className="navbar w-full">
       {/* Mobile menu button only shows for lg and below devices */}
       <div className="flex-none lg:hidden">
         <label className="btn-ghost btn-square btn" onClick={toggleDrawer}>

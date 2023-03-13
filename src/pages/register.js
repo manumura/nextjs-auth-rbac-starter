@@ -78,12 +78,12 @@ const Register = () => {
   const btnClass = clsx("w-full btn", `${loading ? "loading" : ""}`);
 
   return (
-    <section className="grid min-h-screen bg-primary py-20">
+    <section className="grid min-h-screen bg-slate-200 py-20">
       <div className="w-full">
         <FormProvider {...methods}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-secondary p-8 shadow-lg"
+            className="mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg"
           >
             <h1 className="mb-4 text-center text-4xl font-[600]">
               Register to MyApp!
@@ -99,7 +99,7 @@ const Register = () => {
             />
             <span className="block">
               Already have an account?{" "}
-              <Link href="/login" className="text-primary">
+              <Link href="/login" className="text-secondary">
                 Login Here
               </Link>
             </span>

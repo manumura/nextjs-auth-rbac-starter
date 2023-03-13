@@ -55,7 +55,7 @@ const DrawerLayout = ({ children }) => {
       <div className="drawer-side">
         <label htmlFor="app-drawer" className="drawer-overlay"></label>
         <ul
-          className="menu w-80 overflow-y-auto bg-secondary p-4"
+          className="menu w-80 overflow-y-auto bg-slate-50 p-4"
           onClick={toggleDrawer}
         >
           {!user && (

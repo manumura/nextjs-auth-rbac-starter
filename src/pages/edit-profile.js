@@ -24,10 +24,10 @@ const EditProfile = ({ user }) => {
   };
 
   return (
-    <section className="min-h-screen bg-primary">
+    <section className="min-h-screen bg-slate-200">
       <div className="flex flex-col items-center py-20">
         <div
-          className="card m-5 w-3/4 max-w-screen-lg bg-secondary shadow-xl"
+          className="card m-5 w-3/4 max-w-screen-lg bg-slate-50 shadow-xl"
           key={user.id}
         >
           <div className="card-body">

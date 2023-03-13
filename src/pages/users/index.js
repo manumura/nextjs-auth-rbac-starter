@@ -1,19 +1,27 @@
+import { Pagination } from "@/components/Pagination";
 import { getUsers } from "@/lib/api";
+import { DEFAULT_ROWS_PER_PAGE } from "@/lib/constant";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-
-// TODO
-const ROWS_PER_PAGE = 5;
 
 const Users = () => {
   const router = useRouter();
   const [page, setPage] = useState(router.query.page || 1);
+  const [pageSize, setPageSize] = useState(DEFAULT_ROWS_PER_PAGE);
   const [users, setUsers] = useState([]);
+  const [totalElements, setTotalElements] = useState(0);
 
+  // TODO role filter
   let role;
-  let pageSize;
 
   useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+    // console.log("router.query.page ", router.query.page);
+    setPage(router.query.page || 1);
+    // console.log("page ", page);
+
     const abortController = new AbortController();
 
     const doGetUsers = async (role, page, pageSize, signal) => {
@@ -22,12 +30,8 @@ const Users = () => {
         if (res?.data) {
           const users = res.data.elements;
           const totalElements = res.data.totalElements;
-          const numberOfPages = Math.ceil(totalElements / ROWS_PER_PAGE);
-          // https://www.youtube.com/watch?v=Wzt2uWlUEsI&ab_channel=AmitavRoy
-          console.log("users ", users);
-          console.log("totalElements ", totalElements);
-          console.log("numberOfPages ", numberOfPages);
           setUsers(users);
+          setTotalElements(totalElements);
         }
       } catch (error) {
         if (error.name !== "AbortError") {
@@ -44,37 +48,59 @@ const Users = () => {
       perform a React state update on an unmounted component" warning.
     */
     return () => abortController.abort();
-  }, [role, page, pageSize]);
+  }, [role, page, pageSize, router.isReady, router.query.page]);
+
+  const onPageSelect = (pageSelected) => {
+    router.push(`users?page=${pageSelected}`);
+  };
 
   const cards = users.map((user) => (
-    <div
-      className="card m-5 w-3/4 max-w-screen-lg bg-secondary shadow-xl"
-      key={user.id}
-    >
-      <div className="card-body">
-        <h2 className="card-title">{user.name}</h2>
-        <p>{user.email}</p>
-        <h3>{user.role}</h3>
-        <div className="card-actions justify-end">
-          <button className="btn">Edit</button>
-        </div>
-      </div>
-    </div>
+    <tr key={user.id}>
+      <th>{user.id}</th>
+      <td>{user.name}</td>
+      <td>{user.email}</td>
+      <td>{user.role}</td>
+    </tr>
   ));
 
+  const table = (
+    <div className="overflow-x-auto p-5">
+      <table className="table-zebra table w-full">
+        {/* head */}
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>{cards}</tbody>
+      </table>
+      <div className="flex justify-end">
+        <Pagination
+          currentPage={page}
+          onPageSelect={onPageSelect}
+          rowsPerPage={pageSize}
+          totalElements={totalElements}
+        />
+      </div>
+    </div>
+  );
+
   const noResults = (
-    <div className="card m-5 w-3/4 max-w-screen-lg bg-secondary shadow-xl">
-      <div className="card-body">
-        <h2>No Users found</h2>
+    <div className="my-20 flex flex-col items-center justify-center">
+      <div className="card m-5 w-3/4 max-w-screen-lg bg-slate-50 shadow-xl">
+        <div className="card-body text-center">
+          <h2>No Users found</h2>
+        </div>
       </div>
     </div>
   );
 
   return (
-    <section className="min-h-max bg-primary">
-      <div className="flex flex-col items-center justify-center py-10">
-        {cards.length > 0 ? cards : noResults}
-      </div>
+    <section className="min-h-max bg-slate-50">
+      {cards.length > 0 ? table : noResults}
     </section>
   );
 };
