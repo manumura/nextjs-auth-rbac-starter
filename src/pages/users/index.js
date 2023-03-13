@@ -10,6 +10,7 @@ const Users = () => {
   const [pageSize, setPageSize] = useState(DEFAULT_ROWS_PER_PAGE);
   const [users, setUsers] = useState([]);
   const [totalElements, setTotalElements] = useState(0);
+  // TODO loading
 
   // TODO role filter
   let role;

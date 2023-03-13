@@ -2,7 +2,7 @@
 import { logout } from "@/lib/api";
 import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
-import { clearToken } from "@/lib/storage";
+import { clearStorage } from "@/lib/storage";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
@@ -28,7 +28,7 @@ const DrawerLayout = ({ children }) => {
         position: "top-right",
       });
 
-      clearToken();
+      clearStorage();
       setUser(null);
       router.push("/");
     } catch (err) {

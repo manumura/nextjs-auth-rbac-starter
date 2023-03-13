@@ -9,10 +9,10 @@ export async function getServerSideProps({ req }) {
       },
     });
     const data = await res.data;
-    return { props: { user: data } };
+    return { props: { user: data, error: undefined } };
   } catch (err) {
     console.error(err);
-    return { props: { user: {} } };
+    return { props: { user: {}, error: {} } };
   }
 }
 

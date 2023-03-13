@@ -31,4 +31,4 @@ export const getRefreshToken = () => {
   return refreshToken;
 };
 
-export const clearToken = () => window.localStorage.clear();
+export const clearStorage = () => window.localStorage.clear();

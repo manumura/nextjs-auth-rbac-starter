@@ -1,7 +1,7 @@
 import FormInput from "@/components/FormInput";
 import { login } from "@/lib/api";
 import { useAuth } from "@/lib/AuthContext";
-import { saveUser } from "@/lib/storage";
+import { clearStorage, getSavedUser, saveUser } from "@/lib/storage";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -9,16 +9,53 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-const Login = () => {
+export async function getServerSideProps({ query, req }) {
+  // TODO use middleware https://nextjs.org/docs/advanced-features/middleware
+  // REdirect if user is authenticated
+  const accessToken = req?.cookies?.accessToken;
+  if (accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+      props: {},
+    };
+  }
+
+  const props = query?.error
+    ? {
+        error: query?.error,
+      }
+    : {};
+
+  return {
+    props,
+  };
+}
+
+const Login = ({ error }) => {
   const router = useRouter();
-  const { user, setUser } = useAuth();
-  const [loading, setLoading] = useState(false);
   const methods = useForm();
   const {
     reset,
     handleSubmit,
     formState: { isSubmitSuccessful },
   } = methods;
+  const { user, setUser } = useAuth();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Handle access token expired
+    if (error === "401") {
+      clearStorage();
+      toast("Session expired, please login again.", {
+        type: "error",
+        position: "top-right",
+        toastId: "401",
+      });
+    }
+  }, [error]);
 
   useEffect(() => {
     if (isSubmitSuccessful) {
@@ -48,7 +85,7 @@ const Login = () => {
         }
       } catch (err) {
         console.error(err);
-        toast('Login failed! Please check your email and password.', {
+        toast("Login failed! Please check your email and password.", {
           type: "error",
           position: "top-right",
         });
@@ -72,7 +109,7 @@ const Login = () => {
   const btnClass = clsx("w-full btn", `${loading ? "loading" : ""}`);
 
   return (
-    <section className="grid min-h-screen bg-slate-200 py-20">
+    <section className="min-h-screen bg-slate-200 py-20">
       <div className="w-full">
         <FormProvider {...methods}>
           <form

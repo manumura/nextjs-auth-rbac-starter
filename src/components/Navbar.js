@@ -3,7 +3,7 @@
 import { logout } from "@/lib/api";
 import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
-import { clearToken } from "@/lib/storage";
+import { clearStorage } from "@/lib/storage";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -31,7 +31,7 @@ const Navbar = () => {
         position: "top-right",
       });
 
-      clearToken();
+      clearStorage();
       setUser(null);
       router.push("/");
     } else {

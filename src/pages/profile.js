@@ -11,8 +11,15 @@ export async function getServerSideProps({ req }) {
     const data = await res.data;
     return { props: { user: data } };
   } catch (err) {
-    console.error(err);
-    return { props: { user: {} } };
+    console.log(err.response.data);
+    // return { props: { user: {}, error: err?.response?.data } };
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/login?error=${err?.response?.data?.statusCode}`,
+      },
+      props: {},
+    };
   }
 }
 
