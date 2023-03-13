@@ -1,8 +1,13 @@
 import { createContext, useContext, useState } from "react";
 
-export const DrawerOpenContext = createContext({
+interface DrawerOpenContextType {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
+export const DrawerOpenContext = createContext<DrawerOpenContextType>({
   open: undefined,
-  setOpen: async (open) => null,
+  setOpen: async (open) => {},
 });
 
 export const useDrawerOpen = () => useContext(DrawerOpenContext);

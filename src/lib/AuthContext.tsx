@@ -1,9 +1,14 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getSavedUser } from "./storage";
 
-export const AuthContext = createContext({
+interface AuthContextType {
+  user: string;
+  setUser: (user: string) => void;
+}
+
+export const AuthContext = createContext<AuthContextType>({
   user: undefined,
-  setUser: async (user) => null,
+  setUser: async (user) => {},
 });
 
 export const useAuth = () => useContext(AuthContext);

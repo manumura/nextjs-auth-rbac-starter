@@ -1,7 +1,7 @@
 import FormInput from "@/components/FormInput";
 import { login } from "@/lib/api";
 import { useAuth } from "@/lib/AuthContext";
-import { clearStorage, getSavedUser, saveUser } from "@/lib/storage";
+import { clearStorage, saveUser } from "@/lib/storage";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/router";

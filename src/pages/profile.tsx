@@ -9,18 +9,24 @@ export async function getServerSideProps({ req }) {
       },
     });
     const data = await res.data;
-    return { props: { user: data, error: undefined } };
+    return { props: { user: data } };
   } catch (err) {
-    console.error(err);
-    return { props: { user: {}, error: {} } };
+    console.log(err.response.data);
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/login?error=${err?.response?.data?.statusCode}`,
+      },
+      props: {},
+    };
   }
 }
 
-const EditProfile = ({ user }) => {
+const Profile = ({ user }) => {
   const router = useRouter();
 
-  const handleCancel = () => {
-    router.back();
+  const handleEdit = () => {
+    router.push("/edit-profile");
   };
 
   return (
@@ -35,14 +41,9 @@ const EditProfile = ({ user }) => {
             <p>{user.email}</p>
             <h3>{user.role}</h3>
             <div className="card-actions justify-end">
-              <div>
-                <button className="btn-outline btn" onClick={handleCancel}>
-                  Cancel
-                </button>
-              </div>
-              <div>
-                <button className="btn">Save</button>
-              </div>
+              <button className="btn" onClick={handleEdit}>
+                Edit
+              </button>
             </div>
           </div>
         </div>
@@ -51,4 +52,4 @@ const EditProfile = ({ user }) => {
   );
 };
 
-export default EditProfile;
+export default Profile;

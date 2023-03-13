@@ -12,7 +12,6 @@ export async function getServerSideProps({ req }) {
     return { props: { user: data } };
   } catch (err) {
     console.log(err.response.data);
-    // return { props: { user: {}, error: err?.response?.data } };
     return {
       redirect: {
         permanent: false,
@@ -23,11 +22,11 @@ export async function getServerSideProps({ req }) {
   }
 }
 
-const Profile = ({ user }) => {
+const EditProfile = ({ user }) => {
   const router = useRouter();
 
-  const handleEdit = () => {
-    router.push("/edit-profile");
+  const handleCancel = () => {
+    router.back();
   };
 
   return (
@@ -42,9 +41,14 @@ const Profile = ({ user }) => {
             <p>{user.email}</p>
             <h3>{user.role}</h3>
             <div className="card-actions justify-end">
-              <button className="btn" onClick={handleEdit}>
-                Edit
-              </button>
+              <div>
+                <button className="btn-outline btn" onClick={handleCancel}>
+                  Cancel
+                </button>
+              </div>
+              <div>
+                <button className="btn">Save</button>
+              </div>
             </div>
           </div>
         </div>
@@ -53,4 +57,4 @@ const Profile = ({ user }) => {
   );
 };
 
-export default Profile;
+export default EditProfile;
