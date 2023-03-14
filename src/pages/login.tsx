@@ -108,7 +108,7 @@ const Login = ({ error }) => {
   const btnClass = clsx("w-full btn", `${loading ? "loading" : ""}`);
 
   return (
-    <section className="min-h-screen bg-slate-200 py-20">
+    <section className="h-[calc(100vh-72px)] bg-slate-200 py-20">
       <div className="w-full">
         <FormProvider {...methods}>
           <form

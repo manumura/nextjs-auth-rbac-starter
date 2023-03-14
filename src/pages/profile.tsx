@@ -44,7 +44,7 @@ const Profile = ({ user }) => {
   };
 
   return (
-    <section className="min-h-screen bg-slate-200">
+    <section className="h-[calc(100vh-72px)] bg-slate-200">
       <div className="flex flex-col items-center py-20">
         <div
           className="card m-5 w-3/4 max-w-screen-lg bg-slate-50 shadow-xl"

@@ -48,7 +48,7 @@ const Navbar = () => {
   const toggleDrawer = () => setOpen(!open);
 
   return (
-    <div className="navbar w-full">
+    <div className="navbar">
       {/* Mobile menu button only shows for lg and below devices */}
       <div className="flex-none lg:hidden">
         <label className="btn-ghost btn-square btn" onClick={toggleDrawer}>
@@ -74,7 +74,7 @@ const Navbar = () => {
             <Image
               src={logo}
               height="20"
-              alt="Picture of the author"
+              alt="Logo"
               placeholder="empty"
             />
           </Link>

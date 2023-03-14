@@ -3,6 +3,7 @@ import { getUsers } from "@/lib/api";
 import { DEFAULT_ROWS_PER_PAGE } from "@/lib/constant";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import { clearStorage } from "../../lib/storage";
 
 const Users = () => {
@@ -113,19 +114,13 @@ const Users = () => {
     </div>
   );
 
-  const loadingCard = (
-    <div className="my-20 flex flex-col items-center justify-center">
-      <div className="card m-5 w-3/4 max-w-screen-lg bg-slate-200 shadow-xl">
-        <div className="card-body text-center">
-          <h2>Loading...</h2>
-        </div>
-      </div>
-    </div>
+  const loadingSpinner = (
+    <LoadingSpinner />
   );
 
   return (
-    <section className="min-h-max bg-slate-50">
-      {loading ? loadingCard : (cards.length > 0 ? table : noResultsCard)}
+    <section className="h-[calc(100vh-72px)] bg-slate-50">
+      {loading ? loadingSpinner : (cards.length > 0 ? table : noResultsCard)}
     </section>
   );
 };
