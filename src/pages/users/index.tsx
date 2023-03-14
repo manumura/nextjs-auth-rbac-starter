@@ -6,6 +6,24 @@ import { useEffect, useState } from "react";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { clearStorage } from "../../lib/storage";
 
+export async function getServerSideProps({ req }) {
+  // Redirect if user is not authenticated
+  const accessToken = req?.cookies?.accessToken;
+  if (!accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/login?error=401',
+      },
+      props: {},
+    };
+  }
+
+  return {
+    props: {},
+  };
+}
+
 const Users = () => {
   const router = useRouter();
   const [page, setPage] = useState(router.query.page || 1);
@@ -13,7 +31,6 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
-  // TODO loading
 
   // TODO role filter
   let role;

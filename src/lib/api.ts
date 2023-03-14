@@ -54,10 +54,6 @@ axiosInstance.interceptors.response.use(
       return axiosInstance(config);
     } catch (err) {
       console.error("Axios interceptor error: ", err?.response?.data);
-
-      //TODO delete cookies
-      console.error("Axios interceptor error: ",  err.response?.headers);
-
       return Promise.reject(err);
     }
   },

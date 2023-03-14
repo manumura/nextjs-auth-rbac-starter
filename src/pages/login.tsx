@@ -10,8 +10,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 export async function getServerSideProps({ query, req }) {
-  // TODO use middleware https://nextjs.org/docs/advanced-features/middleware
-  // REdirect if user is authenticated
+  // Redirect if user is authenticated
   const accessToken = req?.cookies?.accessToken;
   if (accessToken) {
     return {
