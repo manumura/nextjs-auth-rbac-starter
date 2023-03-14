@@ -1,21 +1,34 @@
 import { axiosInstance } from "@/lib/api";
 import { useRouter } from "next/router";
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps({ req, res }) {
   try {
-    const res = await axiosInstance.get("/v1/profile", {
+    const response = await axiosInstance.get("/v1/profile", {
       headers: {
         Cookie: req.headers.cookie,
       },
     });
-    const data = await res.data;
+
+    // Set new cookies in case tokens are expired (set from axios interceptor)
+    const setCookieHeader = response.config?.headers['set-cookie'];
+    if (setCookieHeader) {
+      res.setHeader('Set-Cookie', setCookieHeader);
+    }
+
+    const data = response.data;
     return { props: { user: data } };
   } catch (err) {
-    console.log(err.response.data);
+    console.error('Edit Profile getServerSideProps error: ', err.response?.data);
+    // Set new cookies in case tokens are expired (set from axios interceptor)
+    const setCookieHeader = err.response?.headers['set-cookie'];
+    if (setCookieHeader) {
+      res.setHeader('Set-Cookie', setCookieHeader);
+    }
+    
     return {
       redirect: {
         permanent: false,
-        destination: `/login?error=${err?.response?.data?.statusCode}`,
+        destination: `/login?error=${err.response?.data?.statusCode}`,
       },
       props: {},
     };

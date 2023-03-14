@@ -6,7 +6,7 @@ export const getServerSideProps = async () => {
     const res = await welcome();
     message = res.data;
   } catch (err) {
-    console.error(err);
+    console.error('Welcome message error: ', err.message);
   }
 
   return {

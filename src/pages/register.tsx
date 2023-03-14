@@ -34,7 +34,7 @@ const Register = () => {
           router.push("/login");
         }
       } catch (err) {
-        console.error(err);
+        console.error(err.message);
         toast('Registration failed! Did you already register with this email?', {
           type: "error",
           position: "top-right",

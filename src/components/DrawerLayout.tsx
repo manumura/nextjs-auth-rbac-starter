@@ -32,7 +32,7 @@ const DrawerLayout = ({ children }) => {
       setUser(null);
       router.push("/");
     } catch (err) {
-      console.error(err);
+      console.error('Logout error: ', err.message);
     }
   };
 

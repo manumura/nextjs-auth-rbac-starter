@@ -3,6 +3,7 @@ import { getUsers } from "@/lib/api";
 import { DEFAULT_ROWS_PER_PAGE } from "@/lib/constant";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { clearStorage } from "../../lib/storage";
 
 const Users = () => {
   const router = useRouter();
@@ -10,6 +11,7 @@ const Users = () => {
   const [pageSize, setPageSize] = useState(DEFAULT_ROWS_PER_PAGE);
   const [users, setUsers] = useState([]);
   const [totalElements, setTotalElements] = useState(0);
+  const [loading, setLoading] = useState(false);
   // TODO loading
 
   // TODO role filter
@@ -19,14 +21,15 @@ const Users = () => {
     if (!router.isReady) {
       return;
     }
-    // console.log("router.query.page ", router.query.page);
-    setPage(router.query.page || 1);
-    // console.log("page ", page);
 
+    setPage(router.query.page || 1);
     const abortController = new AbortController();
 
     const doGetUsers = async (role, page, pageSize, signal) => {
       try {
+        setLoading(true);
+        // TODO remove this
+        await sleep(1000);
         const res = await getUsers(role, page, pageSize, signal);
         if (res?.data) {
           const users = res.data.elements;
@@ -38,11 +41,22 @@ const Users = () => {
         if (error.name !== "AbortError") {
           /* Logic for non-aborted error handling goes here. */
           console.error(error.message);
+          if (error.response?.data?.statusCode === 401) {
+            clearStorage();
+            router.push(`/login?error=${error?.response?.data?.statusCode}`);
+          }
         }
+      } finally {
+        setLoading(false);
       }
     };
 
     doGetUsers(role, page, pageSize, abortController.signal);
+
+    // TODO test to remove
+    function sleep(ms) {
+      return new Promise((resolve, reject) => setTimeout(resolve, ms));
+    }
     /* 
       Abort the request as it isn't needed anymore, the component being 
       unmounted. It helps avoid, among other things, the well-known "can't
@@ -89,9 +103,9 @@ const Users = () => {
     </div>
   );
 
-  const noResults = (
+  const noResultsCard = (
     <div className="my-20 flex flex-col items-center justify-center">
-      <div className="card m-5 w-3/4 max-w-screen-lg bg-slate-50 shadow-xl">
+      <div className="card m-5 w-3/4 max-w-screen-lg bg-slate-200 shadow-xl">
         <div className="card-body text-center">
           <h2>No Users found</h2>
         </div>
@@ -99,9 +113,19 @@ const Users = () => {
     </div>
   );
 
+  const loadingCard = (
+    <div className="my-20 flex flex-col items-center justify-center">
+      <div className="card m-5 w-3/4 max-w-screen-lg bg-slate-200 shadow-xl">
+        <div className="card-body text-center">
+          <h2>Loading...</h2>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <section className="min-h-max bg-slate-50">
-      {cards.length > 0 ? table : noResults}
+      {loading ? loadingCard : (cards.length > 0 ? table : noResultsCard)}
     </section>
   );
 };
