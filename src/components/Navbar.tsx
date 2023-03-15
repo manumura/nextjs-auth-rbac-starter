@@ -28,7 +28,7 @@ const Navbar = () => {
       const user = await res.json();
       toast(`Logout successfull ${user.name}!`, {
         type: "success",
-        position: "top-right",
+        position: "top-center",
       });
 
       clearStorage();
@@ -37,7 +37,7 @@ const Navbar = () => {
     } else {
       toast("Logout failed!", {
         type: "error",
-        position: "top-right",
+        position: "top-center",
       });
     }
   };

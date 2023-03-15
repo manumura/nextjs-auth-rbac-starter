@@ -81,6 +81,13 @@ export const getProfile = async () => {
   return axiosInstance.get("/v1/profile");
 };
 
+export const updateProfile = async (password?, name?) => {
+  return axiosInstance.put("/v1/profile", {
+    ...(password ? { password } : {}),
+    ...(name ? { name } : {}),
+  });
+};
+
 export const getUsers = async (role, page, pageSize, signal) => {
   return axiosInstance.get("/v1/users", {
     params: { role, page, pageSize },

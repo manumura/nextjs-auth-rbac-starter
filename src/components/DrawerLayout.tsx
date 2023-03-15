@@ -25,7 +25,7 @@ const DrawerLayout = ({ children }) => {
       const user = res?.data;
       toast(`Logout successfull ${user?.name}!`, {
         type: "success",
-        position: "top-right",
+        position: "top-center",
       });
 
       clearStorage();

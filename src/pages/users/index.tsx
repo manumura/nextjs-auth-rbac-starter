@@ -13,7 +13,7 @@ export async function getServerSideProps({ req }) {
     return {
       redirect: {
         permanent: false,
-        destination: '/login?error=401',
+        destination: "/login?error=401",
       },
       props: {},
     };
@@ -97,7 +97,7 @@ const Users = () => {
   ));
 
   const table = (
-    <div className="overflow-x-auto p-5">
+    <div className="overflow-x-auto bg-slate-50 p-10 md:container md:mx-auto">
       <table className="table-zebra table w-full">
         {/* head */}
         <thead>
@@ -131,13 +131,11 @@ const Users = () => {
     </div>
   );
 
-  const loadingSpinner = (
-    <LoadingSpinner />
-  );
+  const loadingSpinner = <LoadingSpinner />;
 
   return (
-    <section className="h-[calc(100vh-72px)] bg-slate-50">
-      {loading ? loadingSpinner : (cards.length > 0 ? table : noResultsCard)}
+    <section className="h-[calc(100vh-72px)] bg-slate-200">
+      {loading ? loadingSpinner : cards.length > 0 ? table : noResultsCard}
     </section>
   );
 };

@@ -19,29 +19,31 @@ const Register = () => {
   } = methods;
 
   const onSubmit = async (data) => {
-    if (data) {
-      try {
-        setLoading(true);
-        // TODO remove this
-        await sleep(1000);
-        const res = await register(data.email, data.password, data.name);
+    if (!data) {
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      // TODO remove this
+      await sleep(1000);
+      const res = await register(data.email, data.password, data.name);
 
-        if (res) {
-          toast(`You are successfully registered ${res.data.name}!`, {
-            type: "success",
-            position: "top-right",
-          });
-          router.push("/login");
-        }
-      } catch (err) {
-        console.error(err.message);
-        toast('Registration failed! Did you already register with this email?', {
-          type: "error",
-          position: "top-right",
+      if (res) {
+        toast(`You are successfully registered ${res.data.name}!`, {
+          type: "success",
+          position: "top-center",
         });
-      } finally {
-        setLoading(false);
+        router.push("/login");
       }
+    } catch (err) {
+      console.error(err.message);
+      toast('Registration failed! Did you already register with this email?', {
+        type: "error",
+        position: "top-center",
+      });
+    } finally {
+      setLoading(false);
     }
 
     // TODO test to remove

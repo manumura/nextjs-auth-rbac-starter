@@ -5,6 +5,7 @@ const FormInput = ({
   label,
   name,
   type = 'text',
+  placeholder = '',
   constraints = {}
 }) => {
   const {
@@ -19,13 +20,13 @@ const FormInput = ({
       </label>
       <input
         type={type}
-        placeholder=' '
+        placeholder={placeholder}
         className='block w-full rounded-2xl appearance-none focus:outline-none py-2 px-4'
         {...register(name, constraints)}
       />
       {errors[name] && (
         <span className='text-red-600 text-xs pt-1 block'>
-          {errors[name]?.message}
+          {errors[name]?.message as string}
         </span>
       )}
     </div>

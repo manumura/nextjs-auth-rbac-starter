@@ -50,7 +50,7 @@ const Login = ({ error }) => {
       clearStorage();
       toast("Session expired, please login again.", {
         type: "error",
-        position: "top-right",
+        position: "top-center",
         toastId: "401",
       });
     }
@@ -74,7 +74,7 @@ const Login = ({ error }) => {
         if (res) {
           toast(`Welcome ${res.data.user.name}!`, {
             type: "success",
-            position: "top-right",
+            position: "top-center",
           });
           setUser(res.data.user);
           saveUser(res.data.user);
@@ -85,7 +85,7 @@ const Login = ({ error }) => {
       } catch (err) {
         toast("Login failed! Please check your email and password.", {
           type: "error",
-          position: "top-right",
+          position: "top-center",
         });
       } finally {
         setLoading(false);
