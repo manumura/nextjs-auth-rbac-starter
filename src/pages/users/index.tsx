@@ -1,10 +1,13 @@
 import { Pagination } from "@/components/Pagination";
 import { getUsers } from "@/lib/api";
 import { DEFAULT_ROWS_PER_PAGE } from "@/lib/constant";
+import axios from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import DeleteUserModal from "../../components/DeleteUserModal";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { clearStorage } from "../../lib/storage";
+import { FiDelete, FiEdit } from "react-icons/fi";
 
 export async function getServerSideProps({ req }) {
   // Redirect if user is not authenticated
@@ -31,6 +34,8 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // TODO role filter
   let role;
@@ -56,9 +61,9 @@ const Users = () => {
           setTotalElements(totalElements);
         }
       } catch (error) {
-        if (error.name !== "AbortError") {
-          /* Logic for non-aborted error handling goes here. */
+        if (!axios.isCancel(error)) {
           console.error(error.message);
+          /* Logic for non-aborted error handling goes here. */
           if (error.response?.data?.statusCode === 401) {
             clearStorage();
             router.push(`/login?error=${error?.response?.data?.statusCode}`);
@@ -87,12 +92,38 @@ const Users = () => {
     router.push(`users?page=${pageSelected}`);
   };
 
+  const openDeleteModal = (user) => {
+    console.log(user);
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
+  };
+
+  const onDeleteModalClose = () => {
+    console.log("close modal");
+    setIsDeleteModalOpen(false);
+  };
+
   const cards = users.map((user) => (
     <tr key={user.id}>
       <th>{user.id}</th>
       <td>{user.name}</td>
       <td>{user.email}</td>
       <td>{user.role}</td>
+      <td>
+        <div className="flex justify-center space-x-1">
+          <button className="btn-primary btn gap-2">
+            <FiEdit />
+            Edit
+          </button>
+          <button
+            className="btn-accent btn gap-2"
+            onClick={() => openDeleteModal(user)}
+          >
+            <FiDelete />
+            Delete
+          </button>
+        </div>
+      </td>
     </tr>
   ));
 
@@ -106,6 +137,7 @@ const Users = () => {
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>{cards}</tbody>
@@ -134,8 +166,14 @@ const Users = () => {
   const loadingSpinner = <LoadingSpinner />;
 
   return (
+    //TODO min-h
     <section className="h-[calc(100vh-72px)] bg-slate-200">
       {loading ? loadingSpinner : cards.length > 0 ? table : noResultsCard}
+      <DeleteUserModal
+        user={selectedUser}
+        isOpen={isDeleteModalOpen}
+        onClose={onDeleteModalClose}
+      />
     </section>
   );
 };
