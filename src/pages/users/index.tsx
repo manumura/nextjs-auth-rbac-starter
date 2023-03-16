@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import DeleteUserModal from "../../components/DeleteUserModal";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { clearStorage } from "../../lib/storage";
-import { FiDelete, FiEdit } from "react-icons/fi";
+import { FiDelete, FiEdit, FiPlusCircle } from "react-icons/fi";
 
 export async function getServerSideProps({ req }) {
   // Redirect if user is not authenticated
@@ -40,46 +40,51 @@ const Users = () => {
   // TODO role filter
   let role;
 
-  useEffect(() => {
-    if (!router.isReady) {
-      return;
-    }
+  const doGetUsers = async (role, page, pageSize, signal) => {
+    try {
+      setLoading(true);
+      // TODO remove this
+      await sleep(1000);
+      const res = await getUsers(role, page, pageSize, signal);
+      if (res?.data) {
+        const users = res.data.elements;
+        const totalElements = res.data.totalElements;
+        setUsers(users);
+        setTotalElements(totalElements);
 
-    setPage(router.query.page || 1);
-    const abortController = new AbortController();
-
-    const doGetUsers = async (role, page, pageSize, signal) => {
-      try {
-        setLoading(true);
-        // TODO remove this
-        await sleep(1000);
-        const res = await getUsers(role, page, pageSize, signal);
-        if (res?.data) {
-          const users = res.data.elements;
-          const totalElements = res.data.totalElements;
-          setUsers(users);
-          setTotalElements(totalElements);
+        if (page !== 1 && users.length <= 0) {
+          router.replace("users?page=1");
         }
-      } catch (error) {
-        if (!axios.isCancel(error)) {
-          console.error(error.message);
-          /* Logic for non-aborted error handling goes here. */
-          if (error.response?.data?.statusCode === 401) {
-            clearStorage();
-            router.push(`/login?error=${error?.response?.data?.statusCode}`);
-          }
-        }
-      } finally {
-        setLoading(false);
       }
-    };
-
-    doGetUsers(role, page, pageSize, abortController.signal);
+    } catch (error) {
+      if (!axios.isCancel(error)) {
+        console.error(error.message);
+        /* Logic for non-aborted error handling goes here. */
+        if (error.response?.data?.statusCode === 401) {
+          clearStorage();
+          router.push(`/login?error=${error?.response?.data?.statusCode}`);
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
 
     // TODO test to remove
     function sleep(ms) {
       return new Promise((resolve, reject) => setTimeout(resolve, ms));
     }
+  };
+
+  // TODO move get users to getServerSideProps ?
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    setPage(router.query.page || 1);
+    doGetUsers(role, page, pageSize, abortController.signal);
+
     /* 
       Abort the request as it isn't needed anymore, the component being 
       unmounted. It helps avoid, among other things, the well-known "can't
@@ -93,30 +98,43 @@ const Users = () => {
   };
 
   const openDeleteModal = (user) => {
-    console.log(user);
     setSelectedUser(user);
     setIsDeleteModalOpen(true);
   };
 
-  const onDeleteModalClose = () => {
-    console.log("close modal");
+  const onDeleteModalClose = (isSuccess) => {
     setIsDeleteModalOpen(false);
+    if (isSuccess) {
+      console.log("reload");
+      // Refresh page
+      router.reload();
+    }
   };
 
-  const cards = users.map((user) => (
+  const onCreateUser = () => {
+    console.log("onCreateUser");
+  };
+
+  const noUserRow = (
+    <tr>
+      <td colSpan={5} className="text-center font-bold">No Users found</td>
+    </tr>
+  );
+
+  const userRows = users.map((user) => (
     <tr key={user.id}>
       <th>{user.id}</th>
       <td>{user.name}</td>
       <td>{user.email}</td>
       <td>{user.role}</td>
       <td>
-        <div className="flex justify-center space-x-1">
-          <button className="btn-primary btn gap-2">
+        <div className="flex space-x-1 justify-end">
+          <button className="btn-primary btn-sm btn gap-2">
             <FiEdit />
             Edit
           </button>
           <button
-            className="btn-accent btn gap-2"
+            className="btn-accent btn-sm btn gap-2"
             onClick={() => openDeleteModal(user)}
           >
             <FiDelete />
@@ -127,35 +145,43 @@ const Users = () => {
     </tr>
   ));
 
-  const table = (
+  const usersTable = (
     <div className="overflow-x-auto bg-slate-50 p-10 md:container md:mx-auto">
       <table className="table-zebra table w-full">
-        {/* head */}
         <thead>
           <tr>
             <th></th>
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
-            <th></th>
+            <th>
+              <div className="flex space-x-1 justify-end">
+                <button className="btn gap-2" onClick={onCreateUser}>
+                  <FiPlusCircle />
+                  Create User
+                </button>
+              </div>
+            </th>
           </tr>
         </thead>
-        <tbody>{cards}</tbody>
+        <tbody>{users.length > 0 ? userRows : noUserRow}</tbody>
       </table>
       <div className="flex justify-end">
-        <Pagination
-          currentPage={page}
-          onPageSelect={onPageSelect}
-          rowsPerPage={pageSize}
-          totalElements={totalElements}
-        />
+        {users.length > 0 && (
+          <Pagination
+            currentPage={page}
+            onPageSelect={onPageSelect}
+            rowsPerPage={pageSize}
+            totalElements={totalElements}
+          />
+        )}
       </div>
     </div>
   );
 
   const noResultsCard = (
     <div className="my-20 flex flex-col items-center justify-center">
-      <div className="card m-5 w-3/4 max-w-screen-lg bg-slate-200 shadow-xl">
+      <div className="card m-5 w-3/4 max-w-screen-lg bg-slate-50 shadow-xl">
         <div className="card-body text-center">
           <h2>No Users found</h2>
         </div>
@@ -168,7 +194,7 @@ const Users = () => {
   return (
     //TODO min-h
     <section className="h-[calc(100vh-72px)] bg-slate-200">
-      {loading ? loadingSpinner : cards.length > 0 ? table : noResultsCard}
+      {loading ? loadingSpinner : usersTable}
       <DeleteUserModal
         user={selectedUser}
         isOpen={isDeleteModalOpen}

@@ -71,12 +71,7 @@ const Navbar = () => {
       <div className="mx-2 flex-1 px-2">
         <div className="flex items-center">
           <Link href="/">
-            <Image
-              src={logo}
-              height="20"
-              alt="Logo"
-              placeholder="empty"
-            />
+            <Image src={logo} height="20" alt="Logo" placeholder="empty" />
           </Link>
           <Link href="/">
             <span className="pl-5 text-2xl font-semibold text-neutral">
@@ -96,10 +91,7 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <button
-                  className="btn-outline btn"
-                  onClick={handleLogin}
-                >
+                <button className="btn-outline btn" onClick={handleLogin}>
                   Login
                 </button>
               </li>
@@ -107,6 +99,11 @@ const Navbar = () => {
           )}
           {user && (
             <>
+              <li>
+                <Link href="/users" className="text-neutral">
+                  Users
+                </Link>
+              </li>
               <li>
                 <Link href="/profile" className="text-neutral">
                   Profile

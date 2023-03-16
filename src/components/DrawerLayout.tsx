@@ -32,7 +32,7 @@ const DrawerLayout = ({ children }) => {
       setUser(null);
       router.push("/");
     } catch (err) {
-      console.error('Logout error: ', err.message);
+      console.error("Logout error: ", err.message);
     }
   };
 
@@ -74,6 +74,11 @@ const DrawerLayout = ({ children }) => {
           )}
           {user && (
             <>
+              <li>
+                <Link href="/users" className="text-neutral">
+                  Users
+                </Link>
+              </li>
               <li>
                 <Link href="/profile" className="text-neutral">
                   Profile

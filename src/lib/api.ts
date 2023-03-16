@@ -94,3 +94,7 @@ export const getUsers = async (role, page, pageSize, signal) => {
     signal,
   });
 };
+
+export const deleteUser = async (userId) => {
+  return axiosInstance.delete(`/v1/users/${userId}`);
+};
