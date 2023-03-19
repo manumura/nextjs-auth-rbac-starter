@@ -75,7 +75,7 @@ const Users = () => {
     }
   };
 
-  // TODO move get users to getServerSideProps ?
+  // TODO move get users to getServerSideProps
   useEffect(() => {
     if (!router.isReady) {
       return;
@@ -105,14 +105,18 @@ const Users = () => {
   const onDeleteModalClose = (isSuccess) => {
     setIsDeleteModalOpen(false);
     if (isSuccess) {
-      console.log("reload");
+      console.log("success ", selectedUser);
       // Refresh page
-      router.reload();
+      // router.reload();
+      // TODO remove from users array
+      // const newUsers = users.filter((user) => user.id !== selectedUser.id);
+      // setUsers(newUsers);
+      // console.log('totalElements ', totalElements);
     }
   };
 
   const onCreateUser = () => {
-    console.log("onCreateUser");
+    router.push('create-user');
   };
 
   const noUserRow = (
