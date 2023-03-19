@@ -115,6 +115,10 @@ const Users = () => {
     }
   };
 
+  const handleEditUser = (userId) => {
+    router.push(`users/${userId}`);
+  };
+
   const onCreateUser = () => {
     router.push('create-user');
   };
@@ -133,7 +137,7 @@ const Users = () => {
       <td>{user.role}</td>
       <td>
         <div className="flex space-x-1 justify-end">
-          <button className="btn-primary btn-sm btn gap-2">
+          <button className="btn-primary btn-sm btn gap-2" onClick={() => handleEditUser(user.id)}>
             <FiEdit />
             Edit
           </button>

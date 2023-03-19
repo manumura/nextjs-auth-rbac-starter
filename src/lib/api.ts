@@ -95,6 +95,12 @@ export const getUsers = async (role, page, pageSize, signal) => {
   });
 };
 
+export const getUser = async (id, signal) => {
+  return axiosInstance.get(`/v1/users/${id}`, {
+    signal,
+  });
+};
+
 export const createUser = async (email, name, role) => {
   return axiosInstance.post("/v1/users", { email, name, role });
 };

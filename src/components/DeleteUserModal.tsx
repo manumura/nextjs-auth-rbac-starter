@@ -26,6 +26,10 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
       }
     } catch (error) {
       console.error(error.message);
+      toast(`Delete user failed! ${error.message}`, {
+        type: "error",
+        position: "top-center",
+      });
     } finally {
       setLoading(false);
     }
