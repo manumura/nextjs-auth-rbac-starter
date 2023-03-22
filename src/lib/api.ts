@@ -81,10 +81,10 @@ export const getProfile = async () => {
   return axiosInstance.get("/v1/profile");
 };
 
-export const updateProfile = async (password?, name?) => {
+export const updateProfile = async (name, password?) => {
   return axiosInstance.put("/v1/profile", {
+    name,
     ...(password ? { password } : {}),
-    ...(name ? { name } : {}),
   });
 };
 
@@ -103,6 +103,15 @@ export const getUser = async (id, signal) => {
 
 export const createUser = async (email, name, role) => {
   return axiosInstance.post("/v1/users", { email, name, role });
+};
+
+export const updateUser = async (id, name, email, role, password?) => {
+  return axiosInstance.put(`/v1/users/${id}`, {
+    name,
+    email,
+    role,
+    ...(password ? { password } : {}),
+  });
 };
 
 export const deleteUser = async (userId) => {

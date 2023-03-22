@@ -76,7 +76,7 @@ const EditProfile = ({ user }) => {
       setLoading(true);
       // TODO remove this
       await sleep(1000);
-      const res = await updateProfile(data.password, data.name);
+      const res = await updateProfile(data.name, data.password);
 
       if (res) {
         toast(`Profile successfully updated!`, {
@@ -102,7 +102,7 @@ const EditProfile = ({ user }) => {
   };
 
   const nameConstraints = {
-    // required: { value: true, message: "Full Name is required" },
+    required: { value: true, message: "Full Name is required" },
     minLength: {
       value: 5,
       message: "Full Name is min 5 characters",

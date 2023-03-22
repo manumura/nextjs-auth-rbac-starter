@@ -48,6 +48,7 @@ const Login = ({ error }) => {
     // Handle access token expired
     if (error === "401") {
       clearStorage();
+      setUser(null);
       toast("Session expired, please login again.", {
         type: "error",
         position: "top-center",
@@ -78,8 +79,6 @@ const Login = ({ error }) => {
           });
           setUser(res.data.user);
           saveUser(res.data.user);
-          // saveAccessToken(res.data.accessToken);
-          // saveRefreshToken(res.data.refreshToken);
           router.push("/");
         }
       } catch (err) {

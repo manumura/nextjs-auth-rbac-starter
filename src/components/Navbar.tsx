@@ -1,6 +1,5 @@
 //components/Navbar.tsx
 
-import { logout } from "@/lib/api";
 import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
 import { clearStorage } from "@/lib/storage";

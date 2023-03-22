@@ -75,7 +75,7 @@ const Users = () => {
     }
   };
 
-  // TODO move get users to getServerSideProps
+  // TODO move get users to getServerSideProps + handle forbidden
   useEffect(() => {
     if (!router.isReady) {
       return;
@@ -115,7 +115,7 @@ const Users = () => {
     }
   };
 
-  const handleEditUser = (userId) => {
+  const onEditUser = (userId) => {
     router.push(`users/${userId}`);
   };
 
@@ -137,7 +137,7 @@ const Users = () => {
       <td>{user.role}</td>
       <td>
         <div className="flex space-x-1 justify-end">
-          <button className="btn-primary btn-sm btn gap-2" onClick={() => handleEditUser(user.id)}>
+          <button className="btn-primary btn-sm btn gap-2" onClick={() => onEditUser(user.id)}>
             <FiEdit />
             Edit
           </button>
@@ -183,16 +183,6 @@ const Users = () => {
             totalElements={totalElements}
           />
         )}
-      </div>
-    </div>
-  );
-
-  const noResultsCard = (
-    <div className="my-20 flex flex-col items-center justify-center">
-      <div className="card m-5 w-3/4 max-w-screen-lg bg-slate-50 shadow-xl">
-        <div className="card-body text-center">
-          <h2>No Users found</h2>
-        </div>
       </div>
     </div>
   );

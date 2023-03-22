@@ -22,7 +22,7 @@ const Register = () => {
     if (!data) {
       return;
     }
-    
+
     try {
       setLoading(true);
       // TODO remove this
@@ -38,7 +38,7 @@ const Register = () => {
       }
     } catch (err) {
       console.error(err.message);
-      toast('Registration failed! Did you already register with this email?', {
+      toast("Registration failed! Did you already register with this email?", {
         type: "error",
         position: "top-center",
       });
@@ -66,13 +66,13 @@ const Register = () => {
     required: { value: true, message: "Password is required" },
     minLength: {
       value: 8,
-      message: "Password is min 8 characters"
+      message: "Password is min 8 characters",
     },
   };
   const passwordConfirmConstraints = {
     required: { value: true, message: "Confirm Password is required" },
     validate: (value) => {
-      if (watch('password') !== value) {
+      if (watch("password") !== value) {
         return "Passwords do no match";
       }
     },
@@ -90,9 +90,23 @@ const Register = () => {
             <h1 className="mb-4 text-center text-4xl font-[600]">
               Register to MyApp!
             </h1>
-            <FormInput label="Full Name" name="name" constraints={nameConstraints} />
-            <FormInput label="Email" name="email" type="email" constraints={emailConstraints} />
-            <FormInput label="Password" name="password" type="password" constraints={passwordConstraints} />
+            <FormInput
+              label="Full Name"
+              name="name"
+              constraints={nameConstraints}
+            />
+            <FormInput
+              label="Email"
+              name="email"
+              type="email"
+              constraints={emailConstraints}
+            />
+            <FormInput
+              label="Password"
+              name="password"
+              type="password"
+              constraints={passwordConstraints}
+            />
             <FormInput
               label="Confirm Password"
               name="passwordConfirm"
