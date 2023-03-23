@@ -1,7 +1,6 @@
 import FormInput from "@/components/FormInput";
-import { createUser, register } from "@/lib/api";
+import { createUser } from "@/lib/api";
 import clsx from "clsx";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -28,7 +27,7 @@ const CreateUser = () => {
       const res = await createUser(data.email, data.name, data.role);
 
       if (res) {
-        toast(`User successfully created: ${res.data.name}!`, {
+        toast(`User successfully created: ${res.data.name}`, {
           type: "success",
           position: "top-center",
         });

@@ -16,7 +16,7 @@ export async function getServerSideProps({ query, req }) {
     return {
       redirect: {
         permanent: false,
-        destination: '/',
+        destination: "/",
       },
       props: {},
     };
@@ -41,7 +41,7 @@ const Login = ({ error }) => {
     handleSubmit,
     formState: { isSubmitSuccessful },
   } = methods;
-  const { user, setUser } = useAuth();
+  const { setUser } = useAuth();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -65,30 +65,31 @@ const Login = ({ error }) => {
   }, [isSubmitSuccessful]);
 
   const onSubmit = async (data) => {
-    if (data) {
-      try {
-        setLoading(true);
-        // TODO remove this
-        await sleep(1000);
-        const res = await login(data.email, data.password);
+    if (!data) {
+      return;
+    }
+    try {
+      setLoading(true);
+      // TODO remove this
+      await sleep(1000);
+      const res = await login(data.email, data.password);
 
-        if (res) {
-          toast(`Welcome ${res.data.user.name}!`, {
-            type: "success",
-            position: "top-center",
-          });
-          setUser(res.data.user);
-          saveUser(res.data.user);
-          router.push("/");
-        }
-      } catch (err) {
-        toast("Login failed! Please check your email and password.", {
-          type: "error",
+      if (res) {
+        toast(`Welcome ${res.data.user.name}!`, {
+          type: "success",
           position: "top-center",
         });
-      } finally {
-        setLoading(false);
+        setUser(res.data.user);
+        saveUser(res.data.user);
+        router.push("/");
       }
+    } catch (err) {
+      toast("Login failed! Please check your email and password.", {
+        type: "error",
+        position: "top-center",
+      });
+    } finally {
+      setLoading(false);
     }
 
     // TODO test to remove

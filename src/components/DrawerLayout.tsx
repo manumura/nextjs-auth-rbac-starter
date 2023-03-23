@@ -2,9 +2,10 @@
 import { logout } from "@/lib/api";
 import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
-import { clearStorage } from "@/lib/storage";
+import { clearStorage, getSavedUser } from "@/lib/storage";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 import Navbar from "./Navbar";
 
@@ -14,6 +15,11 @@ const DrawerLayout = ({ children }) => {
   //initialize state here. we use a key and a default state
   const { open, setOpen } = useDrawerOpen();
   const toggleDrawer = () => setOpen(!open);
+
+  useEffect(() => {
+    const savedUser = getSavedUser();
+    setUser(savedUser);
+  }, []);
 
   const handleLogin = () => {
     router.push("/login");

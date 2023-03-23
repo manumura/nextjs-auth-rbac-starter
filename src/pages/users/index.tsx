@@ -1,97 +1,62 @@
 import { Pagination } from "@/components/Pagination";
-import { getUsers } from "@/lib/api";
+import { axiosInstance } from "@/lib/api";
 import { DEFAULT_ROWS_PER_PAGE } from "@/lib/constant";
-import axios from "axios";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { FiDelete, FiEdit, FiPlusCircle } from "react-icons/fi";
 import DeleteUserModal from "../../components/DeleteUserModal";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import { clearStorage } from "../../lib/storage";
-import { FiDelete, FiEdit, FiPlusCircle } from "react-icons/fi";
 
-export async function getServerSideProps({ req }) {
-  // Redirect if user is not authenticated
-  const accessToken = req?.cookies?.accessToken;
-  if (!accessToken) {
+export async function getServerSideProps({ req, res, query }) {
+  try {
+    // TODO handle 403
+    // TODO 404 page
+    // TODO .env template
+    // TODO filter by role
+    const page = query.page || 1;
+    const pageSize = DEFAULT_ROWS_PER_PAGE;
+    const role = undefined;
+
+    const response = await axiosInstance.get("/v1/users", {
+      params: { role, page, pageSize },
+      headers: {
+        Cookie: req.headers.cookie,
+      },
+    });
+
+    // Set new cookies in case tokens are expired (set from axios interceptor)
+    const setCookieHeader = response.config?.headers["set-cookie"];
+    if (setCookieHeader) {
+      res.setHeader("Set-Cookie", setCookieHeader);
+    }
+
+    const users = response.data.elements;
+    const totalElements = response.data.totalElements;
+    return { props: { users, totalElements, page, pageSize } };
+  } catch (err) {
+    console.error(err);
+    console.error("Get Users getServerSideProps error: ", err.response?.data);
+    // Set new cookies in case tokens are expired (set from axios interceptor)
+    const setCookieHeader = err.response?.headers["set-cookie"];
+    if (setCookieHeader) {
+      res.setHeader("Set-Cookie", setCookieHeader);
+    }
+
     return {
       redirect: {
         permanent: false,
-        destination: "/login?error=401",
+        destination: `/login?error=${err.response?.data?.statusCode}`,
       },
       props: {},
     };
   }
-
-  return {
-    props: {},
-  };
 }
 
-const Users = () => {
+const Users = ({ users, totalElements, page, pageSize }) => {
   const router = useRouter();
-  const [page, setPage] = useState(router.query.page || 1);
-  const [pageSize, setPageSize] = useState(DEFAULT_ROWS_PER_PAGE);
-  const [users, setUsers] = useState([]);
-  const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  // TODO role filter
-  let role;
-
-  const doGetUsers = async (role, page, pageSize, signal) => {
-    try {
-      setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      const res = await getUsers(role, page, pageSize, signal);
-      if (res?.data) {
-        const users = res.data.elements;
-        const totalElements = res.data.totalElements;
-        setUsers(users);
-        setTotalElements(totalElements);
-
-        if (page !== 1 && users.length <= 0) {
-          router.replace("users?page=1");
-        }
-      }
-    } catch (error) {
-      if (!axios.isCancel(error)) {
-        console.error(error.message);
-        /* Logic for non-aborted error handling goes here. */
-        if (error.response?.data?.statusCode === 401) {
-          clearStorage();
-          router.push(`/login?error=${error?.response?.data?.statusCode}`);
-        }
-      }
-    } finally {
-      setLoading(false);
-    }
-
-    // TODO test to remove
-    function sleep(ms) {
-      return new Promise((resolve, reject) => setTimeout(resolve, ms));
-    }
-  };
-
-  // TODO move get users to getServerSideProps + handle forbidden
-  useEffect(() => {
-    if (!router.isReady) {
-      return;
-    }
-
-    const abortController = new AbortController();
-    setPage(router.query.page || 1);
-    doGetUsers(role, page, pageSize, abortController.signal);
-
-    /* 
-      Abort the request as it isn't needed anymore, the component being 
-      unmounted. It helps avoid, among other things, the well-known "can't
-      perform a React state update on an unmounted component" warning.
-    */
-    return () => abortController.abort();
-  }, [role, page, pageSize, router.isReady, router.query.page]);
 
   const onPageSelect = (pageSelected) => {
     router.push(`users?page=${pageSelected}`);
@@ -107,11 +72,7 @@ const Users = () => {
     if (isSuccess) {
       console.log("success ", selectedUser);
       // Refresh page
-      // router.reload();
-      // TODO remove from users array
-      // const newUsers = users.filter((user) => user.id !== selectedUser.id);
-      // setUsers(newUsers);
-      // console.log('totalElements ', totalElements);
+      router.reload();
     }
   };
 
@@ -120,12 +81,14 @@ const Users = () => {
   };
 
   const onCreateUser = () => {
-    router.push('create-user');
+    router.push("create-user");
   };
 
   const noUserRow = (
     <tr>
-      <td colSpan={5} className="text-center font-bold">No Users found</td>
+      <td colSpan={5} className="text-center font-bold">
+        No Users found
+      </td>
     </tr>
   );
 
@@ -136,8 +99,11 @@ const Users = () => {
       <td>{user.email}</td>
       <td>{user.role}</td>
       <td>
-        <div className="flex space-x-1 justify-end">
-          <button className="btn-primary btn-sm btn gap-2" onClick={() => onEditUser(user.id)}>
+        <div className="flex justify-end space-x-1">
+          <button
+            className="btn-primary btn-sm btn gap-2"
+            onClick={() => onEditUser(user.id)}
+          >
             <FiEdit />
             Edit
           </button>
@@ -163,7 +129,7 @@ const Users = () => {
             <th>Email</th>
             <th>Role</th>
             <th>
-              <div className="flex space-x-1 justify-end">
+              <div className="flex justify-end space-x-1">
                 <button className="btn gap-2" onClick={onCreateUser}>
                   <FiPlusCircle />
                   Create User
@@ -196,7 +162,7 @@ const Users = () => {
       <DeleteUserModal
         user={selectedUser}
         isOpen={isDeleteModalOpen}
-        onClose={onDeleteModalClose}
+        onClose={() => onDeleteModalClose(false)}
       />
     </section>
   );

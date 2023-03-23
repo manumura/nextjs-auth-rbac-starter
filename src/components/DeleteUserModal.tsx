@@ -1,6 +1,8 @@
 import clsx from "clsx";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { deleteUser } from "../lib/api";
+import { sleep } from "../lib/util";
 import Modal from "./Modal";
 
 const DeleteUserModal = ({ user, isOpen, onClose }) => {
@@ -15,8 +17,7 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
       setLoading(true);
       // TODO remove this
       await sleep(1000);
-      //   const res = await deleteUser(user?.id);
-      const res = { data: "user" };
+      const res = await deleteUser(user?.id);
       if (res?.data) {
         toast(`User successfully deleted: ${user.name}`, {
           type: "success",
@@ -35,15 +36,7 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
     }
   };
 
-  // TODO test to remove
-  function sleep(ms) {
-    return new Promise((resolve, reject) => setTimeout(resolve, ms));
-  }
-
-  const btnClass = clsx(
-    "btn-accent btn mx-1",
-    `${loading ? "loading" : ""}`,
-  );
+  const btnClass = clsx("btn-accent btn mx-1", `${loading ? "loading" : ""}`);
 
   const title = (
     <div>

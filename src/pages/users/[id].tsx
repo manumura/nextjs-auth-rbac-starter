@@ -8,7 +8,6 @@ import FormInput from "../../components/FormInput";
 import FormSelect from "../../components/FormSelect";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { getUser, updateUser } from "../../lib/api";
-import { clearStorage } from "../../lib/storage";
 
 const EditUser = () => {
   const router = useRouter();
@@ -24,7 +23,7 @@ const EditUser = () => {
       role: '',
     },
   });
-  const { handleSubmit, watch, reset, setError } = methods;
+  const { handleSubmit, watch, reset } = methods;
 
   const doGetUser = async (id, signal) => {
     try {
@@ -54,7 +53,6 @@ const EditUser = () => {
         }
 
         if (error.response?.data?.statusCode === 401) {
-          clearStorage();
           router.push(`/login?error=${error?.response?.data?.statusCode}`);
         }
       }
@@ -97,7 +95,7 @@ const EditUser = () => {
       const res = await updateUser(router.query.id, data.name, data.email, data.role, data.password);
 
       if (res) {
-        toast(`User successfully updated: ${res.data.name}!`, {
+        toast(`User successfully updated: ${res.data.name}`, {
           type: "success",
           position: "top-center",
         });
