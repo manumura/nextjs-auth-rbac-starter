@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { sleep } from "../lib/util";
 
 const Register = () => {
   const router = useRouter();
@@ -44,11 +45,6 @@ const Register = () => {
       });
     } finally {
       setLoading(false);
-    }
-
-    // TODO test to remove
-    function sleep(ms) {
-      return new Promise((resolve, reject) => setTimeout(resolve, ms));
     }
   };
 

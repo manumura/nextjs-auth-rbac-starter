@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { sleep } from "../lib/util";
 
 export async function getServerSideProps({ query, req }) {
   // Redirect if user is authenticated
@@ -90,11 +91,6 @@ const Login = ({ error }) => {
       });
     } finally {
       setLoading(false);
-    }
-
-    // TODO test to remove
-    function sleep(ms) {
-      return new Promise((resolve, reject) => setTimeout(resolve, ms));
     }
   };
 

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormInput from "../components/FormInput";
+import { sleep } from "../lib/util";
 
 export async function getServerSideProps({ req, res }) {
   try {
@@ -93,11 +94,6 @@ const EditProfile = ({ user }) => {
       });
     } finally {
       setLoading(false);
-    }
-
-    // TODO test to remove
-    function sleep(ms) {
-      return new Promise((resolve, reject) => setTimeout(resolve, ms));
     }
   };
 

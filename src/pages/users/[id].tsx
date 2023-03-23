@@ -8,6 +8,7 @@ import FormInput from "../../components/FormInput";
 import FormSelect from "../../components/FormSelect";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { getUser, updateUser } from "../../lib/api";
+import { sleep } from "../../lib/util";
 
 const EditUser = () => {
   const router = useRouter();
@@ -59,11 +60,6 @@ const EditUser = () => {
     } finally {
       setLoading(false);
     }
-
-    // TODO test to remove
-    function sleep(ms) {
-      return new Promise((resolve, reject) => setTimeout(resolve, ms));
-    }
   };
 
   useEffect(() => {
@@ -109,11 +105,6 @@ const EditUser = () => {
       });
     } finally {
       setSubmitting(false);
-    }
-
-    // TODO test to remove
-    function sleep(ms) {
-      return new Promise((resolve, reject) => setTimeout(resolve, ms));
     }
   };
 

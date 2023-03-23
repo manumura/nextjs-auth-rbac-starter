@@ -10,9 +10,9 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 export async function getServerSideProps({ req, res, query }) {
   try {
     // TODO handle 403
-    // TODO 404 page
     // TODO .env template
     // TODO filter by role
+    // TODO forget password
     const page = query.page || 1;
     const pageSize = DEFAULT_ROWS_PER_PAGE;
     const role = undefined;
