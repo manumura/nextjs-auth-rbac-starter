@@ -1,20 +1,19 @@
 import { Pagination } from "@/components/Pagination";
 import { axiosInstance } from "@/lib/api";
-import { DEFAULT_ROWS_PER_PAGE } from "@/lib/constant";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FiDelete, FiEdit, FiPlusCircle } from "react-icons/fi";
 import DeleteUserModal from "../../components/DeleteUserModal";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import appConfig from "../../config/config";
 
 export async function getServerSideProps({ req, res, query }) {
   try {
     // TODO handle 403
-    // TODO .env template
     // TODO filter by role
     // TODO forget password
     const page = query.page || 1;
-    const pageSize = DEFAULT_ROWS_PER_PAGE;
+    const pageSize = appConfig.defaultRowsPerPage;
     const role = undefined;
 
     const response = await axiosInstance.get("/v1/users", {
@@ -34,7 +33,6 @@ export async function getServerSideProps({ req, res, query }) {
     const totalElements = response.data.totalElements;
     return { props: { users, totalElements, page, pageSize } };
   } catch (err) {
-    console.error(err);
     console.error("Get Users getServerSideProps error: ", err.response?.data);
     // Set new cookies in case tokens are expired (set from axios interceptor)
     const setCookieHeader = err.response?.headers["set-cookie"];

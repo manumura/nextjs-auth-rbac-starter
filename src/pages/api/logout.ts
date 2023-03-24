@@ -1,14 +1,16 @@
 import axios from "axios";
+import appConfig from "../../config/config";
 
 export default async function handler(req, res) {
+  const BASE_URL = appConfig.baseUrl;
   // const { email, password } = JSON.parse(req.body);
+
   try {
-    // TODO env config
     const response = await axios.post(
       "/v1/logout",
       {},
       {
-        baseURL: "http://localhost:9002/api",
+        baseURL: `${BASE_URL}/api`,
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Credentials": true,

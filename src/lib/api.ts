@@ -1,10 +1,11 @@
 import axios from "axios";
+import appConfig from "../config/config";
 
+const BASE_URL = appConfig.baseUrl;
 const REFRESH_TOKEN_ENDPOINT = "/v1/refresh-token";
 
-// TODO env config
 export const axiosInstance = axios.create({
-  baseURL: "http://localhost:9002/api",
+  baseURL: `${BASE_URL}/api`,
   headers: {
     "Content-Type": "application/json",
   },
@@ -31,8 +32,7 @@ axiosInstance.interceptors.response.use(
         url,
         {},
         {
-          // TODO env config
-          baseURL: "http://localhost:9002/api",
+          baseURL: `${BASE_URL}/api`,
           headers: {
             "Content-Type": "application/json",
             Cookie: config.headers.Cookie,
