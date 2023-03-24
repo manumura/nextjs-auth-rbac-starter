@@ -11,7 +11,6 @@ export async function getServerSideProps({ req, res, query }) {
   try {
     // TODO handle 403
     // TODO filter by role
-    // TODO forget password
     const page = query.page || 1;
     const pageSize = appConfig.defaultRowsPerPage;
     const role = undefined;
@@ -68,7 +67,6 @@ const Users = ({ users, totalElements, page, pageSize }) => {
   const onDeleteModalClose = (isSuccess) => {
     setIsDeleteModalOpen(false);
     if (isSuccess) {
-      console.log("success ", selectedUser);
       // Refresh page
       router.reload();
     }

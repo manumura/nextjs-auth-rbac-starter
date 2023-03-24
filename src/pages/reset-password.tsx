@@ -1,7 +1,10 @@
 import FormInput from "@/components/FormInput";
-import { login } from "@/lib/api";
-import { useAuth } from "@/lib/AuthContext";
-import { clearStorage, saveUser } from "@/lib/storage";
+import {
+  axiosInstance,
+  forgotPassword,
+  getUserByToken,
+  resetPassword,
+} from "@/lib/api";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -10,7 +13,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { sleep } from "../lib/util";
 
-export async function getServerSideProps({ query, req }) {
+export async function getServerSideProps({ req, res, query }) {
   // Redirect if user is authenticated
   const accessToken = req?.cookies?.accessToken;
   if (accessToken) {
@@ -23,48 +26,46 @@ export async function getServerSideProps({ query, req }) {
     };
   }
 
-  const props = query?.error
-    ? {
-        error: query?.error,
-      }
-    : {};
+  const token = query.token;
+  if (!token) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/login?error=404",
+      },
+      props: {},
+    };
+  }
 
-  return {
-    props,
-  };
+  try {
+    const response = await getUserByToken(token);
+    const user = response.data;
+    return { props: { token, user } };
+  } catch (err) {
+    console.error(
+      "Reset Password getServerSideProps error: ",
+      err.response?.data,
+    );
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/login?error=${err.response?.data?.statusCode}`,
+      },
+      props: {},
+    };
+  }
 }
 
-const Login = ({ error }) => {
+const ResetPassword = ({ token, user }) => {
   const router = useRouter();
   const methods = useForm();
   const {
     reset,
     handleSubmit,
     formState: { isSubmitSuccessful },
+    watch,
   } = methods;
-  const { setUser } = useAuth();
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Handle access token expired
-    if (error === "401") {
-      clearStorage();
-      setUser(null);
-      toast("Session expired, please login again.", {
-        type: "error",
-        position: "top-center",
-        toastId: "401",
-      });
-    }
-
-    if (error === "404") {
-      toast("Not Found!", {
-        type: "error",
-        position: "top-center",
-        toastId: "404",
-      });
-    }
-  }, [error]);
 
   useEffect(() => {
     if (isSubmitSuccessful) {
@@ -77,23 +78,23 @@ const Login = ({ error }) => {
     if (!data) {
       return;
     }
+
     try {
       setLoading(true);
       // TODO remove this
       await sleep(1000);
-      const res = await login(data.email, data.password);
+      const res = await resetPassword(data.password, token);
 
       if (res) {
-        toast(`Welcome ${res.data.user.name}!`, {
+        toast("Password successfully updated!", {
           type: "success",
           position: "top-center",
         });
-        setUser(res.data.user);
-        saveUser(res.data.user);
-        router.push("/");
+        router.push("/login");
       }
     } catch (err) {
-      toast("Login failed! Please check your email and password", {
+      console.error(err.message);
+      toast(`Password update failed: ${err.response?.data?.message}`, {
         type: "error",
         position: "top-center",
       });
@@ -102,11 +103,20 @@ const Login = ({ error }) => {
     }
   };
 
-  const emailConstraints = {
-    required: { value: true, message: "Email is required" },
-  };
   const passwordConstraints = {
     required: { value: true, message: "Password is required" },
+    minLength: {
+      value: 8,
+      message: "Password is min 8 characters",
+    },
+  };
+  const passwordConfirmConstraints = {
+    required: { value: true, message: "Confirm Password is required" },
+    validate: (value) => {
+      if (watch("password") !== value) {
+        return "Passwords do no match";
+      }
+    },
   };
   const btnClass = clsx("w-full btn", `${loading ? "loading" : ""}`);
 
@@ -119,35 +129,29 @@ const Login = ({ error }) => {
             className="mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg"
           >
             <h1 className="mb-4 text-center text-4xl font-[600]">
-              Login to MyApp
+              Reset password
             </h1>
             <FormInput
-              label="Email"
-              name="email"
-              type="email"
-              constraints={emailConstraints}
-            />
-            <FormInput
-              label="Password"
+              label="New Password"
               name="password"
               type="password"
               constraints={passwordConstraints}
             />
+            <FormInput
+              label="Confirm New Password"
+              name="passwordConfirm"
+              type="password"
+              constraints={passwordConfirmConstraints}
+            />
 
-            <div className="text-right">
-              <Link href="/forgot-password" className="text-secondary">
-                Forgot Password?
-              </Link>
-            </div>
             <div>
-              <button className={btnClass}>Login</button>
+              <button className={btnClass}>Submit</button>
             </div>
-            <span className="block">
-              Need an account?{" "}
-              <Link href="/register" className="text-secondary">
-                Sign Up Here
+            <div className="text-center">
+              <Link href="/" className="text-secondary">
+                Cancel
               </Link>
-            </span>
+            </div>
           </form>
         </FormProvider>
       </div>
@@ -155,4 +159,4 @@ const Login = ({ error }) => {
   );
 };
 
-export default Login;
+export default ResetPassword;

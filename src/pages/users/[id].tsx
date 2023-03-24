@@ -79,7 +79,6 @@ const EditUser = () => {
   }, [router.isReady, router.query.id]);
 
   const onSubmit = async (data) => {
-    console.log('data ', data);
     if (!data) {
       return;
     }

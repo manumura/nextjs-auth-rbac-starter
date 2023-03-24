@@ -1,7 +1,5 @@
 import FormInput from "@/components/FormInput";
-import { login } from "@/lib/api";
-import { useAuth } from "@/lib/AuthContext";
-import { clearStorage, saveUser } from "@/lib/storage";
+import { forgotPassword } from "@/lib/api";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -23,18 +21,12 @@ export async function getServerSideProps({ query, req }) {
     };
   }
 
-  const props = query?.error
-    ? {
-        error: query?.error,
-      }
-    : {};
-
   return {
-    props,
+    props: {},
   };
 }
 
-const Login = ({ error }) => {
+const ForgotPassword = () => {
   const router = useRouter();
   const methods = useForm();
   const {
@@ -42,29 +34,7 @@ const Login = ({ error }) => {
     handleSubmit,
     formState: { isSubmitSuccessful },
   } = methods;
-  const { setUser } = useAuth();
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Handle access token expired
-    if (error === "401") {
-      clearStorage();
-      setUser(null);
-      toast("Session expired, please login again.", {
-        type: "error",
-        position: "top-center",
-        toastId: "401",
-      });
-    }
-
-    if (error === "404") {
-      toast("Not Found!", {
-        type: "error",
-        position: "top-center",
-        toastId: "404",
-      });
-    }
-  }, [error]);
 
   useEffect(() => {
     if (isSubmitSuccessful) {
@@ -81,19 +51,17 @@ const Login = ({ error }) => {
       setLoading(true);
       // TODO remove this
       await sleep(1000);
-      const res = await login(data.email, data.password);
+      const res = await forgotPassword(data.email);
 
       if (res) {
-        toast(`Welcome ${res.data.user.name}!`, {
+        toast(`Success! Please check the email sent at ${data.email}`, {
           type: "success",
           position: "top-center",
         });
-        setUser(res.data.user);
-        saveUser(res.data.user);
         router.push("/");
       }
     } catch (err) {
-      toast("Login failed! Please check your email and password", {
+      toast("An error occured, please try again", {
         type: "error",
         position: "top-center",
       });
@@ -104,9 +72,6 @@ const Login = ({ error }) => {
 
   const emailConstraints = {
     required: { value: true, message: "Email is required" },
-  };
-  const passwordConstraints = {
-    required: { value: true, message: "Password is required" },
   };
   const btnClass = clsx("w-full btn", `${loading ? "loading" : ""}`);
 
@@ -119,7 +84,7 @@ const Login = ({ error }) => {
             className="mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg"
           >
             <h1 className="mb-4 text-center text-4xl font-[600]">
-              Login to MyApp
+              Forgot password?
             </h1>
             <FormInput
               label="Email"
@@ -127,27 +92,15 @@ const Login = ({ error }) => {
               type="email"
               constraints={emailConstraints}
             />
-            <FormInput
-              label="Password"
-              name="password"
-              type="password"
-              constraints={passwordConstraints}
-            />
 
-            <div className="text-right">
-              <Link href="/forgot-password" className="text-secondary">
-                Forgot Password?
-              </Link>
-            </div>
             <div>
-              <button className={btnClass}>Login</button>
+              <button className={btnClass}>Submit</button>
             </div>
-            <span className="block">
-              Need an account?{" "}
-              <Link href="/register" className="text-secondary">
-                Sign Up Here
+            <div className="text-center">
+              <Link href="/login" className="text-secondary">
+                Cancel
               </Link>
-            </span>
+            </div>
           </form>
         </FormProvider>
       </div>
@@ -155,4 +108,4 @@ const Login = ({ error }) => {
   );
 };
 
-export default Login;
+export default ForgotPassword;

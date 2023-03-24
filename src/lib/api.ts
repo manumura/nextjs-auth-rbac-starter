@@ -71,6 +71,18 @@ export const register = async (email, password, name) => {
   return axiosInstance.post("/v1/register", { email, password, name });
 };
 
+export const forgotPassword = async (email) => {
+  return axiosInstance.post("/v1/forgot-password", { email});
+};
+
+export const getUserByToken = async (token) => {
+  return axiosInstance.get(`/v1/token/${token}`);
+};
+
+export const resetPassword = async (password, token) => {
+  return axiosInstance.post("/v1/new-password", { password, token });
+};
+
 ////////////////////////////////////////////////////////////////
 // Authenticated-only APIs
 export const logout = async () => {
