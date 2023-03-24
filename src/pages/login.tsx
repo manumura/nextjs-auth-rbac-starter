@@ -10,19 +10,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { sleep } from "../lib/util";
 
-export async function getServerSideProps({ query, req }) {
-  // Redirect if user is authenticated
-  const accessToken = req?.cookies?.accessToken;
-  if (accessToken) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/",
-      },
-      props: {},
-    };
-  }
-
+export async function getServerSideProps({ query }) {
   const props = query?.error
     ? {
         error: query?.error,

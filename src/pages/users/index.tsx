@@ -152,7 +152,6 @@ const Users = ({ users, totalElements, page, pageSize }) => {
   const loadingSpinner = <LoadingSpinner />;
 
   return (
-    //TODO min-h
     <section className="h-[calc(100vh-72px)] bg-slate-200">
       {loading ? loadingSpinner : usersTable}
       <DeleteUserModal
