@@ -26,7 +26,14 @@ export default async function handler(req, res) {
     
     res.status(response.status).json(response.data);
   } catch (err) {
-    const data = err.response.data;
+    console.error("Logout handler error: ", err.response?.data);
+    // Set new cookies in case tokens are expired (set from axios interceptor)
+    const setCookieHeader = err.response?.headers["set-cookie"];
+    if (setCookieHeader) {
+      res.setHeader("Set-Cookie", setCookieHeader);
+    }
+
+    const data = err.response?.data;
     res.status(data.statusCode).json({ message: data.message });
   }
 }

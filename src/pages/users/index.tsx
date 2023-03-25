@@ -42,7 +42,7 @@ export async function getServerSideProps({ req, res, query }) {
     return {
       redirect: {
         permanent: false,
-        destination: `/login?error=${err.response?.data?.statusCode}`,
+        destination: `/error?code=${err.response?.data?.statusCode}`,
       },
       props: {},
     };

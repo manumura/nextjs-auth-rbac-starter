@@ -63,6 +63,10 @@ export const welcome = async () => {
   return axiosInstance.get("/index");
 };
 
+export const info = async () => {
+  return axiosInstance.get("/info");
+};
+
 export const login = async (email, password) => {
   return axiosInstance.post("/v1/login", { email, password });
 };

@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken");
   // Redirect if user is not authenticated
   if (isProtectedRoute(request) && !accessToken) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/login?error=401", request.url));
   }
 
   // Redirect if user is authenticated

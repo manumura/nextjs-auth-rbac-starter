@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     return {
       redirect: {
         permanent: false,
-        destination: `/login?error=${err.response?.data?.statusCode}`,
+        destination: `/error?code=${err.response?.data?.statusCode}`,
       },
       props: {},
     };

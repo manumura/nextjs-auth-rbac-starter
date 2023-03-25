@@ -35,6 +35,11 @@ const Navbar = () => {
       setUser(null);
       router.push("/");
     } else {
+      if (res.status === 401) {
+        clearStorage();
+        setUser(null);
+      }
+
       toast("Logout failed!", {
         type: "error",
         position: "top-center",
