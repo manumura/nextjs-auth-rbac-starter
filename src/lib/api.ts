@@ -76,7 +76,7 @@ export const register = async (email, password, name) => {
 };
 
 export const forgotPassword = async (email) => {
-  return axiosInstance.post("/v1/forgot-password", { email});
+  return axiosInstance.post("/v1/forgot-password", { email });
 };
 
 export const getUserByToken = async (token) => {
@@ -93,8 +93,8 @@ export const logout = async () => {
   return axiosInstance.post("/v1/logout");
 };
 
-export const getProfile = async () => {
-  return axiosInstance.get("/v1/profile");
+export const getProfile = async (signal?) => {
+  return axiosInstance.get("/v1/profile", { signal });
 };
 
 export const updateProfile = async (name, password?) => {

@@ -1,7 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import appConfig from "./config/config";
-import { getProfile } from "./lib/api";
 
 export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken");
@@ -14,7 +13,7 @@ export async function middleware(request: NextRequest) {
 
     const user = await getUser(request);
     if (!user || !isAdmin(user)) {
-      console.error(`User is not an admin: ${user.email}`);
+      console.error(`User not found or not an admin: ${user?.email}`);
       return NextResponse.redirect(new URL("/", request.url));
     }
 
@@ -52,6 +51,7 @@ async function getUser(request: NextRequest) {
     const user = await res.json();
     return user;
   }
+  // TODO refresh token
 
   return null;
 }

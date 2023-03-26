@@ -2,10 +2,11 @@
 
 import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
-import { clearStorage } from "@/lib/storage";
+import { clearStorage, getSavedUser } from "@/lib/storage";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 import { toast } from "react-toastify";
 import logo from "../../public/next.svg";
@@ -13,11 +14,16 @@ import logo from "../../public/next.svg";
 const Navbar = () => {
   const router = useRouter();
   const { user, setUser } = useAuth();
+  // https://reacthustle.com/blog/how-to-create-a-responsive-navbar-in-react-with-tailwindcss-daisyui
+  // toggle our drawer using useSessionStorage global state
+  const { open, setOpen } = useDrawerOpen();
+  const toggleDrawer = () => setOpen(!open);
 
   const handleLogin = () => {
     router.push("/login");
   };
 
+  // TODO loading
   const handleLogout = async () => {
     const res = await fetch("/api/logout", {
       method: "POST",
@@ -46,11 +52,6 @@ const Navbar = () => {
       });
     }
   };
-
-  // https://reacthustle.com/blog/how-to-create-a-responsive-navbar-in-react-with-tailwindcss-daisyui
-  // toggle our drawer using useSessionStorage global state
-  const { open, setOpen } = useDrawerOpen();
-  const toggleDrawer = () => setOpen(!open);
 
   return (
     <div className="navbar">

@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { FiDelete, FiEdit, FiPlusCircle } from "react-icons/fi";
 import DeleteUserModal from "../../components/DeleteUserModal";
-import LoadingSpinner from "../../components/LoadingSpinner";
 import appConfig from "../../config/config";
 
 export async function getServerSideProps({ req, res, query }) {
@@ -150,11 +149,9 @@ const Users = ({ users, totalElements, page, pageSize }) => {
     </div>
   );
 
-  const loadingSpinner = <LoadingSpinner />;
-
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200">
-      {loading ? loadingSpinner : usersTable}
+      {usersTable}
       <DeleteUserModal
         user={selectedUser}
         isOpen={isDeleteModalOpen}

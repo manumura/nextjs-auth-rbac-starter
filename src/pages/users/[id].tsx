@@ -6,7 +6,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormInput from "../../components/FormInput";
 import FormSelect from "../../components/FormSelect";
-import LoadingSpinner from "../../components/LoadingSpinner";
+import LoadingOverlay from "../../components/LoadingOverlay";
 import { getUser, updateUser } from "../../lib/api";
 import { sleep } from "../../lib/util";
 
@@ -111,7 +111,7 @@ const EditUser = () => {
     router.back();
   };
 
-  const loadingSpinner = <LoadingSpinner />;
+  const loadingOverlay = <LoadingOverlay />;
 
   const nameConstraints = {
     required: { value: true, message: "Full Name is required" },
@@ -205,7 +205,8 @@ const EditUser = () => {
 
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200">
-      {loading || !user ? loadingSpinner : editUserForm}
+      {editUserForm}
+      {(loading || !user) && <LoadingOverlay />}
     </section>
   );
 };
