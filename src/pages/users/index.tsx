@@ -9,7 +9,6 @@ import appConfig from "../../config/config";
 export async function getServerSideProps({ req, res, query }) {
   try {
     // TODO docker
-    // TODO handle 403
     // TODO filter by role
     const page = query.page || 1;
     const pageSize = appConfig.defaultRowsPerPage;

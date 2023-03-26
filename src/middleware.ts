@@ -7,13 +7,13 @@ export async function middleware(request: NextRequest) {
 
   if (isAdminRoute(request)) {
     if (!accessToken) {
-      console.error("No access token found");
+      console.error(`No access token found (navigating ${request.nextUrl.pathname})`);
       return NextResponse.redirect(new URL("/", request.url));
     }
 
     const user = await getUser(request);
     if (!user || !isAdmin(user)) {
-      console.error(`User not found or not an admin: ${user?.email}`);
+      console.error(`User not found or not an admin: ${user?.email} (navigating ${request.nextUrl.pathname})`);
       return NextResponse.redirect(new URL("/", request.url));
     }
 
@@ -22,13 +22,13 @@ export async function middleware(request: NextRequest) {
 
   // Redirect if user is not authenticated
   if (isProtectedRoute(request) && !accessToken) {
-    console.error("No access token found");
+    console.error(`No access token found (navigating ${request.nextUrl.pathname})`);
     return NextResponse.redirect(new URL("/login?error=401", request.url));
   }
 
   // Redirect if user is authenticated
   if (isPublicRoute(request) && accessToken) {
-    console.error("Already logged in");
+    console.error(`Already logged in (navigating ${request.nextUrl.pathname})`);
     return NextResponse.redirect(new URL("/", request.url));
   }
 

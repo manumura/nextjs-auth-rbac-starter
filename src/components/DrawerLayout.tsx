@@ -1,12 +1,9 @@
 //components/DrawerLayout.tsx
-import { logout } from "@/lib/api";
 import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
-import { clearStorage, getSavedUser } from "@/lib/storage";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
-import { toast } from "react-toastify";
+import LogoutButton from "./LogoutButton";
 import Navbar from "./Navbar";
 
 const DrawerLayout = ({ children }) => {
@@ -16,30 +13,8 @@ const DrawerLayout = ({ children }) => {
   const { open, setOpen } = useDrawerOpen();
   const toggleDrawer = () => setOpen(!open);
 
-  useEffect(() => {
-    const savedUser = getSavedUser();
-    setUser(savedUser);
-  }, []);
-
   const handleLogin = () => {
     router.push("/login");
-  };
-
-  const handleLogout = async () => {
-    try {
-      const res = await logout();
-      const user = res?.data;
-      toast(`Logout successfull ${user?.name}!`, {
-        type: "success",
-        position: "top-center",
-      });
-
-      clearStorage();
-      setUser(null);
-      router.push("/");
-    } catch (err) {
-      console.error("Logout error: ", err.message);
-    }
   };
 
   return (
@@ -91,9 +66,7 @@ const DrawerLayout = ({ children }) => {
                 </Link>
               </li>
               <li>
-                <button className="btn-outline btn" onClick={handleLogout}>
-                  Logout
-                </button>
+                <LogoutButton />
               </li>
             </>
           )}

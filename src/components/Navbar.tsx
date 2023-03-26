@@ -2,14 +2,11 @@
 
 import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
-import { clearStorage, getSavedUser } from "@/lib/storage";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
-
-import { toast } from "react-toastify";
 import logo from "../../public/next.svg";
+import LogoutButton from "./LogoutButton";
 
 const Navbar = () => {
   const router = useRouter();
@@ -21,36 +18,6 @@ const Navbar = () => {
 
   const handleLogin = () => {
     router.push("/login");
-  };
-
-  // TODO loading
-  const handleLogout = async () => {
-    const res = await fetch("/api/logout", {
-      method: "POST",
-      // body: JSON.stringify(data),
-    });
-
-    if (res.ok) {
-      const user = await res.json();
-      toast(`Logout successfull ${user.name}!`, {
-        type: "success",
-        position: "top-center",
-      });
-
-      clearStorage();
-      setUser(null);
-      router.push("/");
-    } else {
-      if (res.status === 401) {
-        clearStorage();
-        setUser(null);
-      }
-
-      toast("Logout failed!", {
-        type: "error",
-        position: "top-center",
-      });
-    }
   };
 
   return (
@@ -121,9 +88,7 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <button className="btn-outline btn" onClick={handleLogout}>
-                  Logout
-                </button>
+                <LogoutButton />
               </li>
             </>
           )}
