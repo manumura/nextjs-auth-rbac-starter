@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import logo from "../../public/next.svg";
+import { isAdmin } from "../lib/util";
 import LogoutButton from "./LogoutButton";
 
 const Navbar = () => {
@@ -72,16 +73,13 @@ const Navbar = () => {
           )}
           {user && (
             <>
-              <li>
-                <Link href="/users" className="text-neutral">
-                  Users
-                </Link>
-              </li>
-              <li>
-                <Link href="/create-user" className="text-neutral">
-                  Create user
-                </Link>
-              </li>
+              {isAdmin(user) && (
+                <li>
+                  <Link href="/users" className="text-neutral">
+                    Users
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link href="/profile" className="text-neutral">
                   Profile

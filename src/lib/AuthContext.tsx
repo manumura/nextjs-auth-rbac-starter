@@ -2,7 +2,13 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { getSavedUser } from "./storage";
 
 interface AuthContextType {
-  user: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+    isActive: boolean;
+  } | null;
   setUser: (user: string) => void;
 }
 

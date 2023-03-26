@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import { DrawerOpenProvider } from "@/lib/DrawerOpenContext";
 import "@/styles/globals.css";
 import axios from "axios";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import LoadingOverlay from "../components/LoadingOverlay";
@@ -14,10 +15,10 @@ import { sleep } from "../lib/util";
 import "react-toastify/dist/ReactToastify.min.css";
 
 export default function App({ Component, pageProps }) {
+  const router = useRouter();
   const { setUser } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  // TODO loading route change
   useEffect(() => {
     const abortController = new AbortController();
     doGetUser(abortController.signal);
@@ -29,6 +30,22 @@ export default function App({ Component, pageProps }) {
     */
     return () => abortController.abort();
   }, []);
+
+  useEffect(() => {
+    // https://www.jamesperkins.dev/post/page-to-page-loading-in-next/
+    const handleStart = (url, { shallow }) => setLoading(true);
+    const handleComplete = (url, { shallow }) => setLoading(false);
+
+    router.events.on("routeChangeStart", handleStart);
+    router.events.on("routeChangeComplete", handleComplete);
+    router.events.on("routeChangeError", handleComplete);
+
+    return () => {
+      router.events.off("routeChangeStart", handleStart);
+      router.events.off("routeChangeComplete", handleComplete);
+      router.events.off("routeChangeError", handleComplete);
+    };
+  });
 
   const doGetUser = async (signal) => {
     try {

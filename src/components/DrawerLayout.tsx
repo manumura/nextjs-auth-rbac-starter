@@ -3,6 +3,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { isAdmin } from "../lib/util";
 import LogoutButton from "./LogoutButton";
 import Navbar from "./Navbar";
 
@@ -55,11 +56,13 @@ const DrawerLayout = ({ children }) => {
           )}
           {user && (
             <>
-              <li>
-                <Link href="/users" className="text-neutral">
-                  Users
-                </Link>
-              </li>
+              {isAdmin(user) && (
+                <li>
+                  <Link href="/users" className="text-neutral">
+                    Users
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link href="/profile" className="text-neutral">
                   Profile

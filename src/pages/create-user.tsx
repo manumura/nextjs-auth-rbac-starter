@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 import FormSelect from "../components/FormSelect";
 import { sleep } from "../lib/util";
 
-// TODO protect route
 const CreateUser = () => {
   const router = useRouter();
   const methods = useForm();
