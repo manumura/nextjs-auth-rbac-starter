@@ -110,6 +110,11 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/create-user" className="text-neutral">
+                  Create user
+                </Link>
+              </li>
+              <li>
                 <Link href="/profile" className="text-neutral">
                   Profile
                 </Link>
