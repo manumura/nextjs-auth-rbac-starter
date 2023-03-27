@@ -44,7 +44,7 @@ const ForgotPassword = () => {
   }, [isSubmitSuccessful]);
 
   const onSubmit = async (data) => {
-    if (!data) {
+    if (!data || loading) {
       return;
     }
     try {
@@ -73,7 +73,7 @@ const ForgotPassword = () => {
   const emailConstraints = {
     required: { value: true, message: "Email is required" },
   };
-  const btnClass = clsx("w-full btn", `${loading ? "loading" : ""}`);
+  const btnClass = clsx("w-full btn", `${loading ? "loading btn-disabled" : ""}`);
 
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200 py-20">

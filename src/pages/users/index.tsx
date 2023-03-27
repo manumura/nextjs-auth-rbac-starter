@@ -57,7 +57,6 @@ export async function getServerSideProps(ctx: NextPageContext) {
 
 const Users = ({ users, totalElements, page, pageSize }) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -161,7 +160,7 @@ const Users = ({ users, totalElements, page, pageSize }) => {
       <DeleteUserModal
         user={selectedUser}
         isOpen={isDeleteModalOpen}
-        onClose={() => onDeleteModalClose(false)}
+        onClose={onDeleteModalClose}
       />
     </section>
   );

@@ -13,6 +13,10 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
   };
 
   const onDelete = async () => {
+    if (loading) {
+      return;
+    }
+
     try {
       setLoading(true);
       // TODO remove this
@@ -36,7 +40,7 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
     }
   };
 
-  const btnClass = clsx("btn-accent btn mx-1", `${loading ? "loading" : ""}`);
+  const btnClass = clsx("btn-accent btn mx-1", `${loading ? "loading btn-disabled" : ""}`);
 
   const title = (
     <div>
@@ -71,7 +75,7 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
       body={body}
       footer={footer}
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={() => onClose(false)}
     />
   );
 };

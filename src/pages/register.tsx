@@ -20,7 +20,7 @@ const Register = () => {
   } = methods;
 
   const onSubmit = async (data) => {
-    if (!data) {
+    if (!data || loading) {
       return;
     }
 
@@ -73,7 +73,7 @@ const Register = () => {
       }
     },
   };
-  const btnClass = clsx("w-full btn", `${loading ? "loading" : ""}`);
+  const btnClass = clsx("w-full btn", `${loading ? "loading btn-disabled" : ""}`);
 
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200 py-20">

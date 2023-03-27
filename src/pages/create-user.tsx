@@ -16,7 +16,7 @@ const CreateUser = () => {
   const { handleSubmit } = methods;
 
   const onSubmit = async (data) => {
-    if (!data) {
+    if (!data || loading) {
       return;
     }
 
@@ -64,7 +64,7 @@ const CreateUser = () => {
     { label: "User", value: "USER" },
   ];
 
-  const btnClass = clsx("btn-primary btn mx-1", `${loading ? "loading" : ""}`);
+  const btnClass = clsx("btn-primary btn mx-1", `${loading ? "loading btn-disabled" : ""}`);
 
   const onCancel = () => {
     router.back();

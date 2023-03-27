@@ -69,6 +69,10 @@ const EditProfile = ({ user }) => {
   } = methods;
 
   const onSubmit = async (data) => {
+    if (!data || loading) {
+      return;
+    }
+    
     if (!data.name && !data.password) {
       setError("name", { message: "Please edit at least 1 field" });
       setError("password", { message: "Please edit at least 1 field" });
@@ -121,7 +125,7 @@ const EditProfile = ({ user }) => {
       }
     },
   };
-  const btnClass = clsx("btn-primary btn", `${loading ? "loading" : ""}`);
+  const btnClass = clsx("btn-primary btn", `${loading ? "loading btn-disabled" : ""}`);
 
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200">

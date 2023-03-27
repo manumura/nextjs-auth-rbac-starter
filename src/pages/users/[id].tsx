@@ -79,7 +79,7 @@ const EditUser = () => {
   }, [router.isReady, router.query.id]);
 
   const onSubmit = async (data) => {
-    if (!data) {
+    if (!data || submitting) {
       return;
     }
 
@@ -110,8 +110,6 @@ const EditUser = () => {
   const onCancel = () => {
     router.back();
   };
-
-  const loadingOverlay = <LoadingOverlay />;
 
   const nameConstraints = {
     required: { value: true, message: "Full Name is required" },
@@ -148,7 +146,7 @@ const EditUser = () => {
     { label: "User", value: "USER" },
   ];
 
-  const btnClass = clsx("btn-primary btn mx-1", `${submitting ? "loading" : ""}`);
+  const btnClass = clsx("btn-primary btn mx-1", `${submitting ? "loading btn-disabled" : ""}`);
 
   const editUserForm = (
     <div className="w-full py-10">
