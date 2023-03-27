@@ -4,6 +4,15 @@ import appConfig from "../config/config";
 const BASE_URL = appConfig.baseUrl;
 const REFRESH_TOKEN_ENDPOINT = "/v1/refresh-token";
 
+// No interceptor for refresh token
+const axiosPublicInstance = axios.create({
+  baseURL: `${BASE_URL}/api`,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true, // for cookies
+});
+
 export const axiosInstance = axios.create({
   baseURL: `${BASE_URL}/api`,
   headers: {
@@ -27,9 +36,8 @@ axiosInstance.interceptors.response.use(
     }
 
     try {
-      const url = `${REFRESH_TOKEN_ENDPOINT}`;
       const response = await axios.post(
-        url,
+        REFRESH_TOKEN_ENDPOINT,
         {},
         {
           baseURL: `${BASE_URL}/api`,
@@ -60,31 +68,31 @@ axiosInstance.interceptors.response.use(
 );
 
 export const welcome = async () => {
-  return axiosInstance.get("/index");
+  return axiosPublicInstance.get("/index");
 };
 
 export const info = async () => {
-  return axiosInstance.get("/v1/info");
+  return axiosPublicInstance.get("/v1/info");
 };
 
 export const login = async (email, password) => {
-  return axiosInstance.post("/v1/login", { email, password });
+  return axiosPublicInstance.post("/v1/login", { email, password });
 };
 
 export const register = async (email, password, name) => {
-  return axiosInstance.post("/v1/register", { email, password, name });
+  return axiosPublicInstance.post("/v1/register", { email, password, name });
 };
 
 export const forgotPassword = async (email) => {
-  return axiosInstance.post("/v1/forgot-password", { email });
+  return axiosPublicInstance.post("/v1/forgot-password", { email });
 };
 
 export const getUserByToken = async (token) => {
-  return axiosInstance.get(`/v1/token/${token}`);
+  return axiosPublicInstance.get(`/v1/token/${token}`);
 };
 
 export const resetPassword = async (password, token) => {
-  return axiosInstance.post("/v1/new-password", { password, token });
+  return axiosPublicInstance.post("/v1/new-password", { password, token });
 };
 
 ////////////////////////////////////////////////////////////////

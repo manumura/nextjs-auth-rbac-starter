@@ -13,7 +13,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { sleep } from "../lib/util";
 
-export async function getServerSideProps({ req, res, query }) {
+export async function getServerSideProps({ req, query }) {
   // Redirect if user is authenticated
   const accessToken = req?.cookies?.accessToken;
   if (accessToken) {
@@ -31,7 +31,7 @@ export async function getServerSideProps({ req, res, query }) {
     return {
       redirect: {
         permanent: false,
-        destination: "/login?error=404",
+        destination: "/error?code=404",
       },
       props: {},
     };

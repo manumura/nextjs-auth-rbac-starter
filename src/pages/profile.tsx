@@ -1,12 +1,14 @@
 import { axiosInstance } from "@/lib/api";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
+import { getAuthCookies } from "../lib/cookies";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   try {
+    const authCookies = getAuthCookies(req, res);
     const response = await axiosInstance.get("/v1/profile", {
       headers: {
-        Cookie: req.headers.cookie,
+        Cookie: authCookies,
       },
     });
 

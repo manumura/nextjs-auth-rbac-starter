@@ -1,23 +1,30 @@
 import { Pagination } from "@/components/Pagination";
 import { axiosInstance } from "@/lib/api";
+import { NextPageContext } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FiDelete, FiEdit, FiPlusCircle } from "react-icons/fi";
 import DeleteUserModal from "../../components/DeleteUserModal";
 import appConfig from "../../config/config";
+import { getAuthCookies } from "../../lib/cookies";
 
-export async function getServerSideProps({ req, res, query }) {
+export async function getServerSideProps(ctx: NextPageContext) {
+  const { req, res, query } = ctx;
+
   try {
     // TODO docker
-    // TODO filter by role
+    // TODO disable submit button when loading
+    // TODO zustand
     const page = query.page || 1;
     const pageSize = appConfig.defaultRowsPerPage;
+    // TODO filter by role
     const role = undefined;
 
+    const authCookies = getAuthCookies(req, res);
     const response = await axiosInstance.get("/v1/users", {
       params: { role, page, pageSize },
       headers: {
-        Cookie: req.headers.cookie,
+        Cookie: authCookies,
       },
     });
 

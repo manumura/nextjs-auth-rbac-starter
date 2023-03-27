@@ -12,6 +12,10 @@ const LogoutButton = () => {
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
+    if (loading) {
+      return;
+    }
+    
     setLoading(true);
     // TODO remove this
     await sleep(1000);
@@ -46,7 +50,7 @@ const LogoutButton = () => {
     setLoading(false);
   };
 
-  const btnClass = clsx("btn-outline btn", `${loading ? "loading" : ""}`);
+  const btnClass = clsx("btn-outline btn", `${loading ? "loading btn-disabled" : ""}`);
 
   return (
     <button className={btnClass} onClick={handleLogout}>

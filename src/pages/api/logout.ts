@@ -1,11 +1,14 @@
 import axios from "axios";
+import { NextApiRequest, NextApiResponse } from "next";
 import appConfig from "../../config/config";
+import { getAuthCookies } from "../../lib/cookies";
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const BASE_URL = appConfig.baseUrl;
   // const { email, password } = JSON.parse(req.body);
 
   try {
+    const authCookies = getAuthCookies(req, res);
     const response = await axios.post(
       "/v1/logout",
       {},
@@ -14,7 +17,7 @@ export default async function handler(req, res) {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Credentials": true,
-          Cookie: req.headers.cookie,
+          Cookie: authCookies,
         },
       },
     );

@@ -5,13 +5,15 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormInput from "../components/FormInput";
+import { getAuthCookies } from "../lib/cookies";
 import { sleep } from "../lib/util";
 
 export async function getServerSideProps({ req, res }) {
   try {
+    const authCookies = getAuthCookies(req, res);
     const response = await axiosInstance.get("/v1/profile", {
       headers: {
-        Cookie: req.headers.cookie,
+        Cookie: authCookies,
       },
     });
 

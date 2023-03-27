@@ -54,7 +54,7 @@ const EditUser = () => {
         }
 
         if (error.response?.data?.statusCode === 401) {
-          router.push(`/login?error=${error?.response?.data?.statusCode}`);
+          router.push(`/error?code=${error?.response?.data?.statusCode}`);
         }
       }
     } finally {
