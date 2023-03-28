@@ -1,5 +1,4 @@
 import DrawerLayout from "@/components/DrawerLayout";
-import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import { DrawerOpenProvider } from "@/lib/DrawerOpenContext";
 import "@/styles/globals.css";
 import axios from "axios";
@@ -13,10 +12,11 @@ import { sleep } from "../lib/util";
 
 // To avoid tailwind to purge toastify styles
 import "react-toastify/dist/ReactToastify.min.css";
+import useUserStore from "../lib/user-store";
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
-  const { setUser } = useAuth();
+  const userStore = useUserStore();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -55,14 +55,14 @@ export default function App({ Component, pageProps }) {
       const res = await getProfile(signal);
       if (res?.data) {
         const user = res.data;
-        setUser(user);
+        userStore.setUser(user);
         saveUser(user);
       }
     } catch (error) {
       if (!axios.isCancel(error)) {
         console.error(error.message);
         /* Logic for non-aborted error handling goes here. */
-        setUser(null);
+        userStore.setUser(null);
         clearStorage();
       }
     } finally {
@@ -71,14 +71,12 @@ export default function App({ Component, pageProps }) {
   };
 
   return (
-    <AuthProvider>
-      <DrawerOpenProvider>
-        <DrawerLayout>
-          <Component {...pageProps} />
-        </DrawerLayout>
-        {loading && <LoadingOverlay />}
-        <ToastContainer />
-      </DrawerOpenProvider>
-    </AuthProvider>
+    <DrawerOpenProvider>
+      <DrawerLayout>
+        <Component {...pageProps} />
+      </DrawerLayout>
+      {loading && <LoadingOverlay />}
+      <ToastContainer />
+    </DrawerOpenProvider>
   );
 }

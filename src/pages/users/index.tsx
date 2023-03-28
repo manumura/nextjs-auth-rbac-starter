@@ -13,8 +13,6 @@ export async function getServerSideProps(ctx: NextPageContext) {
 
   try {
     // TODO docker
-    // TODO disable submit button when loading
-    // TODO zustand
     const page = query.page || 1;
     const pageSize = appConfig.defaultRowsPerPage;
     // TODO filter by role

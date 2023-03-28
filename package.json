@@ -21,7 +21,8 @@
     "react-toastify": "^9.1.2",
     "react-use": "^17.4.0",
     "set-cookie-parser": "^2.6.0",
-    "tailwind-merge": "^1.10.0"
+    "tailwind-merge": "^1.10.0",
+    "zustand": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",

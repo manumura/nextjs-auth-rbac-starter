@@ -1,6 +1,5 @@
 import FormInput from "@/components/FormInput";
 import { login } from "@/lib/api";
-import { useAuth } from "@/lib/AuthContext";
 import { clearStorage, saveUser } from "@/lib/storage";
 import clsx from "clsx";
 import Link from "next/link";
@@ -8,6 +7,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import useUserStore from "../lib/user-store";
 import { sleep } from "../lib/util";
 
 export async function getServerSideProps({ query }) {
@@ -30,14 +30,14 @@ const Login = ({ error }) => {
     handleSubmit,
     formState: { isSubmitSuccessful },
   } = methods;
-  const { setUser } = useAuth();
+  const userStore = useUserStore();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Handle access token expired
     if (error === "401") {
       clearStorage();
-      setUser(null);
+      userStore.setUser(null);
       toast("Session expired, please login again.", {
         type: "error",
         position: "top-center",
@@ -76,7 +76,7 @@ const Login = ({ error }) => {
           type: "success",
           position: "top-center",
         });
-        setUser(res.data.user);
+        userStore.setUser(res.data.user);
         saveUser(res.data.user);
         router.push("/");
       }

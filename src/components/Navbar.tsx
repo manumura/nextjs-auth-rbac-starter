@@ -1,17 +1,18 @@
 //components/Navbar.tsx
 
-import { useAuth } from "@/lib/AuthContext";
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import logo from "../../public/next.svg";
+import useUserStore from "../lib/user-store";
 import { isAdmin } from "../lib/util";
 import LogoutButton from "./LogoutButton";
 
 const Navbar = () => {
   const router = useRouter();
-  const { user, setUser } = useAuth();
+  const userStore = useUserStore();
+  const user = userStore.user;
   // https://reacthustle.com/blog/how-to-create-a-responsive-navbar-in-react-with-tailwindcss-daisyui
   // toggle our drawer using useSessionStorage global state
   const { open, setOpen } = useDrawerOpen();

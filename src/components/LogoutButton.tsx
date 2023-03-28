@@ -2,13 +2,13 @@ import clsx from "clsx";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { useAuth } from "../lib/AuthContext";
 import { clearStorage } from "../lib/storage";
+import useUserStore from "../lib/user-store";
 import { sleep } from "../lib/util";
 
 const LogoutButton = () => {
   const router = useRouter();
-  const { user, setUser } = useAuth();
+  const userStore = useUserStore();
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -33,12 +33,12 @@ const LogoutButton = () => {
       });
 
       clearStorage();
-      setUser(null);
+      userStore.setUser(null);
       router.push("/");
     } else {
       if (res.status === 401) {
         clearStorage();
-        setUser(null);
+        userStore.setUser(null);
       }
 
       toast("Logout failed!", {
