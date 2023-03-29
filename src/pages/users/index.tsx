@@ -12,7 +12,6 @@ export async function getServerSideProps(ctx: NextPageContext) {
   const { req, res, query } = ctx;
 
   try {
-    // TODO docker
     const page = query.page || 1;
     const pageSize = appConfig.defaultRowsPerPage;
     // TODO filter by role
