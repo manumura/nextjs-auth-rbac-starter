@@ -1,7 +1,7 @@
 import { axiosInstance } from "@/lib/api";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import { getAuthCookies } from "../lib/cookies";
+import { getAuthCookies, setAuthCookies } from "../lib/cookies";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   try {
@@ -13,20 +13,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     });
 
     // Set new cookies in case tokens are expired (set from axios interceptor)
-    const setCookieHeader = response.config?.headers["set-cookie"];
-    if (setCookieHeader) {
-      res.setHeader("Set-Cookie", setCookieHeader);
-    }
+    setAuthCookies(response.config?.headers, res);
 
     const data = response.data;
     return { props: { user: data } };
   } catch (err) {
     console.error("Profile getServerSideProps error: ", err.response?.data);
     // Set new cookies in case tokens are expired (set from axios interceptor)
-    const setCookieHeader = err.response?.headers["set-cookie"];
-    if (setCookieHeader) {
-      res.setHeader("Set-Cookie", setCookieHeader);
-    }
+    setAuthCookies(err.response?.headers, res);
 
     return {
       redirect: {

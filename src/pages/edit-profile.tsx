@@ -5,7 +5,7 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormInput from "../components/FormInput";
-import { getAuthCookies } from "../lib/cookies";
+import { getAuthCookies, setAuthCookies } from "../lib/cookies";
 import { sleep } from "../lib/util";
 
 export async function getServerSideProps({ req, res }) {
@@ -18,10 +18,7 @@ export async function getServerSideProps({ req, res }) {
     });
 
     // Set new cookies in case tokens are expired (set from axios interceptor)
-    const setCookieHeader = response.config?.headers["set-cookie"];
-    if (setCookieHeader) {
-      res.setHeader("Set-Cookie", setCookieHeader);
-    }
+    setAuthCookies(response.config?.headers, res);
 
     const data = response.data;
     return { props: { user: data } };
@@ -31,10 +28,7 @@ export async function getServerSideProps({ req, res }) {
       err.response?.data,
     );
     // Set new cookies in case tokens are expired (set from axios interceptor)
-    const setCookieHeader = err.response?.headers["set-cookie"];
-    if (setCookieHeader) {
-      res.setHeader("Set-Cookie", setCookieHeader);
-    }
+    setAuthCookies(err.response?.headers, res);
 
     return {
       redirect: {

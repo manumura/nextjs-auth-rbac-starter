@@ -6,7 +6,7 @@ import { useState } from "react";
 import { FiDelete, FiEdit, FiPlusCircle } from "react-icons/fi";
 import DeleteUserModal from "../../components/DeleteUserModal";
 import appConfig from "../../config/config";
-import { getAuthCookies } from "../../lib/cookies";
+import { getAuthCookies, setAuthCookies } from "../../lib/cookies";
 
 export async function getServerSideProps(ctx: NextPageContext) {
   const { req, res, query } = ctx;
@@ -26,10 +26,7 @@ export async function getServerSideProps(ctx: NextPageContext) {
     });
 
     // Set new cookies in case tokens are expired (set from axios interceptor)
-    const setCookieHeader = response.config?.headers["set-cookie"];
-    if (setCookieHeader) {
-      res.setHeader("Set-Cookie", setCookieHeader);
-    }
+    setAuthCookies(response.config?.headers, res);
 
     const users = response.data.elements;
     const totalElements = response.data.totalElements;
@@ -37,10 +34,7 @@ export async function getServerSideProps(ctx: NextPageContext) {
   } catch (err) {
     console.error("Get Users getServerSideProps error: ", err.response?.data);
     // Set new cookies in case tokens are expired (set from axios interceptor)
-    const setCookieHeader = err.response?.headers["set-cookie"];
-    if (setCookieHeader) {
-      res.setHeader("Set-Cookie", setCookieHeader);
-    }
+    setAuthCookies(err.response?.headers, res);
 
     return {
       redirect: {

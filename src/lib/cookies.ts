@@ -22,3 +22,10 @@ export const getAuthCookies = (
   // Default to the cookies from the request
   return cookieString ? cookieString : req.headers.cookie;
 };
+
+export const setAuthCookies = (headers: any, res: ServerResponse<IncomingMessage>,) => {
+  const setCookieHeader = headers["set-cookie"];
+  if (setCookieHeader) {
+    res.setHeader("Set-Cookie", setCookieHeader);
+  }
+};
