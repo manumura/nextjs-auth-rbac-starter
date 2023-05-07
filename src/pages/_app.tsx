@@ -20,18 +20,6 @@ export default function App({ Component, pageProps }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const abortController = new AbortController();
-    doGetUser(abortController.signal);
-
-    /* 
-      Abort the request as it isn't needed anymore, the component being 
-      unmounted. It helps avoid, among other things, the well-known "can't
-      perform a React state update on an unmounted component" warning.
-    */
-    return () => abortController.abort();
-  }, []);
-
-  useEffect(() => {
     // https://www.jamesperkins.dev/post/page-to-page-loading-in-next/
     const handleStart = (url, { shallow }) => setLoading(true);
     const handleComplete = (url, { shallow }) => setLoading(false);
@@ -47,8 +35,21 @@ export default function App({ Component, pageProps }) {
     };
   });
 
+  useEffect(() => {
+    const abortController = new AbortController();
+    doGetUser(abortController.signal);
+
+    /* 
+      Abort the request as it isn't needed anymore, the component being 
+      unmounted. It helps avoid, among other things, the well-known "can't
+      perform a React state update on an unmounted component" warning.
+    */
+    return () => abortController.abort();
+  }, []);
+
   const doGetUser = async (signal) => {
     try {
+      console.log("Get user profile in App component");
       setLoading(true);
       // TODO remove this
       await sleep(1000);
