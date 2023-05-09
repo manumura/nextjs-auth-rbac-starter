@@ -1,38 +1,8 @@
-import { axiosInstance } from "@/lib/api";
-import { GetServerSideProps } from "next";
-import { useRouter } from "next/router";
-import { getAuthCookies, setAuthCookies } from "../lib/cookies";
+"use client";
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  try {
-    const authCookies = getAuthCookies(req, res);
-    const response = await axiosInstance.get("/v1/profile", {
-      headers: {
-        Cookie: authCookies,
-      },
-    });
+import { useRouter } from "next/navigation";
 
-    // Set new cookies in case tokens are expired (set from axios interceptor)
-    setAuthCookies(response.config?.headers, res);
-
-    const data = response.data;
-    return { props: { user: data } };
-  } catch (err) {
-    console.error("Profile getServerSideProps error: ", err.response?.data);
-    // Set new cookies in case tokens are expired (set from axios interceptor)
-    setAuthCookies(err.response?.headers, res);
-
-    return {
-      redirect: {
-        permanent: false,
-        destination: `/error?code=${err.response?.data?.statusCode}`,
-      },
-      props: {},
-    };
-  }
-};
-
-const Profile = ({ user }) => {
+export default function ProfilePage({ user }) {
   const router = useRouter();
 
   const handleEdit = () => {
@@ -73,6 +43,4 @@ const Profile = ({ user }) => {
       </div>
     </section>
   );
-};
-
-export default Profile;
+}

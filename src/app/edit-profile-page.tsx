@@ -1,46 +1,15 @@
-import { axiosInstance, updateProfile } from "@/lib/api";
+"use client";
+
+import { updateProfile } from "@/lib/api";
 import clsx from "clsx";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import FormInput from "../components/FormInput";
-import { getAuthCookies, setAuthCookies } from "../lib/cookies";
 import { sleep } from "../lib/util";
 
-export async function getServerSideProps({ req, res }) {
-  try {
-    const authCookies = getAuthCookies(req, res);
-    const response = await axiosInstance.get("/v1/profile", {
-      headers: {
-        Cookie: authCookies,
-      },
-    });
-
-    // Set new cookies in case tokens are expired (set from axios interceptor)
-    setAuthCookies(response.config?.headers, res);
-
-    const data = response.data;
-    return { props: { user: data } };
-  } catch (err) {
-    console.error(
-      "Edit Profile getServerSideProps error: ",
-      err.response?.data,
-    );
-    // Set new cookies in case tokens are expired (set from axios interceptor)
-    setAuthCookies(err.response?.headers, res);
-
-    return {
-      redirect: {
-        permanent: false,
-        destination: `/error?code=${err.response?.data?.statusCode}`,
-      },
-      props: {},
-    };
-  }
-}
-
-const EditProfile = ({ user }) => {
+export default function EditProfilePage({ user }) {
   const router = useRouter();
   const methods = useForm({
     defaultValues: {
@@ -66,7 +35,7 @@ const EditProfile = ({ user }) => {
     if (!data || loading) {
       return;
     }
-    
+
     if (!data.name && !data.password) {
       setError("name", { message: "Please edit at least 1 field" });
       setError("password", { message: "Please edit at least 1 field" });
@@ -119,7 +88,10 @@ const EditProfile = ({ user }) => {
       }
     },
   };
-  const btnClass = clsx("btn-primary btn", `${loading ? "loading btn-disabled" : ""}`);
+  const btnClass = clsx(
+    "btn-primary btn",
+    `${loading ? "loading btn-disabled" : ""}`,
+  );
 
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200">
@@ -168,8 +140,7 @@ const EditProfile = ({ user }) => {
           </div>
         </form>
       </FormProvider>
+      <ToastContainer />
     </section>
   );
-};
-
-export default EditProfile;
+}

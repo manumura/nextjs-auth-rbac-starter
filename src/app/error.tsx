@@ -1,34 +1,42 @@
+"use client";
+
 import Link from "next/link";
 
-export async function getServerSideProps({ query }) {
-  const code = query?.code;
-  if (code === "401") {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/login?error=401",
-      },
-      props: {},
-    };
-  }
+// export async function getServerSideProps({ query }) {
+//   const code = query?.code;
+//   if (code === "401") {
+//     return {
+//       redirect: {
+//         permanent: false,
+//         destination: "/login?error=401",
+//       },
+//       props: {},
+//     };
+//   }
 
-  const props = code
-    ? {
-        code,
-      }
-    : {};
+//   const props = code
+//     ? {
+//         code,
+//       }
+//     : {};
 
-  return {
-    props,
-  };
-}
+//   return {
+//     props,
+//   };
+// }
 
-export default function Error({ code }) {
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
   let message = "";
-  if (code === "403") {
+  if (error.message === "403") {
     message = "You are not allowed to access this page";
   }
-  if (code === "404") {
+  if (error.message === "404") {
     message = "The page was not found!";
   }
 

@@ -1,5 +1,7 @@
+"use client";
+
 import clsx from "clsx";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { clearStorage } from "../lib/storage";

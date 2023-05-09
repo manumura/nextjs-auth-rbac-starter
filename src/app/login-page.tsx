@@ -1,28 +1,18 @@
+"use client";
+
 import FormInput from "@/components/FormInput";
 import { login } from "@/lib/api";
 import { clearStorage, saveUser } from "@/lib/storage";
 import clsx from "clsx";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import useUserStore from "../lib/user-store";
 import { sleep } from "../lib/util";
 
-export async function getServerSideProps({ query }) {
-  const props = query?.error
-    ? {
-        error: query?.error,
-      }
-    : {};
-
-  return {
-    props,
-  };
-}
-
-const Login = ({ error }) => {
+export default function LoginPage({ error }) {
   const router = useRouter();
   const methods = useForm();
   const {
@@ -38,6 +28,7 @@ const Login = ({ error }) => {
     if (error === "401") {
       clearStorage();
       userStore.setUser(null);
+      console.log('error ', error);
       toast("Session expired, please login again.", {
         type: "error",
         position: "top-center",
@@ -96,7 +87,10 @@ const Login = ({ error }) => {
   const passwordConstraints = {
     required: { value: true, message: "Password is required" },
   };
-  const btnClass = clsx("w-full btn", `${loading ? "loading btn-disabled" : ""}`);
+  const btnClass = clsx(
+    "w-full btn",
+    `${loading ? "loading btn-disabled" : ""}`,
+  );
 
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200 py-20">
@@ -139,8 +133,7 @@ const Login = ({ error }) => {
           </form>
         </FormProvider>
       </div>
+      <ToastContainer />
     </section>
   );
-};
-
-export default Login;
+}

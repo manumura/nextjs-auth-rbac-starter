@@ -1,14 +1,14 @@
-//components/DrawerLayout.tsx
+"use client";
+
 import { useDrawerOpen } from "@/lib/DrawerOpenContext";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { redirect } from "next/navigation";
 import useUserStore from "../lib/user-store";
 import { isAdmin } from "../lib/util";
 import LogoutButton from "./LogoutButton";
 import Navbar from "./Navbar";
 
 const DrawerLayout = ({ children }) => {
-  const router = useRouter();
   const userStore = useUserStore();
   const user = userStore.user;
   //initialize state here. we use a key and a default state
@@ -16,7 +16,7 @@ const DrawerLayout = ({ children }) => {
   const toggleDrawer = () => setOpen(!open);
 
   const handleLogin = () => {
-    router.push("/login");
+    redirect("/login");
   };
 
   return (

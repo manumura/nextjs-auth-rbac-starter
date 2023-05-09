@@ -9,10 +9,10 @@ import LoadingOverlay from "../components/LoadingOverlay";
 import { getProfile } from "../lib/api";
 import { clearStorage, saveUser } from "../lib/storage";
 import { sleep } from "../lib/util";
+import useUserStore from "../lib/user-store";
 
 // To avoid tailwind to purge toastify styles
 import "react-toastify/dist/ReactToastify.min.css";
-import useUserStore from "../lib/user-store";
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();

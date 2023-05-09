@@ -1,32 +1,16 @@
+"use client";
+
 import FormInput from "@/components/FormInput";
 import { forgotPassword } from "@/lib/api";
 import clsx from "clsx";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { sleep } from "../lib/util";
 
-export async function getServerSideProps({ query, req }) {
-  // Redirect if user is authenticated
-  const accessToken = req?.cookies?.accessToken;
-  if (accessToken) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/",
-      },
-      props: {},
-    };
-  }
-
-  return {
-    props: {},
-  };
-}
-
-const ForgotPassword = () => {
+export default function ForgotPasswordPage() {
   const router = useRouter();
   const methods = useForm();
   const {
@@ -104,8 +88,7 @@ const ForgotPassword = () => {
           </form>
         </FormProvider>
       </div>
+      <ToastContainer />
     </section>
   );
 };
-
-export default ForgotPassword;

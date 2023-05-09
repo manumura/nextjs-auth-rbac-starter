@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function FourOhFour() {
+export default function NotFound() {
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200">
       <div className="flex flex-col items-center py-20">

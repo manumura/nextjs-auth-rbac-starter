@@ -1,7 +1,10 @@
+"use client";
+
+// TODO use store
 import { createContext, useContext, useState } from "react";
 
 interface DrawerOpenContextType {
-  open: boolean;
+  open: boolean | undefined;
   setOpen: (open: boolean) => void;
 }
 

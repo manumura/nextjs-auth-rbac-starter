@@ -5,7 +5,7 @@ export const getAuthCookies = (
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage>,
 ) => {
-  let cookieString: string;
+  let cookieString: string | undefined;
   
   // Try to get cookies set from the middleware
   const setCookieMiddlewareHeader = res.getHeaders()["set-cookie"] as string[];
