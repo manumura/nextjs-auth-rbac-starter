@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import useUserStore from "../lib/user-store";
 import { sleep } from "../lib/util";
 
@@ -70,6 +70,7 @@ export default function LoginPage({ error }) {
         userStore.setUser(res.data.user);
         saveUser(res.data.user);
         router.push("/");
+        router.refresh();
       }
     } catch (err) {
       toast("Login failed! Please check your email and password", {
@@ -133,7 +134,6 @@ export default function LoginPage({ error }) {
           </form>
         </FormProvider>
       </div>
-      <ToastContainer />
     </section>
   );
 }

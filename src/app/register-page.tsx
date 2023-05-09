@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { sleep } from "../lib/util";
 
 export default function RegisterPage() {
@@ -126,7 +126,6 @@ export default function RegisterPage() {
           </form>
         </FormProvider>
       </div>
-      <ToastContainer />
     </section>
   );
 }

@@ -1,14 +1,16 @@
+"use client";
+
 import FormInput from "@/components/FormInput";
 import { createUser } from "@/lib/api";
 import clsx from "clsx";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormSelect from "../components/FormSelect";
 import { sleep } from "../lib/util";
 
-const CreateUser = () => {
+export default function CreateUserPage() {
   const router = useRouter();
   const methods = useForm();
   const [loading, setLoading] = useState(false);
@@ -115,5 +117,3 @@ const CreateUser = () => {
     </section>
   );
 };
-
-export default CreateUser;

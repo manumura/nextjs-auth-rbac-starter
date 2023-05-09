@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import FormInput from "../components/FormInput";
 import { sleep } from "../lib/util";
 
@@ -140,7 +140,6 @@ export default function EditProfilePage({ user }) {
           </div>
         </form>
       </FormProvider>
-      <ToastContainer />
     </section>
   );
 }

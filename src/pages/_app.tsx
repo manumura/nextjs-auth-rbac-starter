@@ -1,15 +1,11 @@
-import DrawerLayout from "@/components/DrawerLayout";
-import { DrawerOpenProvider } from "@/lib/DrawerOpenContext";
 import "@/styles/globals.css";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { ToastContainer } from "react-toastify";
-import LoadingOverlay from "../components/LoadingOverlay";
 import { getProfile } from "../lib/api";
 import { clearStorage, saveUser } from "../lib/storage";
-import { sleep } from "../lib/util";
 import useUserStore from "../lib/user-store";
+import { sleep } from "../lib/util";
 
 // To avoid tailwind to purge toastify styles
 import "react-toastify/dist/ReactToastify.min.css";
@@ -72,12 +68,6 @@ export default function App({ Component, pageProps }) {
   };
 
   return (
-    <DrawerOpenProvider>
-      <DrawerLayout>
         <Component {...pageProps} />
-      </DrawerLayout>
-      {loading && <LoadingOverlay />}
-      <ToastContainer />
-    </DrawerOpenProvider>
   );
 }

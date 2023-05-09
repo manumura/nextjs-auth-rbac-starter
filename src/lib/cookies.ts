@@ -2,13 +2,13 @@ import { IncomingMessage, ServerResponse } from "http";
 import setCookie from "set-cookie-parser";
 
 export const getAuthCookies = (
-  req: IncomingMessage,
-  res: ServerResponse<IncomingMessage>,
+  req: IncomingMessage | undefined,
+  res: ServerResponse<IncomingMessage> | undefined,
 ) => {
   let cookieString: string | undefined;
   
   // Try to get cookies set from the middleware
-  const setCookieMiddlewareHeader = res.getHeaders()["set-cookie"] as string[];
+  const setCookieMiddlewareHeader = res?.getHeaders()["set-cookie"] as string[];
   if (setCookieMiddlewareHeader) {
     const cookies = setCookie.parse(setCookieMiddlewareHeader, {
       decodeValues: true,
@@ -20,12 +20,12 @@ export const getAuthCookies = (
   }
 
   // Default to the cookies from the request
-  return cookieString ? cookieString : req.headers.cookie;
+  return cookieString ? cookieString : req?.headers.cookie;
 };
 
-export const setAuthCookies = (headers: any, res: ServerResponse<IncomingMessage>,) => {
+export const setAuthCookies = (headers: any, res: ServerResponse<IncomingMessage> | undefined,) => {
   const setCookieHeader = headers["set-cookie"];
   if (setCookieHeader) {
-    res.setHeader("Set-Cookie", setCookieHeader);
+    res?.setHeader("Set-Cookie", setCookieHeader);
   }
 };

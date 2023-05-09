@@ -8,7 +8,7 @@ async function getUser() {
     const accessToken = cookies().get("accessToken")?.value;
     const response = await axiosInstance.get("/v1/profile", {
       headers: {
-        Authorization: "bearer " + accessToken,
+        Authorization: `bearer ${accessToken}`,
       },
     });
 

@@ -8,13 +8,13 @@ async function getUser() {
     const accessToken = cookies().get('accessToken')?.value;
     const response = await axiosInstance.get("/v1/profile", {
       headers: {
-        Authorization: 'bearer ' + accessToken,
+        Authorization: `bearer ${accessToken}`,
       },
     });
 
     return response.data;
   } catch (err) {
-    console.error(`Edit Profile getServerSideProps error: ${err.response?.data}`);
+    console.error(`Edit Profile getServerSideProps error: `, err.response?.data);
     return undefined;
   }
 }

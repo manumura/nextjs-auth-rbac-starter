@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { clearStorage } from "../lib/storage";
@@ -10,6 +10,7 @@ import { sleep } from "../lib/util";
 
 const LogoutButton = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const userStore = useUserStore();
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +37,11 @@ const LogoutButton = () => {
 
       clearStorage();
       userStore.setUser(null);
-      router.push("/");
+
+      if (pathname !== "/") {
+        router.push("/");
+      }
+      router.refresh();
     } else {
       if (res.status === 401) {
         clearStorage();

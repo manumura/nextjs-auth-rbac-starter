@@ -1,82 +1,28 @@
-import axios from "axios";
+"use client";
+
 import clsx from "clsx";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import FormInput from "../../components/FormInput";
-import FormSelect from "../../components/FormSelect";
-import LoadingOverlay from "../../components/LoadingOverlay";
-import { getUser, updateUser } from "../../lib/api";
-import { sleep } from "../../lib/util";
+import FormInput from "../components/FormInput";
+import FormSelect from "../components/FormSelect";
+import { updateUser } from "../lib/api";
+import { sleep } from "../lib/util";
 
-const EditUser = () => {
+export default function EditUserPage({ user }) {
   const router = useRouter();
-  const [user, setUser] = useState();
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const methods = useForm({
     defaultValues: {
-      name: '',
-      email: '',
+      name: user.name,
+      email: user.email,
       password: '',
       passwordConfirm: '',
-      role: '',
+      role: user.role,
     },
   });
-  const { handleSubmit, watch, reset } = methods;
-
-  const doGetUser = async (id, signal) => {
-    try {
-      setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      const res = await getUser(id, signal);
-      if (res?.data) {
-        const user = res.data;
-        setUser(user);
-        reset({
-          name: user.name,
-          email: user.email,
-          role: user.role,
-      });
-      }
-    } catch (error) {
-      if (!axios.isCancel(error)) {
-        console.error(error.message);
-        /* Logic for non-aborted error handling goes here. */
-        if (error.response?.data?.statusCode === 404) {
-          router.push("/users");
-          toast("User not found!", {
-            type: "error",
-            position: "top-center",
-          });
-        }
-
-        if (error.response?.data?.statusCode === 401) {
-          router.push(`/error?code=${error?.response?.data?.statusCode}`);
-        }
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!router.isReady) {
-      return;
-    }
-
-    const abortController = new AbortController();
-    doGetUser(router.query.id, abortController.signal);
-
-    /* 
-      Abort the request as it isn't needed anymore, the component being 
-      unmounted. It helps avoid, among other things, the well-known "can't
-      perform a React state update on an unmounted component" warning.
-    */
-    return () => abortController.abort();
-  }, [router.isReady, router.query.id]);
+  const { handleSubmit, watch } = methods;
 
   const onSubmit = async (data) => {
     if (!data || submitting) {
@@ -87,7 +33,7 @@ const EditUser = () => {
       setSubmitting(true);
       // TODO remove this
       await sleep(1000);
-      const res = await updateUser(router.query.id, data.name, data.email, data.role, data.password);
+      const res = await updateUser(user.id, data.name, data.email, data.role, data.password);
 
       if (res) {
         toast(`User successfully updated: ${res.data.name}`, {
@@ -204,9 +150,6 @@ const EditUser = () => {
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200">
       {editUserForm}
-      {(loading || !user) && <LoadingOverlay />}
     </section>
   );
 };
-
-export default EditUser;

@@ -21,7 +21,7 @@ async function getUser(token) {
     return user;
   } catch (err) {
     console.error(
-      `Reset Password getServerSideProps error: ${err.response?.data}`,
+      `Reset Password getServerSideProps error:`, err.response?.data
     );
     return undefined;
   }
