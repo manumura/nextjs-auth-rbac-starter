@@ -9,8 +9,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import useUserStore from "../lib/user-store";
-import { sleep } from "../lib/util";
+import useUserStore from "../../lib/user-store";
+import { sleep } from "../../lib/util";
 
 export default function LoginPage({ error }) {
   const router = useRouter();

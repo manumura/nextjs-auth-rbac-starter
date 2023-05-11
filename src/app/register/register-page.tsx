@@ -1,21 +1,25 @@
 "use client";
 
 import FormInput from "@/components/FormInput";
-import { createUser } from "@/lib/api";
+import { register } from "@/lib/api";
 import clsx from "clsx";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import FormSelect from "../components/FormSelect";
-import { sleep } from "../lib/util";
+import { sleep } from "../../lib/util";
 
-export default function CreateUserPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const methods = useForm();
   const [loading, setLoading] = useState(false);
 
-  const { handleSubmit } = methods;
+  const {
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful },
+    watch,
+  } = methods;
 
   const onSubmit = async (data) => {
     if (!data || loading) {
@@ -26,18 +30,18 @@ export default function CreateUserPage() {
       setLoading(true);
       // TODO remove this
       await sleep(1000);
-      const res = await createUser(data.email, data.name, data.role);
+      const res = await register(data.email, data.password, data.name);
 
       if (res) {
-        toast(`User successfully created: ${res.data.name}`, {
+        toast(`You are successfully registered ${res.data.name}!`, {
           type: "success",
           position: "top-center",
         });
-        router.push("/users");
+        router.push("/login");
       }
     } catch (err) {
       console.error(err.message);
-      toast(`User creation failed: ${err.response?.data?.message}`, {
+      toast("Registration failed! Did you already register with this email?", {
         type: "error",
         position: "top-center",
       });
@@ -56,21 +60,25 @@ export default function CreateUserPage() {
   const emailConstraints = {
     required: { value: true, message: "Email is required" },
   };
-  const roleConstraints = {
-    required: { value: true, message: "Role is required" },
+  const passwordConstraints = {
+    required: { value: true, message: "Password is required" },
+    minLength: {
+      value: 8,
+      message: "Password is min 8 characters",
+    },
   };
-
-  const roles = [
-    { label: "--- Please select a role ---", value: "" },
-    { label: "Admin", value: "ADMIN" },
-    { label: "User", value: "USER" },
-  ];
-
-  const btnClass = clsx("btn-primary btn mx-1", `${loading ? "loading btn-disabled" : ""}`);
-
-  const onCancel = () => {
-    router.back();
+  const passwordConfirmConstraints = {
+    required: { value: true, message: "Confirm Password is required" },
+    validate: (value) => {
+      if (watch("password") !== value) {
+        return "Passwords do no match";
+      }
+    },
   };
+  const btnClass = clsx(
+    "w-full btn",
+    `${loading ? "loading btn-disabled" : ""}`,
+  );
 
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200 py-20">
@@ -80,9 +88,9 @@ export default function CreateUserPage() {
             onSubmit={handleSubmit(onSubmit)}
             className="mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg"
           >
-            <h2 className="mb-4 text-center text-2xl font-[600]">
-              Create a new user
-            </h2>
+            <h1 className="mb-4 text-center text-4xl font-[600]">
+              Register to MyApp!
+            </h1>
             <FormInput
               label="Full Name"
               name="name"
@@ -94,26 +102,30 @@ export default function CreateUserPage() {
               type="email"
               constraints={emailConstraints}
             />
-            <FormSelect
-              label="Role"
-              name="role"
-              options={roles}
-              constraints={roleConstraints}
+            <FormInput
+              label="Password"
+              name="password"
+              type="password"
+              constraints={passwordConstraints}
             />
-            <div className="flex justify-center space-x-5">
-              <button
-                type="button"
-                id="btn-cancel"
-                className="btn-outline btn mx-1"
-                onClick={onCancel}
-              >
-                Cancel
-              </button>
-              <button className={btnClass}>Create</button>
+            <FormInput
+              label="Confirm Password"
+              name="passwordConfirm"
+              type="password"
+              constraints={passwordConfirmConstraints}
+            />
+            <span className="block">
+              Already have an account?{" "}
+              <Link href="/login" className="text-secondary">
+                Login Here
+              </Link>
+            </span>
+            <div>
+              <button className={btnClass}>Register</button>
             </div>
           </form>
         </FormProvider>
       </div>
     </section>
   );
-};
+}

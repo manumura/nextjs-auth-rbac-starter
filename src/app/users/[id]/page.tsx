@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { axiosInstance } from "../../../lib/api";
-import EditUserPage from "../../edit-user-page";
+import EditUserPage from "./edit-user-page";
 
 async function getUserById(id) {
   try {

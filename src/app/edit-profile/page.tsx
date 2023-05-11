@@ -1,6 +1,6 @@
 import { axiosInstance } from "@/lib/api";
 import { cookies } from 'next/headers';
-import EditProfilePage from "../edit-profile-page";
+import EditProfilePage from "./edit-profile-page";
 import { redirect } from "next/navigation";
 
 async function getUser() {

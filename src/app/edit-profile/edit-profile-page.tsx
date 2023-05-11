@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import FormInput from "../components/FormInput";
-import { sleep } from "../lib/util";
+import FormInput from "../../components/FormInput";
+import { sleep } from "../../lib/util";
 
 export default function EditProfilePage({ user }) {
   const router = useRouter();

@@ -4,7 +4,7 @@ import { Pagination } from "@/components/Pagination";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FiDelete, FiEdit, FiPlusCircle } from "react-icons/fi";
-import DeleteUserModal from "../components/DeleteUserModal";
+import DeleteUserModal from "../../components/DeleteUserModal";
 
 export default function UsersPage({ users, totalElements, page, pageSize }) {
   const router = useRouter();

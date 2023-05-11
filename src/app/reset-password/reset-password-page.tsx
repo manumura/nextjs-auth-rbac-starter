@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { sleep } from "../lib/util";
+import { sleep } from "../../lib/util";
 
 export default function ResetPasswordPage({ token }) {
   const router = useRouter();

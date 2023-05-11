@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import FormInput from "../components/FormInput";
-import FormSelect from "../components/FormSelect";
-import { updateUser } from "../lib/api";
-import { sleep } from "../lib/util";
+import FormInput from "../../../components/FormInput";
+import FormSelect from "../../../components/FormSelect";
+import { updateUser } from "../../../lib/api";
+import { sleep } from "../../../lib/util";
 
 export default function EditUserPage({ user }) {
   const router = useRouter();

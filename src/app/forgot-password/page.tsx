@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import ForgotPasswordPage from "../forgot-password-page";
+import ForgotPasswordPage from "./forgot-password-page";
 
 async function isAuthenticated() {
   // Redirect if user is authenticated

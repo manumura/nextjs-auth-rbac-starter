@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import ResetPasswordPage from "../reset-password-page";
+import ResetPasswordPage from "./reset-password-page";
 import { cookies } from "next/headers";
 import {
   axiosInstance,

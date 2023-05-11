@@ -1,7 +1,10 @@
 import { cookies } from "next/headers";
 import appConfig from "../../config/config";
 import { axiosInstance } from "../../lib/api";
-import UsersPage from "../users-page";
+import UsersPage from "./users-page";
+import { Suspense } from "react";
+import LoadingOverlay from "../../components/LoadingOverlay";
+import { use } from "react";
 
 async function getUsers(page, pageSize, role) {
   try {
@@ -24,22 +27,24 @@ async function getUsers(page, pageSize, role) {
   }
 }
 
-export default async function Users({ searchParams }) {
+export default function Users({ searchParams }) {
   // Fetch data directly in a Server Component
   const page = searchParams?.page || 1;
   const pageSize = appConfig.defaultRowsPerPage;
   // TODO filter by role
   const role = undefined;
 
-  const { users, totalElements } = await getUsers(page, pageSize, role);
+  const { users, totalElements } = use(getUsers(page, pageSize, role));
 
   // Forward fetched data to your Client Component
   return (
-    <UsersPage
-      users={users}
-      totalElements={totalElements}
-      page={page}
-      pageSize={pageSize}
-    />
+    <Suspense fallback={<LoadingOverlay />}>
+      <UsersPage
+        users={users}
+        totalElements={totalElements}
+        page={page}
+        pageSize={pageSize}
+      />
+    </Suspense>
   );
 }
