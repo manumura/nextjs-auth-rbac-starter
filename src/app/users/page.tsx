@@ -5,19 +5,21 @@ import UsersPage from "../users-page";
 
 async function getUsers(page, pageSize, role) {
   try {
-    const accessToken = cookies().get("accessToken")?.value;
+    const cookieStore = cookies();
     const response = await axiosInstance.get("/v1/users", {
       params: { role, page, pageSize },
       headers: {
-        Authorization: `bearer ${accessToken}`,
+        // Authorization: `bearer ${accessToken}`,
+        Cookie: cookieStore as any,
       },
+      withCredentials: true,
     });
 
     const users = response.data.elements;
     const totalElements = response.data.totalElements;
     return { users, totalElements };
   } catch (err) {
-    console.error(`Get Users getServerSideProps error: ${err.response?.data}`);
+    console.error(`Get Users getServerSideProps error: `, err.response?.data);
     return { users: [], totalElements: 0 };
   }
 }

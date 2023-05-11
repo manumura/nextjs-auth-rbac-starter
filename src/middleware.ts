@@ -12,6 +12,11 @@ export async function middleware(request: NextRequest) {
     new URL("/login?error=401", request.url),
   );
 
+  // todo TEST
+  // if (request.nextUrl.pathname.startsWith("/api")) {
+  //   console.log("TEST middleware api", request.nextUrl.pathname);
+  // }
+
   if (isAdminRoute(request)) {
     if (!accessToken) {
       console.error(
@@ -102,7 +107,11 @@ function setAuthCookies(setCookieHeader: string, response: NextResponse) {
   setAuthCookie(response, "refreshToken", refreshTokenCookie);
 }
 
-function setAuthCookie(response: NextResponse, name: string, cookie: setCookie.Cookie) {
+function setAuthCookie(
+  response: NextResponse,
+  name: string,
+  cookie: setCookie.Cookie,
+) {
   response.cookies.set(name, cookie.value, {
     httpOnly: cookie.httpOnly,
     maxAge: cookie.maxAge,
@@ -155,5 +164,6 @@ function isPublicRoute(request: NextRequest) {
 // See "Matching Paths" below to learn more
 export const config = {
   // matcher solution for public, api, assets and _next exclusion
-  matcher: "/((?!api|static|.*\\..*|_next).*)",
+  // matcher: "/((?!api|static|.*\\..*|_next).*)",
+  matcher: "/((?!static|.*\\..*|_next).*)",
 };

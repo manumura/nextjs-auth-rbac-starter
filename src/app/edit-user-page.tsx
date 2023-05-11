@@ -41,6 +41,7 @@ export default function EditUserPage({ user }) {
           position: "top-center",
         });
         router.back();
+        router.refresh();
       }
     } catch (err) {
       console.error(err.message);

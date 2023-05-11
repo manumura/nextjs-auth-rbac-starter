@@ -1,37 +1,51 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import DrawerLayout from "../components/DrawerLayout";
-import { axiosInstance } from "../lib/api";
 import "../styles/globals.css";
 
 // To avoid tailwind to purge toastify styles
 import "react-toastify/dist/ReactToastify.min.css";
+import { axiosInstance } from "../lib/api";
 
 // TODO refresh token expired
-// TODO refresh users list after update
 async function getProfile() {
-  try {
-    const cookieStore = cookies();
-    const accessToken = cookieStore.get("accessToken")?.value;
-    if (!accessToken) {
-      return undefined;
-    }
+  // try {
+  //   // const accessToken = cookies().get("accessToken")?.value;
+  //   const cookieStore = cookies();
+  //   const response = await axiosInstance.get("/v1/profile", {
+  //     headers: {
+  //       // Authorization: `bearer ${accessToken}`,
+  //       Cookie: cookieStore as any,
+  //     },
+  //     withCredentials: true,
+  //   });
 
-    const response = await axiosInstance.get("/v1/profile", {
-      headers: {
-        // Authorization: `bearer ${accessToken}`,
-         Cookie: cookieStore as any,
-      },
-      withCredentials: true,
-    });
-    const user = response.data;
-    return user;
-  } catch (err) {
-    console.error(
-      `Get Profile in RootLayout getServerSideProps error: `,
-      err.response?.data,
-    );
+  //   return response.data;
+  // } catch (err) {
+  //   console.error(`Profile getServerSideProps error: `, err.response?.data);
+  //   return undefined;
+  // }
+
+  const h = headers();
+  const protocol = h.get("x-forwarded-proto");
+  const host = h.get("host");
+  const cookieStore = cookies();
+
+  const res = await fetch(`${protocol}://${host}/api/profile`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "Cookie": cookieStore as any,
+    },
+  });
+  console.log("TEST RootLayout", res.headers.get("set-cookie"));
+
+  if (!res.ok) {
     return undefined;
   }
+
+  const user = await res.json();
+  return user;
 }
 
 export default async function RootLayout({
@@ -46,9 +60,7 @@ export default async function RootLayout({
   return (
     <html lang="en" data-theme="emerald">
       <body>
-        <DrawerLayout user={user}>
-          {children}
-        </DrawerLayout>
+        <DrawerLayout user={user}>{children}</DrawerLayout>
       </body>
     </html>
   );

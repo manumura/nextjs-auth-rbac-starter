@@ -28,7 +28,6 @@ export default function LoginPage({ error }) {
     if (error === "401") {
       clearStorage();
       userStore.setUser(null);
-      console.log('error ', error);
       toast("Session expired, please login again.", {
         type: "error",
         position: "top-center",
@@ -69,7 +68,7 @@ export default function LoginPage({ error }) {
         });
         userStore.setUser(res.data.user);
         saveUser(res.data.user);
-        router.push("/");
+        router.replace("/");
         router.refresh();
       }
     } catch (err) {

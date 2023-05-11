@@ -9,7 +9,6 @@ import LogoutButton from "./LogoutButton";
 import Navbar from "./Navbar";
 
 const DrawerLayout = ({ user, children }) => {
-  console.log("user ", user);
   //initialize state here. we use a key and a default state
   const { open, setOpen } = useDrawerOpenStore();
   const toggleDrawer = () => setOpen(!open);

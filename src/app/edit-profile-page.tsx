@@ -53,7 +53,8 @@ export default function EditProfilePage({ user }) {
           type: "success",
           position: "top-center",
         });
-        router.push("/profile");
+        router.back();
+        router.refresh();
       }
     } catch (err) {
       console.error(err.message);
