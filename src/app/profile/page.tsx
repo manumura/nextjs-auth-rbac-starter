@@ -12,11 +12,10 @@ async function getProfile() {
     method: "GET",
     credentials: "include",
     headers: {
-      "Access-Control-Allow-Credentials": "true",
-      "Cookie": cookieStore as any,
+      "Content-Type": "application/json",
+      Cookie: cookieStore as any,
     },
   });
-  console.log("TEST1 Profile", res.headers.get("set-cookie"));
 
   if (!res.ok) {
     return undefined;
@@ -34,5 +33,7 @@ export default async function Profile() {
   }
 
   // Forward fetched data to your Client Component
-  return <ProfilePage user={user} />;
+  return (
+    <ProfilePage user={user} />
+  );
 }

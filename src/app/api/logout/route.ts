@@ -5,12 +5,6 @@ import appConfig from "../../../config/config";
 export async function POST(request: Request) {
   const BASE_URL = appConfig.baseUrl;
   const cookieStore = cookies();
-  // const accessToken = cookieStore.get("accessToken")?.value;
-  // if (!accessToken) {
-  //   return new Response(JSON.stringify({}), {
-  //     status: 401,
-  //   });
-  // }
 
   const res = await axios.post(
     "/v1/logout",

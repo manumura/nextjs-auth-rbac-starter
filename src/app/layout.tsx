@@ -1,51 +1,27 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import DrawerLayout from "../components/DrawerLayout";
+import { axiosInstance } from "../lib/api";
 import "../styles/globals.css";
 
 // To avoid tailwind to purge toastify styles
 import "react-toastify/dist/ReactToastify.min.css";
-import { axiosInstance } from "../lib/api";
 
-// TODO refresh token expired
+// TODO refresh token
 async function getProfile() {
-  // try {
-  //   // const accessToken = cookies().get("accessToken")?.value;
-  //   const cookieStore = cookies();
-  //   const response = await axiosInstance.get("/v1/profile", {
-  //     headers: {
-  //       // Authorization: `bearer ${accessToken}`,
-  //       Cookie: cookieStore as any,
-  //     },
-  //     withCredentials: true,
-  //   });
+  try {
+    const cookieStore = cookies();
+    const response = await axiosInstance.get("/v1/profile", {
+      headers: {
+        Cookie: cookieStore as any,
+      },
+      withCredentials: true,
+    });
 
-  //   return response.data;
-  // } catch (err) {
-  //   console.error(`Profile getServerSideProps error: `, err.response?.data);
-  //   return undefined;
-  // }
-
-  const h = headers();
-  const protocol = h.get("x-forwarded-proto");
-  const host = h.get("host");
-  const cookieStore = cookies();
-
-  const res = await fetch(`${protocol}://${host}/api/profile`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "Cookie": cookieStore as any,
-    },
-  });
-  console.log("TEST RootLayout", res.headers.get("set-cookie"));
-
-  if (!res.ok) {
+    return response.data;
+  } catch (err) {
+    console.error(`Profile getServerSideProps error: `, err.response?.data);
     return undefined;
   }
-
-  const user = await res.json();
-  return user;
 }
 
 export default async function RootLayout({

@@ -1,90 +1,62 @@
 import { headers } from "next/headers";
-import { axiosInstance } from "../../../lib/api";
 import { NextResponse } from "next/server";
-import setCookie from "set-cookie-parser";
+import appConfig from "../../../config/config";
 
 export async function GET(request: Request) {
+  const BASE_URL = appConfig.baseUrl;
   const headersList = headers();
   const cookies = headersList.get("Cookie");
 
-  try {
-    const res = await axiosInstance.get("/v1/profile", {
-      headers: {
-        // Authorization: `bearer ${accessToken}`,
-        Cookie: cookies,
-      },
-      withCredentials: true,
-    });
+  let responseHeaders = {};
+  let user = {};
+  let status = 200;
 
-    const h = res.headers;
-    const setCookieHeader = h["set-cookie"];
-    let responseHeaders = {};
-    if (setCookieHeader) {
-      responseHeaders = {
-        "Set-Cookie": setCookieHeader,
-      };
-    }
-    console.log("TEST2 route Profile", setCookieHeader);
+  const res = await fetch(`${BASE_URL}/api/v1/profile`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: cookies as any,
+    },
+  });
 
-    return new Response(JSON.stringify(res.data), {
-      status: res.status,
-      headers: responseHeaders,
-    });
-    // const response = NextResponse.json(
-    //   res.data,
-    //   { status: res.status }
-    // );
-    // if (setCookieHeader) {
-    //   setAuthCookies(setCookieHeader, response);
-    // }
-    // return response;
-  } catch (err) {
-    // console.error(err.response.headers);
-    const res = err.response;
-    const h = res.headers;
-    const setCookieHeader = h["set-cookie"];
-    let responseHeaders = {};
-    if (setCookieHeader) {
-      // console.log("setCookieHeader", setCookieHeader);
-      responseHeaders = {
-        "Set-Cookie": setCookieHeader,
-      };
+  if (res.status === 200) {
+    user = await res.json();
+  } else if (res.status === 401) {
+    status = 401;
+    const refreshTokenRes = await refreshToken(cookies);
+
+    if (refreshTokenRes.status === 200) {
+      status = 200;
+      const data = await refreshTokenRes.json();
+      // TODO retry original request
+      user = data.user;
+
+      const setCookieHeader = refreshTokenRes.headers.get("set-cookie");
+      if (setCookieHeader) {
+        responseHeaders = {
+          "Set-Cookie": setCookieHeader,
+        };
+      }
     }
-    return new Response(JSON.stringify({}), {
-      status: err.response.status,
-      headers: responseHeaders,
-    });
-    // const response = NextResponse.json(
-    //   res.data,
-    //   { status: res.status }
-    // );
-    // if (setCookieHeader) {
-    //   setAuthCookies(setCookieHeader, response);
-    // }
-    // return response;
   }
+
+  return NextResponse.json(user, {
+    status,
+    headers: responseHeaders,
+  });
 }
 
-function setAuthCookies(setCookieHeader: string | string[], response: NextResponse) {
-  const splitCookieHeaders = setCookie.splitCookiesString(setCookieHeader);
-  const cookies = setCookie.parse(splitCookieHeaders, {
-    decodeValues: true,
-    map: true,
+async function refreshToken(cookies: string | null) {
+  const BASE_URL = appConfig.baseUrl;
+  const res = await fetch(`${BASE_URL}/api/v1/refresh-token`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: cookies as any,
+    },
+    body: JSON.stringify({}),
   });
-
-  const accessTokenCookie = cookies.accessToken;
-  setAuthCookie(response, "accessToken", accessTokenCookie);
-
-  const refreshTokenCookie = cookies.refreshToken;
-  setAuthCookie(response, "refreshToken", refreshTokenCookie);
-}
-
-function setAuthCookie(response: NextResponse, name: string, cookie: setCookie.Cookie) {
-  response.cookies.set(name, cookie.value, {
-    httpOnly: cookie.httpOnly,
-    maxAge: cookie.maxAge,
-    path: cookie.path,
-    expires: cookie.expires,
-    sameSite: cookie.sameSite as "lax" | "strict" | "none",
-  });
+  return res;
 }

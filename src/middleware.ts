@@ -85,7 +85,7 @@ async function refreshToken(request: NextRequest, response: NextResponse) {
     const data = await refreshTokenResponse.json();
     const setCookieHeader = refreshTokenResponse.headers.get("set-cookie");
     if (setCookieHeader) {
-      setAuthCookies(setCookieHeader, response);
+      setAuthCookies(setCookieHeader, request, response);
     }
     return data.user;
   }
@@ -93,7 +93,7 @@ async function refreshToken(request: NextRequest, response: NextResponse) {
   return null;
 }
 
-function setAuthCookies(setCookieHeader: string, response: NextResponse) {
+function setAuthCookies(setCookieHeader: string, request: NextRequest, response: NextResponse) {
   const splitCookieHeaders = setCookie.splitCookiesString(setCookieHeader);
   const cookies = setCookie.parse(splitCookieHeaders, {
     decodeValues: true,
@@ -101,17 +101,19 @@ function setAuthCookies(setCookieHeader: string, response: NextResponse) {
   });
 
   const accessTokenCookie = cookies.accessToken;
-  setAuthCookie(response, "accessToken", accessTokenCookie);
+  setAuthCookie(request, response, "accessToken", accessTokenCookie);
 
   const refreshTokenCookie = cookies.refreshToken;
-  setAuthCookie(response, "refreshToken", refreshTokenCookie);
+  setAuthCookie(request, response, "refreshToken", refreshTokenCookie);
 }
 
 function setAuthCookie(
+  request: NextRequest,
   response: NextResponse,
-  name: string,
+  name: "accessToken" | "refreshToken",
   cookie: setCookie.Cookie,
 ) {
+  request.cookies.set(name, cookie.value);
   response.cookies.set(name, cookie.value, {
     httpOnly: cookie.httpOnly,
     maxAge: cookie.maxAge,
