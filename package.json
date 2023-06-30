@@ -17,7 +17,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.9",
-    "react-icons": "^4.8.0",
+    "react-icons": "^4.9.0",
     "react-toastify": "^9.1.2",
     "react-use": "^17.4.0",
     "set-cookie-parser": "^2.6.0",
