@@ -2,15 +2,18 @@
 
 import FormInput from "@/components/FormInput";
 import { login } from "@/lib/api";
-import { clearStorage, saveUser } from "@/lib/storage";
+import { clearStorage, saveIdToken } from "@/lib/storage";
 import clsx from "clsx";
+import * as jose from "jose";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import useUserStore from "../../lib/user-store";
+import appConfig from "../../config/config";
+import useUserStore, { IUser } from "../../lib/user-store";
 import { sleep } from "../../lib/util";
+import { IdTokenPayload } from "../../types/IdTokenPayload";
 
 export default function LoginPage({ error }) {
   const router = useRouter();
@@ -61,13 +64,20 @@ export default function LoginPage({ error }) {
       await sleep(1000);
       const res = await login(data.email, data.password);
 
-      if (res) {
-        toast(`Welcome ${res.data.user.name}!`, {
+      if (res?.data) {
+        const alg = 'RS256';
+        const publicKey = await jose.importSPKI(appConfig.idTokenPublicKey, alg);
+        const { payload } = await jose.jwtVerify(res.data.idToken, publicKey);
+        // const idToken = jose.decodeJwt(res.data.idToken) as IdTokenPayload;
+        const user = payload?.user as IUser;
+        
+        userStore.setUser(user);
+        toast(`Welcome ${user?.name}!`, {
           type: "success",
           position: "top-center",
         });
-        userStore.setUser(res.data.user);
-        saveUser(res.data.user);
+        saveIdToken(res.data.idToken);
+        
         router.replace("/");
         router.refresh();
       }
