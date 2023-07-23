@@ -1,5 +1,17 @@
 import { IncomingMessage, ServerResponse } from "http";
+import { NextResponse } from "next/server";
 import setCookie from "set-cookie-parser";
+
+const COOKIE_NAMES = ["accessToken", "refreshToken", "accessTokenExpiresAt", "idToken"];
+
+export const clearCookies = (response: NextResponse) => {
+  for (const n of COOKIE_NAMES) {
+    response.cookies.set(n, "", {
+      httpOnly: true,
+      maxAge: -1,
+    });
+  }
+};
 
 export const getAuthCookies = (
   req: IncomingMessage | undefined,
@@ -23,7 +35,7 @@ export const getAuthCookies = (
   return cookieString ? cookieString : req?.headers.cookie;
 };
 
-export const setAuthCookies = (headers: any, res: ServerResponse<IncomingMessage> | undefined,) => {
+export const setAuthCookies = (headers: any, res: ServerResponse<IncomingMessage> | undefined) => {
   const setCookieHeader = headers["set-cookie"];
   if (setCookieHeader) {
     res?.setHeader("Set-Cookie", setCookieHeader);

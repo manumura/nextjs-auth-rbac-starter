@@ -1,11 +1,13 @@
+import * as jose from "jose";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import setCookie from "set-cookie-parser";
 import appConfig from "./config/config";
-import { isAdmin } from "./lib/util";
+import { IUser } from "./lib/user-store";
 
 export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken");
+  const idToken = request.cookies.get("idToken");
   const nextResponse = NextResponse.next();
   const redirectHomeResponse = NextResponse.redirect(new URL("/", request.url));
   const redirectLoginResponse = NextResponse.redirect(
@@ -13,9 +15,9 @@ export async function middleware(request: NextRequest) {
   );
 
   // todo TEST
-  // if (request.nextUrl.pathname.startsWith("/api")) {
-  //   console.log("TEST middleware api", request.nextUrl.pathname);
-  // }
+  if (request.nextUrl.pathname.startsWith("/api")) {
+    console.log("TEST middleware api", request.nextUrl.pathname);
+  }
 
   if (isAdminRoute(request)) {
     if (!accessToken) {
@@ -25,13 +27,20 @@ export async function middleware(request: NextRequest) {
       return redirectLoginResponse;
     }
 
-    const user = await fetchUser(request, nextResponse);
-    if (!isAdmin(user)) {
-      console.error(
-        `User is not an admin: ${user?.email} (navigating ${request.nextUrl.pathname})`,
-      );
-      return redirectHomeResponse;
-    }
+    // TODO constant
+    const alg = 'RS256';
+    const publicKey = await jose.importSPKI(appConfig.idTokenPublicKey, alg);
+    const { payload } = await jose.jwtVerify(idToken?.value as string, publicKey);
+    // const idToken = jose.decodeJwt(res.data.idToken) as IdTokenPayload;
+    const user = payload?.user as IUser;
+    console.log("TEST middleware user", user);
+    // const user = await fetchUser(request, nextResponse);
+    // if (!isAdmin(user)) {
+    //   console.error(
+    //     `User is not an admin: ${user?.email} (navigating ${request.nextUrl.pathname})`,
+    //   );
+    //   return redirectHomeResponse;
+    // }
 
     return nextResponse;
   }

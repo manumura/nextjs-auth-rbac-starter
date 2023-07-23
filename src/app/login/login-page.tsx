@@ -13,7 +13,6 @@ import { toast } from "react-toastify";
 import appConfig from "../../config/config";
 import useUserStore, { IUser } from "../../lib/user-store";
 import { sleep } from "../../lib/util";
-import { IdTokenPayload } from "../../types/IdTokenPayload";
 
 export default function LoginPage({ error }) {
   const router = useRouter();

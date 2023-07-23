@@ -1,5 +1,7 @@
 import axios from "axios";
 import appConfig from "../config/config";
+import cookie from "cookie";
+import moment from "moment";
 
 const BASE_URL = appConfig.baseUrl;
 const REFRESH_TOKEN_ENDPOINT = "/v1/refresh-token";
@@ -20,6 +22,51 @@ export const axiosInstance = axios.create({
   },
   withCredentials: true, // for cookies
 });
+
+axiosInstance.interceptors.request.use(
+  async (request) => {
+    // console.log("axiosInstance.interceptors.request: ", request);
+    const cookiesHeader = request.headers["Cookie"];
+    const cookies = cookie.parse(cookiesHeader || '');
+    const expiresAtAsString = cookies.accessTokenExpiresAt;
+    const now = moment().utc();
+    const expiresAt = moment(expiresAtAsString).utc();
+    if (!expiresAt || expiresAt.isBefore(now)) {
+      console.log("access token expired");
+
+      try {
+        const response = await axios.post(
+          REFRESH_TOKEN_ENDPOINT,
+          {},
+          {
+            baseURL: `${BASE_URL}/api`,
+            headers: {
+              "Content-Type": "application/json",
+              Cookie: cookiesHeader,
+            },
+            withCredentials: true, // for cookies
+          },
+        );
+  
+        // Update cookies
+        if (response && response.status === 200 && response.data) {
+          const data = response?.data;
+          request.headers.Cookie = `accessToken=${data.accessToken}; refreshToken=${data.refreshToken}; accessTokenExpiresAt=${data.accessTokenExpiresAt}`;
+          request.headers["set-cookie"] = response.headers["set-cookie"];
+        }
+  
+        return request;
+      } catch (err) {
+        console.error("Axios interceptor error: ", err?.response?.data);
+        return Promise.reject(err);
+      }
+    }
+    return request;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
 
 axiosInstance.interceptors.response.use(
   (response) => response,
@@ -54,11 +101,12 @@ axiosInstance.interceptors.response.use(
         const data = response?.data;
         config.headers = {
           ...config.headers,
-          Cookie: `accessToken=${data.accessToken}; refreshToken=${data.refreshToken}`,
+          Cookie: `accessToken=${data.accessToken}; refreshToken=${data.refreshToken}; accessTokenExpiresAt=${data.accessTokenExpiresAt}`,
           "set-cookie": response.headers["set-cookie"],
         };
       }
 
+      // retun config;
       return axiosInstance(config);
     } catch (err) {
       console.error("Axios interceptor error: ", err?.response?.data);

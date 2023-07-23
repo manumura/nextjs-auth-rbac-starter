@@ -37,7 +37,7 @@ export default async function Users({ searchParams }) {
 
   // Forward fetched data to your Client Component
   return (
-    <Suspense fallback={<LoadingOverlay />}>
+    <Suspense fallback={<LoadingOverlay label="Loading..." />}>
       <UsersPage
         users={users}
         totalElements={totalElements}

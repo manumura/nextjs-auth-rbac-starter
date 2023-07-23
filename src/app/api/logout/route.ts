@@ -1,36 +1,26 @@
-import axios from "axios";
 import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
 import appConfig from "../../../config/config";
+import { clearCookies } from "../../../lib/cookies";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const BASE_URL = appConfig.baseUrl;
-  const cookieStore = cookies();
 
-  const res = await axios.post(
-    "/v1/logout",
-    {},
-    {
-      baseURL: `${BASE_URL}/api`,
-      headers: {
-        "Content-Type": "application/json",
-        // Authorization: `bearer ${accessToken}`,
-        Cookie: cookieStore as any,
-      },
-      withCredentials: true,
+  const res = await fetch(`${BASE_URL}/api/v1/logout`, {
+    method: "POST",
+    body: JSON.stringify({}),
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: cookies() as any,
     },
-  );
-
-  const headers = res.headers;
-  const setCookieHeader = headers["set-cookie"];
-  let responseHeaders = {};
-  if (setCookieHeader) {
-    responseHeaders = {
-      'Set-Cookie': setCookieHeader,
-    };
-  }
-
-  return new Response(JSON.stringify(res.data), {
-    status: res.status,
-    headers: responseHeaders,
   });
+
+  const user = await res.json();
+  const response = new NextResponse(JSON.stringify(user), {
+    status: res.status,
+    // headers: responseHeaders,
+  });
+  clearCookies(response);
+  return response;
 }

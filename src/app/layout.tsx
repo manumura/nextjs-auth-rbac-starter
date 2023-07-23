@@ -10,7 +10,6 @@ import "react-toastify/dist/ReactToastify.min.css";
 async function getProfile() {
   try {
     const cookieStore = cookies();
-    console.log(`cookieStore: `, cookieStore);
     const response = await axiosInstance.get("/v1/profile", {
       headers: {
         Cookie: cookieStore as any,
