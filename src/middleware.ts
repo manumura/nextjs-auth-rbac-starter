@@ -1,13 +1,17 @@
 import * as jose from "jose";
+import moment from "moment";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import setCookie from "set-cookie-parser";
 import appConfig from "./config/config";
 import { IUser } from "./lib/user-store";
+import { isAdmin } from "./lib/util";
+import { appConstant } from "./config/constant";
 
 export async function middleware(request: NextRequest) {
-  const accessToken = request.cookies.get("accessToken");
-  const idToken = request.cookies.get("idToken");
+  const accessTokenCookie = request.cookies.get("accessToken");
+  const idTokenCookie = request.cookies.get("idToken");
+  const accessTokenExpiresAtCookie = request.cookies.get("accessTokenExpiresAt");
   const nextResponse = NextResponse.next();
   const redirectHomeResponse = NextResponse.redirect(new URL("/", request.url));
   const redirectLoginResponse = NextResponse.redirect(
@@ -20,33 +24,34 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isAdminRoute(request)) {
-    if (!accessToken) {
+    if (!accessTokenCookie) {
       console.error(
         `No access token found (navigating ${request.nextUrl.pathname})`,
       );
       return redirectLoginResponse;
     }
 
-    // TODO constant
-    const alg = 'RS256';
-    const publicKey = await jose.importSPKI(appConfig.idTokenPublicKey, alg);
-    const { payload } = await jose.jwtVerify(idToken?.value as string, publicKey);
+    const accessTokenExpiresAt = moment(accessTokenExpiresAtCookie?.value).toDate();
+    console.log("TEST middleware accessTokenExpiresAt", accessTokenExpiresAt);
+
+    const publicKey = await jose.importSPKI(appConfig.idTokenPublicKey, appConstant.ALG);
+    const { payload } = await jose.jwtVerify(idTokenCookie?.value as string, publicKey);
     // const idToken = jose.decodeJwt(res.data.idToken) as IdTokenPayload;
     const user = payload?.user as IUser;
     console.log("TEST middleware user", user);
     // const user = await fetchUser(request, nextResponse);
-    // if (!isAdmin(user)) {
-    //   console.error(
-    //     `User is not an admin: ${user?.email} (navigating ${request.nextUrl.pathname})`,
-    //   );
-    //   return redirectHomeResponse;
-    // }
+    if (!isAdmin(user)) {
+      console.error(
+        `User is not an admin: ${user?.email} (navigating ${request.nextUrl.pathname})`,
+      );
+      return redirectHomeResponse;
+    }
 
     return nextResponse;
   }
 
   // Redirect if user is not authenticated
-  if (isProtectedRoute(request) && !accessToken) {
+  if (isProtectedRoute(request) && !accessTokenCookie) {
     console.error(
       `No access token found (navigating ${request.nextUrl.pathname})`,
     );
@@ -54,7 +59,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect if user is authenticated
-  if (isPublicRoute(request) && accessToken) {
+  if (isPublicRoute(request) && accessTokenCookie) {
     console.error(`Already logged in (navigating ${request.nextUrl.pathname})`);
     return redirectHomeResponse;
   }

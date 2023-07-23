@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import appConfig from "../../config/config";
 import useUserStore, { IUser } from "../../lib/user-store";
 import { sleep } from "../../lib/util";
+import { appConstant } from "../../config/constant";
 
 export default function LoginPage({ error }) {
   const router = useRouter();
@@ -61,12 +62,16 @@ export default function LoginPage({ error }) {
       setLoading(true);
       // TODO remove this
       await sleep(1000);
-      const res = await login(data.email, data.password);
+      // const res = await login(data.email, data.password);
+      const res = await fetch("/api/login", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
 
-      if (res?.data) {
-        const alg = 'RS256';
-        const publicKey = await jose.importSPKI(appConfig.idTokenPublicKey, alg);
-        const { payload } = await jose.jwtVerify(res.data.idToken, publicKey);
+      if (res.ok) {
+        const login = await res.json();
+        const publicKey = await jose.importSPKI(appConfig.idTokenPublicKey, appConstant.ALG);
+        const { payload } = await jose.jwtVerify(login.idToken, publicKey);
         // const idToken = jose.decodeJwt(res.data.idToken) as IdTokenPayload;
         const user = payload?.user as IUser;
         
@@ -75,10 +80,15 @@ export default function LoginPage({ error }) {
           type: "success",
           position: "top-center",
         });
-        saveIdToken(res.data.idToken);
+        saveIdToken(login.idToken);
         
         router.replace("/");
         router.refresh();
+      } else {
+        toast("Login failed! Please check your email and password", {
+          type: "error",
+          position: "top-center",
+        });
       }
     } catch (err) {
       toast("Login failed! Please check your email and password", {

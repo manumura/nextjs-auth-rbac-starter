@@ -1,8 +1,15 @@
-import { IncomingMessage, ServerResponse } from "http";
+import moment from "moment";
 import { NextResponse } from "next/server";
-import setCookie from "set-cookie-parser";
+import { appConstant } from "../config/constant";
+import { COOKIE_OPTIONS } from "../config/cookie.config";
+import { LoginResponse } from "../types/LoginResponse";
 
-const COOKIE_NAMES = ["accessToken", "refreshToken", "accessTokenExpiresAt", "idToken"];
+const COOKIE_NAMES = [
+  appConstant.ACCESS_TOKEN, 
+  appConstant.ACCESS_TOKEN_EXPIRES_AT, 
+  appConstant.REFRESH_TOKEN, 
+  appConstant.ID_TOKEN,
+];
 
 export const clearCookies = (response: NextResponse) => {
   for (const n of COOKIE_NAMES) {
@@ -13,31 +20,9 @@ export const clearCookies = (response: NextResponse) => {
   }
 };
 
-export const getAuthCookies = (
-  req: IncomingMessage | undefined,
-  res: ServerResponse<IncomingMessage> | undefined,
-) => {
-  let cookieString: string | undefined;
-  
-  // Try to get cookies set from the middleware
-  const setCookieMiddlewareHeader = res?.getHeaders()["set-cookie"] as string[];
-  if (setCookieMiddlewareHeader) {
-    const cookies = setCookie.parse(setCookieMiddlewareHeader, {
-      decodeValues: true,
-      map: true,
-    });
-    const accessTokenCookie = cookies.accessToken;
-    const refreshTokenCookie = cookies.refreshToken;
-    cookieString = `accessToken=${accessTokenCookie.value}; refreshToken=${refreshTokenCookie.value}`;
-  }
-
-  // Default to the cookies from the request
-  return cookieString ? cookieString : req?.headers.cookie;
-};
-
-export const setAuthCookies = (headers: any, res: ServerResponse<IncomingMessage> | undefined) => {
-  const setCookieHeader = headers["set-cookie"];
-  if (setCookieHeader) {
-    res?.setHeader("Set-Cookie", setCookieHeader);
-  }
+export const setAuthCookies = (response: NextResponse, login: LoginResponse) => {
+  response.cookies.set(appConstant.ACCESS_TOKEN, login.accessToken, COOKIE_OPTIONS);
+  response.cookies.set(appConstant.ACCESS_TOKEN_EXPIRES_AT, moment(login.accessTokenExpiresAt).format(), COOKIE_OPTIONS);
+  response.cookies.set(appConstant.REFRESH_TOKEN, login.refreshToken, COOKIE_OPTIONS);
+  response.cookies.set(appConstant.ID_TOKEN, login.idToken, COOKIE_OPTIONS);
 };
