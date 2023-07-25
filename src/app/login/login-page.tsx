@@ -1,7 +1,6 @@
 "use client";
 
 import FormInput from "@/components/FormInput";
-import { login } from "@/lib/api";
 import { clearStorage, saveIdToken } from "@/lib/storage";
 import clsx from "clsx";
 import * as jose from "jose";
@@ -11,9 +10,9 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import appConfig from "../../config/config";
+import { appConstant } from "../../config/constant";
 import useUserStore, { IUser } from "../../lib/user-store";
 import { sleep } from "../../lib/util";
-import { appConstant } from "../../config/constant";
 
 export default function LoginPage({ error }) {
   const router = useRouter();

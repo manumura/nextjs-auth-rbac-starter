@@ -1,12 +1,7 @@
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getClientBaseUrl } from "../../lib/util";
 import ResetPasswordPage from "./reset-password-page";
-import { cookies } from "next/headers";
-import {
-  axiosInstance,
-  forgotPassword,
-  getUserByToken,
-  resetPassword,
-} from "@/lib/api";
 
 async function isAuthenticated() {
   // Redirect if user is authenticated
@@ -16,9 +11,19 @@ async function isAuthenticated() {
 
 async function getUser(token) {
   try {
-    const response = await getUserByToken(token);
-    const user = response.data;
-    return user;
+    const baseUrl = getClientBaseUrl(headers());
+    // const response = await getUserByToken(token);
+    // const user = response.data;
+    const res = await fetch(`${baseUrl}/api/token/${token}`, {
+      method: "GET",
+    });
+    
+    if (res.ok) {
+      const user = await res.json();
+      return user;
+    }
+    return undefined;
+        
   } catch (err) {
     console.error(
       `Reset Password getServerSideProps error:`, err.response?.data

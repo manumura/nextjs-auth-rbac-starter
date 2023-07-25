@@ -1,7 +1,6 @@
 "use client";
 
 import FormInput from "@/components/FormInput";
-import { register } from "@/lib/api";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -30,17 +29,26 @@ export default function RegisterPage() {
       setLoading(true);
       // TODO remove this
       await sleep(1000);
-      const res = await register(data.email, data.password, data.name);
+      // const res = await register(data.email, data.password, data.name);
+      const res = await fetch("/api/register", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
 
-      if (res) {
-        toast(`You are successfully registered ${res.data.name}!`, {
+      if (res.ok) {
+        const register = await res.json();
+        toast(`You are successfully registered ${register.name}!`, {
           type: "success",
           position: "top-center",
         });
         router.push("/login");
+      } else {
+        toast("Registration failed! Did you already register with this email?", {
+          type: "error",
+          position: "top-center",
+        });
       }
     } catch (err) {
-      console.error(err.message);
       toast("Registration failed! Did you already register with this email?", {
         type: "error",
         position: "top-center",

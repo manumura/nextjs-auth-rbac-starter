@@ -1,9 +1,6 @@
 "use client";
 
 import FormInput from "@/components/FormInput";
-import {
-  resetPassword
-} from "@/lib/api";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -39,17 +36,30 @@ export default function ResetPasswordPage({ token }) {
       setLoading(true);
       // TODO remove this
       await sleep(1000);
-      const res = await resetPassword(data.password, token);
+      // const res = await resetPassword(data.password, token);
+      const body = {
+        password: data.password, 
+        token
+      };
+      const res = await fetch("/api/reset-password", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
 
-      if (res) {
+      if (res.ok) {
         toast("Password successfully updated!", {
           type: "success",
           position: "top-center",
         });
         router.push("/login");
+      } else {
+        toast('Password update failed', {
+          type: "error",
+          position: "top-center",
+        });
       }
+
     } catch (err) {
-      console.error(err.message);
       toast(`Password update failed: ${err.response?.data?.message}`, {
         type: "error",
         position: "top-center",

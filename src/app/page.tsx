@@ -1,15 +1,32 @@
-import { welcome, info } from "@/lib/api";
+import { headers } from "next/headers";
 import HomePage from "./home-page";
+import { getClientBaseUrl } from "../lib/util";
 
 export const getAppInfos = async () => {
   let message = 'Welcome fallback!';
   let information = {};
 
+  const baseUrl = getClientBaseUrl(headers());
+
   try {
-    const welcomeRes = await welcome();
-    message = welcomeRes.data;
-    const infoRes = await info();
-    information = infoRes.data;
+    const welcomeRes = await fetch(`${baseUrl}/api/welcome`, {
+      method: "GET",
+    });
+    if (welcomeRes.ok) {
+      const messageAsJson = await welcomeRes.json();
+      message = messageAsJson.message;
+    }
+
+    const infoRes = await fetch(`${baseUrl}/api/info`, {
+      method: "GET",
+    });
+    if (infoRes.ok) {
+      information = await infoRes.json();
+    }
+    // const welcomeRes = await welcome();
+    // message = welcomeRes.data;
+    // const infoRes = await info();
+    // information = infoRes.data;
   } catch (err) {
     console.error(`Welcome message error: ${err.message}`);
   }

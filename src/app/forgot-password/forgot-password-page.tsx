@@ -1,7 +1,6 @@
 "use client";
 
 import FormInput from "@/components/FormInput";
-import { forgotPassword } from "@/lib/api";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,14 +34,23 @@ export default function ForgotPasswordPage() {
       setLoading(true);
       // TODO remove this
       await sleep(1000);
-      const res = await forgotPassword(data.email);
+      // const res = await forgotPassword(data.email);
+      const res = await fetch("/api/forgot-password", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
 
-      if (res) {
+      if (res.ok) {
         toast(`Success! Please check the email sent at ${data.email}`, {
           type: "success",
           position: "top-center",
         });
         router.push("/");
+      } else {
+        toast("An error occured, please try again", {
+          type: "error",
+          position: "top-center",
+        });
       }
     } catch (err) {
       toast("An error occured, please try again", {

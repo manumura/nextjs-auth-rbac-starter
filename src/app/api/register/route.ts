@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import appConfig from "../../../config/config";
-import { setAuthCookies } from "../../../lib/cookies";
 
 export async function POST(request: NextRequest) {
   const BASE_URL = appConfig.baseUrl;
   const body = await request.text() ;
 
-  const res = await fetch(`${BASE_URL}/api/v1/login`, {
+  const res = await fetch(`${BASE_URL}/api/v1/register`, {
     method: "POST",
     body,
-    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
@@ -21,11 +19,10 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const login = await res.json();
-  const response = new NextResponse(JSON.stringify(login), {
+  const register = await res.json();
+  const response = new NextResponse(JSON.stringify(register), {
     status: res.status,
   });
   
-  setAuthCookies(response, login);
   return response;
 }

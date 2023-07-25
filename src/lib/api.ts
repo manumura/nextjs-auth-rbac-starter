@@ -115,39 +115,39 @@ axiosInstance.interceptors.response.use(
   },
 );
 
-export const welcome = async () => {
-  return axiosPublicInstance.get("/index");
-};
+// export const welcome = async () => {
+//   return axiosPublicInstance.get("/index");
+// };
 
-export const info = async () => {
-  return axiosPublicInstance.get("/v1/info");
-};
+// export const info = async () => {
+//   return axiosPublicInstance.get("/v1/info");
+// };
 
-export const login = async (email, password) => {
-  return axiosPublicInstance.post("/v1/login", { email, password });
-};
+// export const login = async (email, password) => {
+//   return axiosPublicInstance.post("/v1/login", { email, password });
+// };
 
-export const register = async (email, password, name) => {
-  return axiosPublicInstance.post("/v1/register", { email, password, name });
-};
+// export const register = async (email, password, name) => {
+//   return axiosPublicInstance.post("/v1/register", { email, password, name });
+// };
 
-export const forgotPassword = async (email) => {
-  return axiosPublicInstance.post("/v1/forgot-password", { email });
-};
+// export const forgotPassword = async (email) => {
+//   return axiosPublicInstance.post("/v1/forgot-password", { email });
+// };
 
-export const getUserByToken = async (token) => {
-  return axiosPublicInstance.get(`/v1/token/${token}`);
-};
+// export const getUserByToken = async (token) => {
+//   return axiosPublicInstance.get(`/v1/token/${token}`);
+// };
 
-export const resetPassword = async (password, token) => {
-  return axiosPublicInstance.post("/v1/new-password", { password, token });
-};
+// export const resetPassword = async (password, token) => {
+//   return axiosPublicInstance.post("/v1/new-password", { password, token });
+// }; 
 
 ////////////////////////////////////////////////////////////////
 // Authenticated-only APIs
-export const logout = async () => {
-  return axiosInstance.post("/v1/logout");
-};
+// export const logout = async () => {
+//   return axiosInstance.post("/v1/logout");
+// };
 
 export const getProfile = async (signal?) => {
   return axiosInstance.get("/v1/profile", { signal });
