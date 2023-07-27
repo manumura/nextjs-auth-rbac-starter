@@ -1,7 +1,6 @@
 "use client";
 
 import FormInput from "@/components/FormInput";
-import { createUser } from "@/lib/api";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -22,28 +21,35 @@ export default function CreateUserPage() {
       return;
     }
 
-    try {
-      setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      const res = await createUser(data.email, data.name, data.role);
+    setLoading(true);
+    // TODO remove this
+    await sleep(1000);
+    // const res = await createUser(data.email, data.name, data.role);
+    const body = {
+      email: data.email,
+      name: data.name,
+      role: data.role,
+    };
+    const res = await fetch("/api/users", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    const json = await res.json();
 
-      if (res) {
-        toast(`User successfully created: ${res.data.name}`, {
-          type: "success",
-          position: "top-center",
-        });
-        router.push("/users");
-      }
-    } catch (err) {
-      console.error(err.message);
-      toast(`User creation failed: ${err.response?.data?.message}`, {
+    if (res.ok) {
+      toast(`User successfully created: ${json.name}`, {
+        type: "success",
+        position: "top-center",
+      });
+      router.push("/users");
+    } else {
+      toast(`User creation failed: ${json.message}`, {
         type: "error",
         position: "top-center",
       });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const nameConstraints = {
@@ -66,7 +72,10 @@ export default function CreateUserPage() {
     { label: "User", value: "USER" },
   ];
 
-  const btnClass = clsx("btn-primary btn mx-1", `${loading ? "loading btn-disabled" : ""}`);
+  const btnClass = clsx(
+    "btn-primary btn mx-1",
+    `${loading ? "loading btn-disabled" : ""}`,
+  );
 
   const onCancel = () => {
     router.back();
@@ -116,4 +125,4 @@ export default function CreateUserPage() {
       </div>
     </section>
   );
-};
+}

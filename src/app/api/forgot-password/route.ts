@@ -13,16 +13,11 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  if (!res.ok) {
-    return new NextResponse(null, {
-      status: res.status,
-    });
-  }
-
-  const forgotPassword = await res.json();
-  const response = new NextResponse(JSON.stringify(forgotPassword), {
+  const json = await res.json();
+  const response = new NextResponse(JSON.stringify(json), {
     status: res.status,
+    statusText: res.statusText,
+    headers: res.headers,
   });
-  
   return response;
 }

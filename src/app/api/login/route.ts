@@ -15,17 +15,13 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  if (!res.ok) {
-    return new NextResponse(null, {
-      status: res.status,
-    });
-  }
-
-  const login = await res.json();
-  const response = new NextResponse(JSON.stringify(login), {
+  const json = await res.json();
+  const response = new NextResponse(JSON.stringify(json), {
     status: res.status,
+    statusText: res.statusText,
+    headers: res.headers,
   });
-  
-  setAuthCookies(response, login);
+
+  setAuthCookies(response, json);
   return response;
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { updateProfile } from "@/lib/api";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -46,18 +45,30 @@ export default function EditProfilePage({ user }) {
       setLoading(true);
       // TODO remove this
       await sleep(1000);
-      const res = await updateProfile(data.name, data.password);
+      // const res = await updateProfile(data.name, data.password);
+      const body = {
+        name: data.name,
+        ...(data.password ? { password: data.password } : {}),
+      };
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        body: JSON.stringify(body),
+      });
 
-      if (res) {
+      if (res.ok) {
         toast(`Profile successfully updated!`, {
           type: "success",
           position: "top-center",
         });
         router.back();
         router.refresh();
+      } else {
+        toast("Profile update failed!", {
+          type: "error",
+          position: "top-center",
+        });
       }
     } catch (err) {
-      console.error(err.message);
       toast("Profile update failed!", {
         type: "error",
         position: "top-center",

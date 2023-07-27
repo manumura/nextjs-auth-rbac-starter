@@ -149,32 +149,32 @@ axiosInstance.interceptors.response.use(
 //   return axiosInstance.post("/v1/logout");
 // };
 
-export const getProfile = async (signal?) => {
-  return axiosInstance.get("/v1/profile", { signal });
-};
+// export const getProfile = async (signal?) => {
+//   return axiosInstance.get("/v1/profile", { signal });
+// };
 
-export const updateProfile = async (name, password?) => {
-  return axiosInstance.put("/v1/profile", {
-    name,
-    ...(password ? { password } : {}),
-  });
-};
+// export const updateProfile = async (name, password?) => {
+//   return axiosInstance.put("/v1/profile", {
+//     name,
+//     ...(password ? { password } : {}),
+//   });
+// };
 
-export const getUsers = async (role, page, pageSize, signal) => {
-  return axiosInstance.get("/v1/users", {
-    params: { role, page, pageSize },
-    signal,
-  });
-};
+// export const getUsers = async (role, page, pageSize, signal) => {
+//   return axiosInstance.get("/v1/users", {
+//     params: { role, page, pageSize },
+//     signal,
+//   });
+// };
+
+// export const createUser = async (email, name, role) => {
+//   return axiosInstance.post("/v1/users", { email, name, role });
+// };
 
 export const getUser = async (id, signal) => {
   return axiosInstance.get(`/v1/users/${id}`, {
     signal,
   });
-};
-
-export const createUser = async (email, name, role) => {
-  return axiosInstance.post("/v1/users", { email, name, role });
 };
 
 export const updateUser = async (id, name, email, role, password?) => {

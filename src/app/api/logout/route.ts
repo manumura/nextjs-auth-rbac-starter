@@ -16,12 +16,13 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  const user = await res.json();
-  const response = new NextResponse(JSON.stringify(user), {
+  const json = await res.json();
+  const response = new NextResponse(JSON.stringify(json), {
     status: res.status,
-    // headers: responseHeaders,
+    statusText: res.statusText,
+    headers: res.headers,
   });
-  
+
   clearCookies(response);
   return response;
 }

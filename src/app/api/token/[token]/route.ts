@@ -12,6 +12,11 @@ export async function GET(request: NextRequest, { params }) {
     },
   });
 
-  const user = await res.json();
-  return NextResponse.json(user);
+  const json = await res.json();
+  const response = new NextResponse(JSON.stringify(json), {
+    status: res.status,
+    statusText: res.statusText,
+    headers: res.headers,
+  });
+  return response;
 }

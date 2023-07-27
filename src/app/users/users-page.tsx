@@ -44,7 +44,7 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
     </tr>
   );
 
-  const userRows = users.map((user) => (
+  const userRows = users && users.map((user) => (
     <tr key={user.id}>
       <th>{user.id}</th>
       <td>{user.name}</td>
@@ -90,10 +90,10 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
             </th>
           </tr>
         </thead>
-        <tbody>{users.length > 0 ? userRows : noUserRow}</tbody>
+        <tbody>{users && users.length > 0 ? userRows : noUserRow}</tbody>
       </table>
       <div className="flex justify-end">
-        {users.length > 0 && (
+        {users && users.length > 0 && (
           <Pagination
             currentPage={page}
             onPageSelect={onPageSelect}

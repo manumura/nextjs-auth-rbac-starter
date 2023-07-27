@@ -10,6 +10,11 @@ export async function GET(request: Request) {
     },
   });
 
-  const response = await res.json();
-  return NextResponse.json(response);
+  const json = await res.json();
+  const response = new NextResponse(JSON.stringify(json), {
+    status: res.status,
+    statusText: res.statusText,
+    headers: res.headers,
+  });
+  return response;
 }

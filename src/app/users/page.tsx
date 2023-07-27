@@ -1,29 +1,39 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { Suspense } from "react";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import appConfig from "../../config/config";
 import { axiosInstance } from "../../lib/api";
 import UsersPage from "./users-page";
+import { getClientBaseUrl } from "../../lib/util";
+import { URLSearchParams } from "url";
 
 async function getUsers(page, pageSize, role) {
-  try {
-    const cookieStore = cookies();
-    const response = await axiosInstance.get("/v1/users", {
-      params: { role, page, pageSize },
-      headers: {
-        // Authorization: `bearer ${accessToken}`,
-        Cookie: cookieStore as any,
-      },
-      withCredentials: true,
-    });
+  const baseUrl = getClientBaseUrl(headers());
+  const cookieStore = cookies();
+  const params = new URLSearchParams({
+    ...(page ? { page } : {}),
+    ...(pageSize ? { pageSize } : {}),
+    ...(role ? { role } : {}),
+  });
 
-    const users = response.data.elements;
-    const totalElements = response.data.totalElements;
-    return { users, totalElements };
-  } catch (err) {
-    console.error(`Get Users getServerSideProps error: `, err.response?.data);
+  const res = await fetch(`${baseUrl}/api/users?` + params, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      Cookie: cookieStore as any,
+    },
+  });
+
+  if (!res.ok) {
+    console.error(`Get Users getServerSideProps error: `, res.statusText);
     return { users: [], totalElements: 0 };
   }
+
+  const response = await res.json();
+  // TODO remove try catch
+  const users = response.elements;
+  const totalElements = response.totalElements;
+  return { users, totalElements };
 }
 
 export default async function Users({ searchParams }) {
