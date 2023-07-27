@@ -1,28 +1,28 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import ProfilePage from "./profile-page";
+import { getClientBaseUrl } from "../../lib/util";
+import { toast } from "react-toastify";
 
 async function getProfile() {
-  const h = headers();
-  const protocol = h.get("x-forwarded-proto");
-  const host = h.get("host");
+  const baseUrl = getClientBaseUrl(headers());
   const cookieStore = cookies();
 
-  const res = await fetch(`${protocol}://${host}/api/profile`, {
+  const res = await fetch(`${baseUrl}/api/profile`, {
     method: "GET",
     credentials: "include",
     headers: {
-      "Content-Type": "application/json",
       Cookie: cookieStore as any,
     },
   });
 
   if (!res.ok) {
+    console.error(`Get Profile getServerSideProps error: `,  res.statusText);
     return undefined;
   }
 
-  const user = await res.json();
-  return user;
+  const json = await res.json();
+  return json;
 }
 
 export default async function Profile() {

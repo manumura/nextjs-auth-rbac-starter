@@ -1,27 +1,32 @@
+import * as jose from "jose";
 import { cookies } from "next/headers";
 import DrawerLayout from "../components/DrawerLayout";
-import { axiosInstance } from "../lib/api";
 import "../styles/globals.css";
+import appConfig from "../config/config";
+import { appConstant } from "../config/constant";
+import { IUser } from "../lib/user-store";
 
 // To avoid tailwind to purge toastify styles
 import "react-toastify/dist/ReactToastify.min.css";
 
-// TODO refresh token
 async function getProfile() {
-  try {
-    const cookieStore = cookies();
-    const response = await axiosInstance.get("/v1/profile", {
-      headers: {
-        Cookie: cookieStore as any,
-      },
-      withCredentials: true,
-    });
-
-    return response.data;
-  } catch (err) {
-    console.error(`Profile getServerSideProps error: `, err.response?.data);
+  const cookieStore = cookies();
+  const idTokenCookie = cookieStore.get("idToken");
+  if (!idTokenCookie || !idTokenCookie.value) {
+    console.error("No idToken cookie found");
     return undefined;
   }
+
+  const publicKey = await jose.importSPKI(
+    appConfig.idTokenPublicKey,
+    appConstant.ALG,
+  );
+  const { payload } = await jose.jwtVerify(
+    idTokenCookie?.value as string,
+    publicKey,
+  );
+  const user = payload?.user as IUser;
+  return user;
 }
 
 export default async function RootLayout({

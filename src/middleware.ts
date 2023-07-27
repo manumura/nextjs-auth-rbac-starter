@@ -11,7 +11,9 @@ import { appConstant } from "./config/constant";
 export async function middleware(request: NextRequest) {
   const accessTokenCookie = request.cookies.get("accessToken");
   const idTokenCookie = request.cookies.get("idToken");
-  const accessTokenExpiresAtCookie = request.cookies.get("accessTokenExpiresAt");
+  const accessTokenExpiresAtCookie = request.cookies.get(
+    "accessTokenExpiresAt",
+  );
   const nextResponse = NextResponse.next();
   const redirectHomeResponse = NextResponse.redirect(new URL("/", request.url));
   const redirectLoginResponse = NextResponse.redirect(
@@ -24,18 +26,33 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isAdminRoute(request)) {
-    if (!accessTokenCookie) {
+    if (!accessTokenCookie || !accessTokenCookie.value) {
       console.error(
         `No access token found (navigating ${request.nextUrl.pathname})`,
       );
       return redirectLoginResponse;
     }
 
-    const accessTokenExpiresAt = moment(accessTokenExpiresAtCookie?.value).toDate();
+    if (!idTokenCookie || !idTokenCookie.value) {
+      console.error(
+        `No idToken found (navigating ${request.nextUrl.pathname})`,
+      );
+      return redirectLoginResponse;
+    }
+
+    const accessTokenExpiresAt = moment(
+      accessTokenExpiresAtCookie?.value,
+    ).toDate();
     console.log("TEST middleware accessTokenExpiresAt", accessTokenExpiresAt);
 
-    const publicKey = await jose.importSPKI(appConfig.idTokenPublicKey, appConstant.ALG);
-    const { payload } = await jose.jwtVerify(idTokenCookie?.value as string, publicKey);
+    const publicKey = await jose.importSPKI(
+      appConfig.idTokenPublicKey,
+      appConstant.ALG,
+    );
+    const { payload } = await jose.jwtVerify(
+      idTokenCookie?.value as string,
+      publicKey,
+    );
     // const idToken = jose.decodeJwt(res.data.idToken) as IdTokenPayload;
     const user = payload?.user as IUser;
     console.log("TEST middleware user", user);
@@ -107,7 +124,11 @@ async function refreshToken(request: NextRequest, response: NextResponse) {
   return null;
 }
 
-function setAuthCookies(setCookieHeader: string, request: NextRequest, response: NextResponse) {
+function setAuthCookies(
+  setCookieHeader: string,
+  request: NextRequest,
+  response: NextResponse,
+) {
   const splitCookieHeaders = setCookie.splitCookiesString(setCookieHeader);
   const cookies = setCookie.parse(splitCookieHeaders, {
     decodeValues: true,

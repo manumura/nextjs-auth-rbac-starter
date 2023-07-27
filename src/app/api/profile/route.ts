@@ -4,8 +4,6 @@ import appConfig from "../../../config/config";
 
 export async function GET(request: NextRequest) {
   const BASE_URL = appConfig.baseUrl;
-  // const headersList = headers();
-  // const cookies = headersList.get("Cookie");
 
   const res = await fetch(`${BASE_URL}/api/v1/profile`, {
     method: "GET",
@@ -16,15 +14,19 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  const user = await res.json();
-  return NextResponse.json(user);
+  const json = await res.json();
+  const response = new NextResponse(JSON.stringify(json), {
+    status: res.status,
+    statusText: res.statusText,
+    headers: res.headers,
+  });
+
+  return response;
 }
 
 export async function PUT(request: NextRequest) {
   const BASE_URL = appConfig.baseUrl;
-  const body = await request.text() ;
-  // const headersList = headers();
-  // const cookies = headersList.get("Cookie");
+  const body = await request.text();
 
   const res = await fetch(`${BASE_URL}/api/v1/profile`, {
     method: "PUT",
@@ -36,6 +38,12 @@ export async function PUT(request: NextRequest) {
     },
   });
 
-  const user = await res.json();
-  return NextResponse.json(user);
+  const json = await res.json();
+  const response = new NextResponse(JSON.stringify(json), {
+    status: res.status,
+    statusText: res.statusText,
+    headers: res.headers,
+  });
+
+  return response;
 }
