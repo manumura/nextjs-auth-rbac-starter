@@ -17,8 +17,8 @@ export default function EditUserPage({ user }) {
     defaultValues: {
       name: user.name,
       email: user.email,
-      password: '',
-      passwordConfirm: '',
+      password: "",
+      passwordConfirm: "",
       role: user.role,
     },
   });
@@ -29,29 +29,27 @@ export default function EditUserPage({ user }) {
       return;
     }
 
-    try {
-      setSubmitting(true);
-      // TODO remove this
-      await sleep(1000);
-      const res = await updateUser(user.id, data.name, data.email, data.role, data.password);
+    setSubmitting(true);
+    // TODO remove this
+    await sleep(1000);
+    const res = await updateUser(
+      user.id,
+      data.name,
+      data.email,
+      data.role,
+      data.password,
+    );
 
-      if (res) {
-        toast(`User successfully updated: ${res.data.name}`, {
-          type: "success",
-          position: "top-center",
-        });
-        router.back();
-        router.refresh();
-      }
-    } catch (err) {
-      console.error(err.message);
-      toast(`User update failed: ${err.response?.data?.message}`, {
-        type: "error",
+    if (res) {
+      toast(`User successfully updated: ${res.data.name}`, {
+        type: "success",
         position: "top-center",
       });
-    } finally {
-      setSubmitting(false);
+      router.back();
+      router.refresh();
     }
+
+    setSubmitting(false);
   };
 
   const onCancel = () => {
@@ -93,7 +91,10 @@ export default function EditUserPage({ user }) {
     { label: "User", value: "USER" },
   ];
 
-  const btnClass = clsx("btn-primary btn mx-1", `${submitting ? "loading btn-disabled" : ""}`);
+  const btnClass = clsx(
+    "btn-primary btn mx-1",
+    `${submitting ? "loading btn-disabled" : ""}`,
+  );
 
   const editUserForm = (
     <div className="w-full py-10">
@@ -153,4 +154,4 @@ export default function EditUserPage({ user }) {
       {editUserForm}
     </section>
   );
-};
+}

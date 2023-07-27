@@ -30,42 +30,39 @@ export default function ForgotPasswordPage() {
     if (!data || loading) {
       return;
     }
-    try {
-      setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      // const res = await forgotPassword(data.email);
-      const res = await fetch("/api/forgot-password", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
 
-      if (res.ok) {
-        toast(`Success! Please check the email sent at ${data.email}`, {
-          type: "success",
-          position: "top-center",
-        });
-        router.push("/");
-      } else {
-        toast("An error occured, please try again", {
-          type: "error",
-          position: "top-center",
-        });
-      }
-    } catch (err) {
+    setLoading(true);
+    // TODO remove this
+    await sleep(1000);
+    // const res = await forgotPassword(data.email);
+    const res = await fetch("/api/forgot-password", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      toast(`Success! Please check the email sent at ${data.email}`, {
+        type: "success",
+        position: "top-center",
+      });
+      router.push("/");
+    } else {
       toast("An error occured, please try again", {
         type: "error",
         position: "top-center",
       });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const emailConstraints = {
     required: { value: true, message: "Email is required" },
   };
-  const btnClass = clsx("w-full btn", `${loading ? "loading btn-disabled" : ""}`);
+  const btnClass = clsx(
+    "w-full btn",
+    `${loading ? "loading btn-disabled" : ""}`,
+  );
 
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200 py-20">
@@ -98,4 +95,4 @@ export default function ForgotPasswordPage() {
       </div>
     </section>
   );
-};
+}

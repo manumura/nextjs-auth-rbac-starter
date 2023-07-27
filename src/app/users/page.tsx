@@ -1,11 +1,10 @@
 import { cookies, headers } from "next/headers";
 import { Suspense } from "react";
+import { URLSearchParams } from "url";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import appConfig from "../../config/config";
-import { axiosInstance } from "../../lib/api";
-import UsersPage from "./users-page";
 import { getClientBaseUrl } from "../../lib/util";
-import { URLSearchParams } from "url";
+import UsersPage from "./users-page";
 
 async function getUsers(page, pageSize, role) {
   const baseUrl = getClientBaseUrl(headers());
@@ -29,10 +28,9 @@ async function getUsers(page, pageSize, role) {
     return { users: [], totalElements: 0 };
   }
 
-  const response = await res.json();
-  // TODO remove try catch
-  const users = response.elements;
-  const totalElements = response.totalElements;
+  const json = await res.json();
+  const users = json.elements;
+  const totalElements = json.totalElements;
   return { users, totalElements };
 }
 

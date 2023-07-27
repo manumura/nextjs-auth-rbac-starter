@@ -41,41 +41,34 @@ export default function EditProfilePage({ user }) {
       return;
     }
 
-    try {
-      setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      // const res = await updateProfile(data.name, data.password);
-      const body = {
-        name: data.name,
-        ...(data.password ? { password: data.password } : {}),
-      };
-      const res = await fetch("/api/profile", {
-        method: "PUT",
-        body: JSON.stringify(body),
-      });
+    setLoading(true);
+    // TODO remove this
+    await sleep(1000);
+    // const res = await updateProfile(data.name, data.password);
+    const body = {
+      name: data.name,
+      ...(data.password ? { password: data.password } : {}),
+    };
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      body: JSON.stringify(body),
+    });
 
-      if (res.ok) {
-        toast(`Profile successfully updated!`, {
-          type: "success",
-          position: "top-center",
-        });
-        router.back();
-        router.refresh();
-      } else {
-        toast("Profile update failed!", {
-          type: "error",
-          position: "top-center",
-        });
-      }
-    } catch (err) {
+    if (res.ok) {
+      toast(`Profile successfully updated!`, {
+        type: "success",
+        position: "top-center",
+      });
+      router.back();
+      router.refresh();
+    } else {
       toast("Profile update failed!", {
         type: "error",
         position: "top-center",
       });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const nameConstraints = {

@@ -57,46 +57,43 @@ export default function LoginPage({ error }) {
     if (!data || loading) {
       return;
     }
-    try {
-      setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      // const res = await login(data.email, data.password);
-      const res = await fetch("/api/login", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
 
-      if (res.ok) {
-        const login = await res.json();
-        const publicKey = await jose.importSPKI(appConfig.idTokenPublicKey, appConstant.ALG);
-        const { payload } = await jose.jwtVerify(login.idToken, publicKey);
-        // const idToken = jose.decodeJwt(res.data.idToken) as IdTokenPayload;
-        const user = payload?.user as IUser;
-        
-        userStore.setUser(user);
-        toast(`Welcome ${user?.name}!`, {
-          type: "success",
-          position: "top-center",
-        });
-        saveIdToken(login.idToken);
-        
-        router.replace("/");
-        router.refresh();
-      } else {
-        toast("Login failed! Please check your email and password", {
-          type: "error",
-          position: "top-center",
-        });
-      }
-    } catch (err) {
+    setLoading(true);
+    // TODO remove this
+    await sleep(1000);
+    // const res = await login(data.email, data.password);
+    const res = await fetch("/api/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      const login = await res.json();
+      const publicKey = await jose.importSPKI(
+        appConfig.idTokenPublicKey,
+        appConstant.ALG,
+      );
+      const { payload } = await jose.jwtVerify(login.idToken, publicKey);
+      // const idToken = jose.decodeJwt(res.data.idToken) as IdTokenPayload;
+      const user = payload?.user as IUser;
+
+      userStore.setUser(user);
+      toast(`Welcome ${user?.name}!`, {
+        type: "success",
+        position: "top-center",
+      });
+      saveIdToken(login.idToken);
+
+      router.replace("/");
+      router.refresh();
+    } else {
       toast("Login failed! Please check your email and password", {
         type: "error",
         position: "top-center",
       });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const emailConstraints = {

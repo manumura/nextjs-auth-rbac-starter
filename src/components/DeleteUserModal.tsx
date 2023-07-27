@@ -17,30 +17,25 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
       return;
     }
 
-    try {
-      setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      const res = await deleteUser(user?.id);
-      if (res?.data) {
-        toast(`User successfully deleted: ${user.name}`, {
-          type: "success",
-          position: "top-center",
-        });
-        onClose(true);
-      }
-    } catch (error) {
-      console.error(error.message);
-      toast(`Delete user failed! ${error.message}`, {
-        type: "error",
+    setLoading(true);
+    // TODO remove this
+    await sleep(1000);
+    const res = await deleteUser(user?.id);
+    if (res?.data) {
+      toast(`User successfully deleted: ${user.name}`, {
+        type: "success",
         position: "top-center",
       });
-    } finally {
-      setLoading(false);
+      onClose(true);
     }
+
+    setLoading(false);
   };
 
-  const btnClass = clsx("btn-accent btn mx-1", `${loading ? "loading btn-disabled" : ""}`);
+  const btnClass = clsx(
+    "btn-accent btn mx-1",
+    `${loading ? "loading btn-disabled" : ""}`,
+  );
 
   const title = (
     <div>

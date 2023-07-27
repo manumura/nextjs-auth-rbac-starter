@@ -1,22 +1,27 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { axiosInstance } from "../../../lib/api";
+import { getClientBaseUrl } from "../../../lib/util";
 import EditUserPage from "./edit-user-page";
 
 async function getUserById(id) {
-  try {
-    const accessToken = cookies().get("accessToken")?.value;
-    const response = await axiosInstance.get(`/v1/users/${id}`, {
-      headers: {
-        Authorization: `bearer ${accessToken}`,
-      },
-    });
-    const user = response.data;
-    return user;
-  } catch (err) {
-    console.error(`Edit User getServerSideProps error: `, err.response?.data);
-    return undefined;
+  const baseUrl = getClientBaseUrl(headers());
+  const cookieStore = cookies();
+
+  const res = await fetch(`${baseUrl}/api/users/${id}`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      Cookie: cookieStore as any,
+    },
+  });
+
+  if (!res.ok) {
+    console.error(`Edit User getServerSideProps error: `, res.statusText);
+    return { users: [], totalElements: 0 };
   }
+
+  const json = await res.json();
+  return json;
 }
 
 export default async function EditUser({params}) {

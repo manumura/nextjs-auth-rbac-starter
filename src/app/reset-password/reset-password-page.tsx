@@ -32,41 +32,33 @@ export default function ResetPasswordPage({ token }) {
       return;
     }
 
-    try {
-      setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      // const res = await resetPassword(data.password, token);
-      const body = {
-        password: data.password, 
-        token
-      };
-      const res = await fetch("/api/reset-password", {
-        method: "POST",
-        body: JSON.stringify(body),
+    setLoading(true);
+    // TODO remove this
+    await sleep(1000);
+    // const res = await resetPassword(data.password, token);
+    const body = {
+      password: data.password,
+      token,
+    };
+    const res = await fetch("/api/reset-password", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+
+    if (res.ok) {
+      toast("Password successfully updated!", {
+        type: "success",
+        position: "top-center",
       });
-
-      if (res.ok) {
-        toast("Password successfully updated!", {
-          type: "success",
-          position: "top-center",
-        });
-        router.push("/login");
-      } else {
-        toast('Password update failed', {
-          type: "error",
-          position: "top-center",
-        });
-      }
-
-    } catch (err) {
-      toast(`Password update failed: ${err.response?.data?.message}`, {
+      router.push("/login");
+    } else {
+      toast("Password update failed", {
         type: "error",
         position: "top-center",
       });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const passwordConstraints = {
@@ -84,7 +76,10 @@ export default function ResetPasswordPage({ token }) {
       }
     },
   };
-  const btnClass = clsx("w-full btn", `${loading ? "loading btn-disabled" : ""}`);
+  const btnClass = clsx(
+    "w-full btn",
+    `${loading ? "loading btn-disabled" : ""}`,
+  );
 
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200 py-20">
@@ -123,4 +118,4 @@ export default function ResetPasswordPage({ token }) {
       </div>
     </section>
   );
-};
+}

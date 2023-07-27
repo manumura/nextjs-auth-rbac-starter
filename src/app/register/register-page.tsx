@@ -25,37 +25,30 @@ export default function RegisterPage() {
       return;
     }
 
-    try {
-      setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      // const res = await register(data.email, data.password, data.name);
-      const res = await fetch("/api/register", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+    setLoading(true);
+    // TODO remove this
+    await sleep(1000);
+    // const res = await register(data.email, data.password, data.name);
+    const res = await fetch("/api/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
 
-      if (res.ok) {
-        const register = await res.json();
-        toast(`You are successfully registered ${register.name}!`, {
-          type: "success",
-          position: "top-center",
-        });
-        router.push("/login");
-      } else {
-        toast("Registration failed! Did you already register with this email?", {
-          type: "error",
-          position: "top-center",
-        });
-      }
-    } catch (err) {
+    if (res.ok) {
+      const register = await res.json();
+      toast(`You are successfully registered ${register.name}!`, {
+        type: "success",
+        position: "top-center",
+      });
+      router.push("/login");
+    } else {
       toast("Registration failed! Did you already register with this email?", {
         type: "error",
         position: "top-center",
       });
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const nameConstraints = {

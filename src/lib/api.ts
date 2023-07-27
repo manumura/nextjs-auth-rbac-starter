@@ -171,11 +171,11 @@ axiosInstance.interceptors.response.use(
 //   return axiosInstance.post("/v1/users", { email, name, role });
 // };
 
-export const getUser = async (id, signal) => {
-  return axiosInstance.get(`/v1/users/${id}`, {
-    signal,
-  });
-};
+// export const getUser = async (id, signal) => {
+//   return axiosInstance.get(`/v1/users/${id}`, {
+//     signal,
+//   });
+// };
 
 export const updateUser = async (id, name, email, role, password?) => {
   return axiosInstance.put(`/v1/users/${id}`, {

@@ -1,22 +1,27 @@
-import { axiosInstance } from "@/lib/api";
-import { cookies } from 'next/headers';
-import EditProfilePage from "./edit-profile-page";
+import { cookies, headers } from 'next/headers';
 import { redirect } from "next/navigation";
+import { getClientBaseUrl } from "../../lib/util";
+import EditProfilePage from "./edit-profile-page";
 
 async function getUser() {
-  try {
-    const accessToken = cookies().get('accessToken')?.value;
-    const response = await axiosInstance.get("/v1/profile", {
-      headers: {
-        Authorization: `bearer ${accessToken}`,
-      },
-    });
+  const baseUrl = getClientBaseUrl(headers());
+  const cookieStore = cookies();
 
-    return response.data;
-  } catch (err) {
-    console.error(`Edit Profile getServerSideProps error: `, err.response?.data);
+  const res = await fetch(`${baseUrl}/api/profile`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      Cookie: cookieStore as any,
+    },
+  });
+
+  if (!res.ok) {
+    console.error(`Edit Profile getServerSideProps error: `,  res.statusText);
     return undefined;
   }
+
+  const json = await res.json();
+  return json;
 }
 
 export default async function EditProfile() {

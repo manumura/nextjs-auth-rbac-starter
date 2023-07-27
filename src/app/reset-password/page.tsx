@@ -9,7 +9,7 @@ async function isAuthenticated() {
   return !!accessToken;
 }
 
-async function getUser(token) {
+async function getUserByToken(token) {
   try {
     const baseUrl = getClientBaseUrl(headers());
     // const response = await getUserByToken(token);
@@ -43,7 +43,7 @@ export default async function ResetPassword({ searchParams }) {
     redirect("/login?error=404");
   }
 
-  const user = await getUser(searchParams?.token);
+  const user = await getUserByToken(searchParams?.token);
   if (!user) {
     redirect("/login?error=404");
   }
