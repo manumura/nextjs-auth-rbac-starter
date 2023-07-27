@@ -177,15 +177,15 @@ axiosInstance.interceptors.response.use(
 //   });
 // };
 
-export const updateUser = async (id, name, email, role, password?) => {
-  return axiosInstance.put(`/v1/users/${id}`, {
-    name,
-    email,
-    role,
-    ...(password ? { password } : {}),
-  });
-};
+// export const updateUser = async (id, name, email, role, password?) => {
+//   return axiosInstance.put(`/v1/users/${id}`, {
+//     name,
+//     email,
+//     role,
+//     ...(password ? { password } : {}),
+//   });
+// };
 
-export const deleteUser = async (userId) => {
-  return axiosInstance.delete(`/v1/users/${userId}`);
-};
+// export const deleteUser = async (userId) => {
+//   return axiosInstance.delete(`/v1/users/${userId}`);
+// };

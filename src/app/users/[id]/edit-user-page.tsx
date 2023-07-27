@@ -7,7 +7,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormInput from "../../../components/FormInput";
 import FormSelect from "../../../components/FormSelect";
-import { updateUser } from "../../../lib/api";
 import { sleep } from "../../../lib/util";
 
 export default function EditUserPage({ user }) {
@@ -32,21 +31,37 @@ export default function EditUserPage({ user }) {
     setSubmitting(true);
     // TODO remove this
     await sleep(1000);
-    const res = await updateUser(
-      user.id,
-      data.name,
-      data.email,
-      data.role,
-      data.password,
-    );
+    // const res = await updateUser(
+    //   user.id,
+    //   data.name,
+    //   data.email,
+    //   data.role,
+    //   data.password,
+    // );
+    const body = {
+      name: data.name,
+      email: data.email,
+      role: data.role,
+      ...(data.password ? { password: data.password } : {}),
+    };
+    const res = await fetch(`/api/users/${user.id}`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    });
+    const json = await res.json();
 
-    if (res) {
-      toast(`User successfully updated: ${res.data.name}`, {
+    if (res.ok) {
+      toast(`User successfully updated: ${json.name}`, {
         type: "success",
         position: "top-center",
       });
       router.back();
       router.refresh();
+    } else {
+      toast(`Error updating user: ${json.message}`, {
+        type: "error",
+        position: "top-center",
+      });
     }
 
     setSubmitting(false);
