@@ -1,8 +1,7 @@
 import clsx from "clsx";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { deleteUser } from "../lib/api";
-import { sleep } from "../lib/util";
+import { sleep } from "../lib/utils";
 import Modal from "./Modal";
 
 const DeleteUserModal = ({ user, isOpen, onClose }) => {
@@ -17,30 +16,34 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
       return;
     }
 
-    try {
-      setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      const res = await deleteUser(user?.id);
-      if (res?.data) {
-        toast(`User successfully deleted: ${user.name}`, {
-          type: "success",
-          position: "top-center",
-        });
-        onClose(true);
-      }
-    } catch (error) {
-      console.error(error.message);
-      toast(`Delete user failed! ${error.message}`, {
+    setLoading(true);
+    // TODO remove this
+    await sleep(1000);
+    // const res = await deleteUser(user?.id);
+    const res = await fetch(`/api/users/${user.id}`, {
+      method: "DELETE",
+    });
+    const json = await res.json();
+    setLoading(false);
+
+    if (res.ok) {
+      toast(`User successfully deleted: ${json.name}`, {
+        type: "success",
+        position: "top-center",
+      });
+      onClose(true);
+    } else {
+      toast(`Error deleting user: ${json.message}`, {
         type: "error",
         position: "top-center",
       });
-    } finally {
-      setLoading(false);
-    }
+    }    
   };
 
-  const btnClass = clsx("btn-accent btn mx-1", `${loading ? "loading btn-disabled" : ""}`);
+  const btnClass = clsx(
+    "btn-accent btn mx-1",
+    `${loading ? "loading btn-disabled" : ""}`,
+  );
 
   const title = (
     <div>

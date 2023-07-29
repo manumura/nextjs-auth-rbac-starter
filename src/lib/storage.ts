@@ -1,16 +1,15 @@
 const KEY = {
   ACCESS_TOKEN: 'accessToken',
   REFRESH_TOKEN: 'refreshToken',
-  USER: 'user',
+  ID_TOKEN: 'idToken',
 };
 
-export const saveUser = (user) => {
-  window.localStorage.setItem(KEY.USER, JSON.stringify(user));
+export const saveIdToken = (idToken) => {
+  window.localStorage.setItem(KEY.ID_TOKEN, idToken);
 };
 
-export const getSavedUser = () => {
-  const user = JSON.parse(window.localStorage.getItem(KEY.USER));
-  return user;
+export const getSavedIdToken = () => {
+  return window.localStorage.getItem(KEY.ID_TOKEN);
 };
 
 export const saveAccessToken = (accessToken) => {

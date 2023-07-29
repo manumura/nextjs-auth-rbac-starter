@@ -1,26 +1,55 @@
+import moment from "moment";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import setCookie from "set-cookie-parser";
 import appConfig from "./config/config";
-import { isAdmin } from "./lib/util";
+import { clearCookies, setRequestAuthCookies, setResponseAuthCookies } from "./lib/cookies.utils.";
+import { getUserFromIdToken } from "./lib/jwt.utils";
+import { isAdmin } from "./lib/utils";
 
 export async function middleware(request: NextRequest) {
-  const accessToken = request.cookies.get("accessToken");
+  const accessTokenCookie = request.cookies.get("accessToken");
+  const idTokenCookie = request.cookies.get("idToken");
+  const accessTokenExpiresAtCookie = request.cookies.get(
+    "accessTokenExpiresAt",
+  );
   const nextResponse = NextResponse.next();
   const redirectHomeResponse = NextResponse.redirect(new URL("/", request.url));
   const redirectLoginResponse = NextResponse.redirect(
     new URL("/login?error=401", request.url),
   );
 
+  // Refresh token if expired
+  if (!isPublicRoute(request)) {
+    const accessTokenExpiresAt = moment(
+      accessTokenExpiresAtCookie?.value,
+    ).utc();
+    const now = moment().utc();
+
+    // Check validity of token
+    if (accessTokenExpiresAt.isBefore(now)) {
+      console.log('Middleware: access token is expired');
+      const response = await refreshToken(request);
+      return response;
+    }
+  }
+
   if (isAdminRoute(request)) {
-    if (!accessToken) {
+    if (!accessTokenCookie || !accessTokenCookie.value) {
       console.error(
         `No access token found (navigating ${request.nextUrl.pathname})`,
       );
       return redirectLoginResponse;
     }
 
-    const user = await fetchUser(request, nextResponse);
+    if (!idTokenCookie || !idTokenCookie.value) {
+      console.error(
+        `No idToken found (navigating ${request.nextUrl.pathname})`,
+      );
+      return redirectLoginResponse;
+    }
+
+    const user = await getUserFromIdToken(idTokenCookie?.value as string);
+    // const user = await fetchUser(request, nextResponse);
     if (!isAdmin(user)) {
       console.error(
         `User is not an admin: ${user?.email} (navigating ${request.nextUrl.pathname})`,
@@ -32,7 +61,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect if user is not authenticated
-  if (isProtectedRoute(request) && !accessToken) {
+  if (isProtectedRoute(request) && !accessTokenCookie) {
     console.error(
       `No access token found (navigating ${request.nextUrl.pathname})`,
     );
@@ -40,7 +69,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect if user is authenticated
-  if (isPublicRoute(request) && accessToken) {
+  if (isPublicRoute(request) && accessTokenCookie) {
     console.error(`Already logged in (navigating ${request.nextUrl.pathname})`);
     return redirectHomeResponse;
   }
@@ -48,25 +77,9 @@ export async function middleware(request: NextRequest) {
   return nextResponse;
 }
 
-async function fetchUser(request: NextRequest, response: NextResponse) {
-  const getUserResponse = await doFetchUser(request.cookies.toString());
-
-  if (getUserResponse.ok) {
-    const user = await getUserResponse.json();
-    return user;
-  }
-
-  if (getUserResponse.status === 401) {
-    const user = await refreshToken(request, response);
-    return user;
-  }
-
-  return null;
-}
-
-async function refreshToken(request: NextRequest, response: NextResponse) {
+async function refreshToken(request: NextRequest): Promise<NextResponse> {
   const BASE_URL = appConfig.baseUrl;
-  const refreshTokenResponse = await fetch(`${BASE_URL}/api/v1/refresh-token`, {
+  const res = await fetch(`${BASE_URL}/api/v1/refresh-token`, {
     method: "POST",
     body: JSON.stringify({}),
     credentials: "include",
@@ -76,53 +89,24 @@ async function refreshToken(request: NextRequest, response: NextResponse) {
     },
   });
 
-  if (refreshTokenResponse.ok) {
-    const data = await refreshTokenResponse.json();
-    const setCookieHeader = refreshTokenResponse.headers.get("set-cookie");
-    if (setCookieHeader) {
-      setAuthCookies(setCookieHeader, response);
-    }
-    return data.user;
+  const json = await res.json();
+  const nextResponse = NextResponse.next();
+
+  if (res.ok) {
+    // const requestHeaders = new Headers(request.headers);
+    // requestHeaders.set('x-new-access-token', json.accessToken);
+    // const nextResponse = NextResponse.next({
+    //   request: {
+    //       headers: requestHeaders,
+    //   },
+    // });
+    setResponseAuthCookies(nextResponse, json);
+    setRequestAuthCookies(request, json);
+  } else {
+    clearCookies(nextResponse);
   }
 
-  return null;
-}
-
-function setAuthCookies(setCookieHeader: string, response: NextResponse) {
-  const splitCookieHeaders = setCookie.splitCookiesString(setCookieHeader);
-  const cookies = setCookie.parse(splitCookieHeaders, {
-    decodeValues: true,
-    map: true,
-  });
-
-  const accessTokenCookie = cookies.accessToken;
-  setAuthCookie(response, "accessToken", accessTokenCookie);
-
-  const refreshTokenCookie = cookies.refreshToken;
-  setAuthCookie(response, "refreshToken", refreshTokenCookie);
-}
-
-function setAuthCookie(response: NextResponse, name: string, cookie: setCookie.Cookie) {
-  response.cookies.set(name, cookie.value, {
-    httpOnly: cookie.httpOnly,
-    maxAge: cookie.maxAge,
-    path: cookie.path,
-    expires: cookie.expires,
-    sameSite: cookie.sameSite as "lax" | "strict" | "none",
-  });
-}
-
-async function doFetchUser(cookies: string) {
-  const BASE_URL = appConfig.baseUrl;
-  return fetch(`${BASE_URL}/api/v1/profile`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: cookies,
-    },
-    // cache: "force-cache",
-  });
+  return nextResponse;
 }
 
 function isAdminRoute(request: NextRequest) {
@@ -152,8 +136,13 @@ function isPublicRoute(request: NextRequest) {
   return false;
 }
 
+function isAPIRoute(request: NextRequest) {
+  return request.nextUrl.pathname.startsWith("/api");
+}
+
 // See "Matching Paths" below to learn more
 export const config = {
   // matcher solution for public, api, assets and _next exclusion
   matcher: "/((?!api|static|.*\\..*|_next).*)",
+  // matcher: "/((?!static|.*\\..*|_next).*)",
 };

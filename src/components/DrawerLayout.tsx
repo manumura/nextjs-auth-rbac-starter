@@ -1,22 +1,20 @@
-//components/DrawerLayout.tsx
-import { useDrawerOpen } from "@/lib/DrawerOpenContext";
+"use client";
+
 import Link from "next/link";
-import { useRouter } from "next/router";
-import useUserStore from "../lib/user-store";
-import { isAdmin } from "../lib/util";
+import { redirect } from "next/navigation";
+import { ToastContainer } from "react-toastify";
+import useDrawerOpenStore from "../lib/drawer-open-store";
+import { isAdmin } from "../lib/utils";
 import LogoutButton from "./LogoutButton";
 import Navbar from "./Navbar";
 
-const DrawerLayout = ({ children }) => {
-  const router = useRouter();
-  const userStore = useUserStore();
-  const user = userStore.user;
+const DrawerLayout = ({ user, children }) => {
   //initialize state here. we use a key and a default state
-  const { open, setOpen } = useDrawerOpen();
+  const { open, setOpen } = useDrawerOpenStore();
   const toggleDrawer = () => setOpen(!open);
 
   const handleLogin = () => {
-    router.push("/login");
+    redirect("/login");
   };
 
   return (
@@ -31,8 +29,10 @@ const DrawerLayout = ({ children }) => {
       />
 
       <div className="drawer-content flex flex-col">
-        <Navbar />
-        {children}
+        <Navbar user={user} />
+        {/* <Suspense fallback={<LoadingOverlay />}> */}
+          {children}
+        {/* </Suspense> */}
       </div>
 
       <div className="drawer-side">
@@ -76,6 +76,7 @@ const DrawerLayout = ({ children }) => {
           )}
         </ul>
       </div>
+      <ToastContainer />
     </div>
   );
 };

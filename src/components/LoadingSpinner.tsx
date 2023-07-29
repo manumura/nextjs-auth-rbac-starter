@@ -1,4 +1,4 @@
-const LoadingSpinner = () => {
+const LoadingSpinner = ({ label }) => {
   return (
     <div className="flex flex-col items-center justify-center">
       <svg
@@ -65,7 +65,7 @@ const LoadingSpinner = () => {
         ></path>
       </svg>
       <span>
-        <h2 className="text-xl font-semibold">Loading...</h2>
+        <h2 className="text-xl font-semibold">{label}</h2>
       </span>
     </div>
   );
