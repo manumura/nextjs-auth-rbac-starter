@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import appConfig from "../../../config/config";
-import { clearCookies } from "../../../lib/cookies";
+import { clearCookies } from "../../../lib/cookies.utils.";
 
 export async function POST(request: NextRequest) {
   const BASE_URL = appConfig.baseUrl;

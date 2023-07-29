@@ -1,9 +1,10 @@
 import { cookies, headers } from 'next/headers';
 import { redirect } from "next/navigation";
-import { getClientBaseUrl } from "../../lib/util";
+import { IUser } from '../../lib/user-store';
+import { getClientBaseUrl } from "../../lib/utils";
 import EditProfilePage from "./edit-profile-page";
 
-async function getUser() {
+async function getUser(): Promise<IUser | undefined> {
   const baseUrl = getClientBaseUrl(headers());
   const cookieStore = cookies();
 
@@ -28,7 +29,7 @@ export default async function EditProfile() {
   // Fetch data directly in a Server Component
   const user = await getUser();
   if (!user) {
-    redirect('/login');
+    redirect("/login?error=404");
   }
 
   // Forward fetched data to your Client Component

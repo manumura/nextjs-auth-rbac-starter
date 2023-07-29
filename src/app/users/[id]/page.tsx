@@ -1,9 +1,10 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getClientBaseUrl } from "../../../lib/util";
+import { getClientBaseUrl } from "../../../lib/utils";
 import EditUserPage from "./edit-user-page";
+import { IUser } from "../../../lib/user-store";
 
-async function getUserById(id) {
+async function getUserById(id: number): Promise<IUser | undefined> {
   const baseUrl = getClientBaseUrl(headers());
   const cookieStore = cookies();
 
@@ -17,7 +18,7 @@ async function getUserById(id) {
 
   if (!res.ok) {
     console.error(`Edit User getServerSideProps error: `, res.statusText);
-    return { users: [], totalElements: 0 };
+    return undefined;
   }
 
   const json = await res.json();

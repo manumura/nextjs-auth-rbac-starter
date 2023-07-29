@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import appConfig from "../../../config/config";
-import { setAuthCookies } from "../../../lib/cookies";
+import { setResponseAuthCookies } from "../../../lib/cookies.utils.";
 
 export async function POST(request: NextRequest) {
   const BASE_URL = appConfig.baseUrl;
@@ -22,6 +22,6 @@ export async function POST(request: NextRequest) {
     headers: res.headers,
   });
 
-  setAuthCookies(response, json);
+  setResponseAuthCookies(response, json);
   return response;
 }

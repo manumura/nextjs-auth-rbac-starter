@@ -7,7 +7,7 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormSelect from "../../components/FormSelect";
-import { sleep } from "../../lib/util";
+import { sleep } from "../../lib/utils";
 
 export default function CreateUserPage() {
   const router = useRouter();

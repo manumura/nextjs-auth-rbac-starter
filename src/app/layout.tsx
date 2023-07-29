@@ -1,13 +1,10 @@
-import * as jose from "jose";
 import { cookies } from "next/headers";
 import DrawerLayout from "../components/DrawerLayout";
 import "../styles/globals.css";
-import appConfig from "../config/config";
-import { appConstant } from "../config/constant";
-import { IUser } from "../lib/user-store";
 
 // To avoid tailwind to purge toastify styles
 import "react-toastify/dist/ReactToastify.min.css";
+import { getUserFromIdToken } from "../lib/jwt.utils";
 
 async function getProfile() {
   const cookieStore = cookies();
@@ -17,15 +14,7 @@ async function getProfile() {
     return undefined;
   }
 
-  const publicKey = await jose.importSPKI(
-    appConfig.idTokenPublicKey,
-    appConstant.ALG,
-  );
-  const { payload } = await jose.jwtVerify(
-    idTokenCookie?.value as string,
-    publicKey,
-  );
-  const user = payload?.user as IUser;
+  const user = await getUserFromIdToken(idTokenCookie?.value as string);
   return user;
 }
 

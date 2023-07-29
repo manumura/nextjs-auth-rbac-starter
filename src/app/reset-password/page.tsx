@@ -1,6 +1,6 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getClientBaseUrl } from "../../lib/util";
+import { getClientBaseUrl } from "../../lib/utils";
 import ResetPasswordPage from "./reset-password-page";
 
 async function isAuthenticated() {
@@ -10,26 +10,18 @@ async function isAuthenticated() {
 }
 
 async function getUserByToken(token) {
-  try {
-    const baseUrl = getClientBaseUrl(headers());
-    // const response = await getUserByToken(token);
-    // const user = response.data;
-    const res = await fetch(`${baseUrl}/api/token/${token}`, {
-      method: "GET",
-    });
-    
-    if (res.ok) {
-      const user = await res.json();
-      return user;
-    }
-    return undefined;
-        
-  } catch (err) {
-    console.error(
-      `Reset Password getServerSideProps error:`, err.response?.data
-    );
+  const baseUrl = getClientBaseUrl(headers());
+  const res = await fetch(`${baseUrl}/api/token/${token}`, {
+    method: "GET",
+  });
+
+  if (!res.ok) {
+    console.error(`Reset password getServerSideProps error: `, res.statusText);
     return undefined;
   }
+
+  const json = await res.json();
+  return json;
 }
 
 export default async function ResetPassword({ searchParams }) {

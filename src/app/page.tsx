@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import HomePage from "./home-page";
-import { getClientBaseUrl } from "../lib/util";
+import { getClientBaseUrl } from "../lib/utils";
 
 export const getAppInfos = async () => {
   let message = "Welcome fallback!";

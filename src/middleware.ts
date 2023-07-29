@@ -1,12 +1,10 @@
-import * as jose from "jose";
 import moment from "moment";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import setCookie from "set-cookie-parser";
 import appConfig from "./config/config";
-import { IUser } from "./lib/user-store";
-import { isAdmin } from "./lib/util";
-import { appConstant } from "./config/constant";
+import { clearCookies, setRequestAuthCookies, setResponseAuthCookies } from "./lib/cookies.utils.";
+import { getUserFromIdToken } from "./lib/jwt.utils";
+import { isAdmin } from "./lib/utils";
 
 export async function middleware(request: NextRequest) {
   const accessTokenCookie = request.cookies.get("accessToken");
@@ -20,9 +18,19 @@ export async function middleware(request: NextRequest) {
     new URL("/login?error=401", request.url),
   );
 
-  // todo TEST
-  if (request.nextUrl.pathname.startsWith("/api")) {
-    console.log("TEST middleware api", request.nextUrl.pathname);
+  // Refresh token if expired
+  if (!isPublicRoute(request)) {
+    const accessTokenExpiresAt = moment(
+      accessTokenExpiresAtCookie?.value,
+    ).utc();
+    const now = moment().utc();
+
+    // Check validity of token
+    if (accessTokenExpiresAt.isBefore(now)) {
+      console.log('Middleware: access token is expired');
+      const response = await refreshToken(request);
+      return response;
+    }
   }
 
   if (isAdminRoute(request)) {
@@ -40,22 +48,7 @@ export async function middleware(request: NextRequest) {
       return redirectLoginResponse;
     }
 
-    const accessTokenExpiresAt = moment(
-      accessTokenExpiresAtCookie?.value,
-    ).toDate();
-    console.log("TEST middleware accessTokenExpiresAt", accessTokenExpiresAt);
-
-    const publicKey = await jose.importSPKI(
-      appConfig.idTokenPublicKey,
-      appConstant.ALG,
-    );
-    const { payload } = await jose.jwtVerify(
-      idTokenCookie?.value as string,
-      publicKey,
-    );
-    // const idToken = jose.decodeJwt(res.data.idToken) as IdTokenPayload;
-    const user = payload?.user as IUser;
-    console.log("TEST middleware user", user);
+    const user = await getUserFromIdToken(idTokenCookie?.value as string);
     // const user = await fetchUser(request, nextResponse);
     if (!isAdmin(user)) {
       console.error(
@@ -84,25 +77,9 @@ export async function middleware(request: NextRequest) {
   return nextResponse;
 }
 
-async function fetchUser(request: NextRequest, response: NextResponse) {
-  const getUserResponse = await doFetchUser(request.cookies.toString());
-
-  if (getUserResponse.ok) {
-    const user = await getUserResponse.json();
-    return user;
-  }
-
-  if (getUserResponse.status === 401) {
-    const user = await refreshToken(request, response);
-    return user;
-  }
-
-  return null;
-}
-
-async function refreshToken(request: NextRequest, response: NextResponse) {
+async function refreshToken(request: NextRequest): Promise<NextResponse> {
   const BASE_URL = appConfig.baseUrl;
-  const refreshTokenResponse = await fetch(`${BASE_URL}/api/v1/refresh-token`, {
+  const res = await fetch(`${BASE_URL}/api/v1/refresh-token`, {
     method: "POST",
     body: JSON.stringify({}),
     credentials: "include",
@@ -112,63 +89,24 @@ async function refreshToken(request: NextRequest, response: NextResponse) {
     },
   });
 
-  if (refreshTokenResponse.ok) {
-    const data = await refreshTokenResponse.json();
-    const setCookieHeader = refreshTokenResponse.headers.get("set-cookie");
-    if (setCookieHeader) {
-      setAuthCookies(setCookieHeader, request, response);
-    }
-    return data.user;
+  const json = await res.json();
+  const nextResponse = NextResponse.next();
+
+  if (res.ok) {
+    // const requestHeaders = new Headers(request.headers);
+    // requestHeaders.set('x-new-access-token', json.accessToken);
+    // const nextResponse = NextResponse.next({
+    //   request: {
+    //       headers: requestHeaders,
+    //   },
+    // });
+    setResponseAuthCookies(nextResponse, json);
+    setRequestAuthCookies(request, json);
+  } else {
+    clearCookies(nextResponse);
   }
 
-  return null;
-}
-
-function setAuthCookies(
-  setCookieHeader: string,
-  request: NextRequest,
-  response: NextResponse,
-) {
-  const splitCookieHeaders = setCookie.splitCookiesString(setCookieHeader);
-  const cookies = setCookie.parse(splitCookieHeaders, {
-    decodeValues: true,
-    map: true,
-  });
-
-  const accessTokenCookie = cookies.accessToken;
-  setAuthCookie(request, response, "accessToken", accessTokenCookie);
-
-  const refreshTokenCookie = cookies.refreshToken;
-  setAuthCookie(request, response, "refreshToken", refreshTokenCookie);
-}
-
-function setAuthCookie(
-  request: NextRequest,
-  response: NextResponse,
-  name: "accessToken" | "refreshToken",
-  cookie: setCookie.Cookie,
-) {
-  request.cookies.set(name, cookie.value);
-  response.cookies.set(name, cookie.value, {
-    httpOnly: cookie.httpOnly,
-    maxAge: cookie.maxAge,
-    path: cookie.path,
-    expires: cookie.expires,
-    sameSite: cookie.sameSite as "lax" | "strict" | "none",
-  });
-}
-
-async function doFetchUser(cookies: string) {
-  const BASE_URL = appConfig.baseUrl;
-  return fetch(`${BASE_URL}/api/v1/profile`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: cookies,
-    },
-    // cache: "force-cache",
-  });
+  return nextResponse;
 }
 
 function isAdminRoute(request: NextRequest) {
@@ -198,9 +136,13 @@ function isPublicRoute(request: NextRequest) {
   return false;
 }
 
+function isAPIRoute(request: NextRequest) {
+  return request.nextUrl.pathname.startsWith("/api");
+}
+
 // See "Matching Paths" below to learn more
 export const config = {
   // matcher solution for public, api, assets and _next exclusion
-  // matcher: "/((?!api|static|.*\\..*|_next).*)",
-  matcher: "/((?!static|.*\\..*|_next).*)",
+  matcher: "/((?!api|static|.*\\..*|_next).*)",
+  // matcher: "/((?!static|.*\\..*|_next).*)",
 };

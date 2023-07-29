@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      Cookie: cookies() as any,
+      Cookie: request.cookies.toString(),
     },
   });
 
@@ -19,7 +19,9 @@ export async function GET(request: NextRequest) {
   const response = new NextResponse(JSON.stringify(json), {
     status: res.status,
     statusText: res.statusText,
-    headers: res.headers,
+    headers: {
+      ...res.headers,
+    },
   });
   return response;
 }

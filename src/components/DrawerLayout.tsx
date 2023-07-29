@@ -4,7 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 import useDrawerOpenStore from "../lib/drawer-open-store";
-import { isAdmin } from "../lib/util";
+import { isAdmin } from "../lib/utils";
 import LogoutButton from "./LogoutButton";
 import Navbar from "./Navbar";
 

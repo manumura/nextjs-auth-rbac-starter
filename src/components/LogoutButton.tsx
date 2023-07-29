@@ -6,7 +6,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { clearStorage } from "../lib/storage";
 import useUserStore from "../lib/user-store";
-import { sleep } from "../lib/util";
+import { sleep } from "../lib/utils";
 
 const LogoutButton = () => {
   const router = useRouter();

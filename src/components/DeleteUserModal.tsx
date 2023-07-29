@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { sleep } from "../lib/util";
+import { sleep } from "../lib/utils";
 import Modal from "./Modal";
 
 const DeleteUserModal = ({ user, isOpen, onClose }) => {

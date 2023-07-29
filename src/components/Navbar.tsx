@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import logo from "../../public/next.svg";
-import { isAdmin } from "../lib/util";
+import { isAdmin } from "../lib/utils";
 import LogoutButton from "./LogoutButton";
 import useDrawerOpenStore from "../lib/drawer-open-store";
 

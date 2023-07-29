@@ -1,10 +1,10 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { IUser } from "../../lib/user-store";
+import { getClientBaseUrl } from "../../lib/utils";
 import ProfilePage from "./profile-page";
-import { getClientBaseUrl } from "../../lib/util";
-import { toast } from "react-toastify";
 
-async function getProfile() {
+async function getProfile(): Promise<IUser | undefined> {
   const baseUrl = getClientBaseUrl(headers());
   const cookieStore = cookies();
 
@@ -29,7 +29,7 @@ export default async function Profile() {
   // Fetch data directly in a Server Component
   const user = await getProfile();
   if (!user) {
-    redirect("/login");
+    redirect("/login?error=404");
   }
 
   // Forward fetched data to your Client Component

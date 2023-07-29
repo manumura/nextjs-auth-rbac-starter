@@ -10,7 +10,7 @@ export type IUser = {
 
 type UserState = {
   user: IUser | null;
-  setUser: (user: IUser | null) => void;
+  setUser: (user: IUser | undefined) => void;
 };
 
 const useUserStore = create<UserState>((set) => ({

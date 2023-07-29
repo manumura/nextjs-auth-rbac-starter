@@ -3,16 +3,14 @@
 import FormInput from "@/components/FormInput";
 import { clearStorage, saveIdToken } from "@/lib/storage";
 import clsx from "clsx";
-import * as jose from "jose";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import appConfig from "../../config/config";
-import { appConstant } from "../../config/constant";
-import useUserStore, { IUser } from "../../lib/user-store";
-import { sleep } from "../../lib/util";
+import { getUserFromIdToken } from "../../lib/jwt.utils";
+import useUserStore from "../../lib/user-store";
+import { sleep } from "../../lib/utils";
 
 export default function LoginPage({ error }) {
   const router = useRouter();
@@ -29,7 +27,7 @@ export default function LoginPage({ error }) {
     // Handle access token expired
     if (error === "401") {
       clearStorage();
-      userStore.setUser(null);
+      userStore.setUser(undefined);
       toast("Session expired, please login again.", {
         type: "error",
         position: "top-center",
@@ -68,21 +66,15 @@ export default function LoginPage({ error }) {
     });
 
     if (res.ok) {
-      const login = await res.json();
-      const publicKey = await jose.importSPKI(
-        appConfig.idTokenPublicKey,
-        appConstant.ALG,
-      );
-      const { payload } = await jose.jwtVerify(login.idToken, publicKey);
-      // const idToken = jose.decodeJwt(res.data.idToken) as IdTokenPayload;
-      const user = payload?.user as IUser;
+      const json = await res.json();
+      const user = await getUserFromIdToken(json.idToken);
 
       userStore.setUser(user);
       toast(`Welcome ${user?.name}!`, {
         type: "success",
         position: "top-center",
       });
-      saveIdToken(login.idToken);
+      saveIdToken(json.idToken);
 
       router.replace("/");
       router.refresh();

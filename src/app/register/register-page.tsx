@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { sleep } from "../../lib/util";
+import { sleep } from "../../lib/utils";
 
 export default function RegisterPage() {
   const router = useRouter();
