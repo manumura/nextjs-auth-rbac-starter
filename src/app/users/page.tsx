@@ -21,6 +21,7 @@ async function getUsers(page, pageSize, role) {
     headers: {
       Cookie: cookieStore as any,
     },
+    cache: "no-cache",
   });
 
   if (!res.ok) {

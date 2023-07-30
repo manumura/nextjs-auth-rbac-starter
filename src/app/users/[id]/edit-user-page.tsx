@@ -106,9 +106,16 @@ export default function EditUserPage({ user }) {
     { label: "User", value: "USER" },
   ];
 
-  const btnClass = clsx(
-    "btn-primary btn mx-1",
-    `${submitting ? "loading btn-disabled" : ""}`,
+  const btn = (
+    <button className="btn btn-primary mx-1">
+      Save
+    </button>
+  );
+  const btnLoading = (
+    <button className="btn btn-primary mx-1 btn-disabled">
+      <span className="loading loading-spinner"></span>
+      Save
+    </button>
   );
 
   const editUserForm = (
@@ -149,6 +156,7 @@ export default function EditUserPage({ user }) {
             constraints={roleConstraints}
           />
           <div className="flex justify-center space-x-5">
+            {submitting ? btnLoading : btn}
             <button
               type="button"
               id="btn-cancel"
@@ -157,7 +165,6 @@ export default function EditUserPage({ user }) {
             >
               Cancel
             </button>
-            <button className={btnClass}>Save</button>
           </div>
         </form>
       </FormProvider>

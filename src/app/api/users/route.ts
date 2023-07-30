@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
       "Content-Type": "application/json",
       Cookie: request.cookies.toString(),
     },
+    cache: "no-cache",
   });
 
   const json = await res.json();

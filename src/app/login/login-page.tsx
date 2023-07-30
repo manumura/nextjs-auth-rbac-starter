@@ -94,9 +94,16 @@ export default function LoginPage({ error }) {
   const passwordConstraints = {
     required: { value: true, message: "Password is required" },
   };
-  const btnClass = clsx(
-    "w-full btn",
-    `${loading ? "loading btn-disabled" : ""}`,
+  const btn = (
+    <button className="w-full btn">
+      Login
+    </button>
+  );
+  const btnLoading = (
+    <button className="w-full btn btn-disabled">
+      <span className="loading loading-spinner"></span>
+      Login
+    </button>
   );
 
   return (
@@ -129,7 +136,7 @@ export default function LoginPage({ error }) {
               </Link>
             </div>
             <div>
-              <button className={btnClass}>Login</button>
+              {loading ? btnLoading : btn}
             </div>
             <span className="block">
               Need an account?{" "}

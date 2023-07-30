@@ -41,7 +41,9 @@ export default function CreateUserPage() {
         type: "success",
         position: "top-center",
       });
+      // Go back to users page and refresh the list
       router.push("/users");
+      router.refresh();
     } else {
       toast(`User creation failed: ${json.message}`, {
         type: "error",
@@ -72,9 +74,16 @@ export default function CreateUserPage() {
     { label: "User", value: "USER" },
   ];
 
-  const btnClass = clsx(
-    "btn-primary btn mx-1",
-    `${loading ? "loading btn-disabled" : ""}`,
+  const btn = (
+    <button className="btn btn-primary mx-1">
+      Create
+    </button>
+  );
+  const btnLoading = (
+    <button className="btn btn-primary mx-1 btn-disabled">
+      <span className="loading loading-spinner"></span>
+      Create
+    </button>
   );
 
   const onCancel = () => {
@@ -110,6 +119,7 @@ export default function CreateUserPage() {
               constraints={roleConstraints}
             />
             <div className="flex justify-center space-x-5">
+              {loading ? btnLoading : btn}
               <button
                 type="button"
                 id="btn-cancel"
@@ -118,7 +128,6 @@ export default function CreateUserPage() {
               >
                 Cancel
               </button>
-              <button className={btnClass}>Create</button>
             </div>
           </form>
         </FormProvider>

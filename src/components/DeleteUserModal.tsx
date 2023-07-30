@@ -40,9 +40,16 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
     }    
   };
 
-  const btnClass = clsx(
-    "btn-accent btn mx-1",
-    `${loading ? "loading btn-disabled" : ""}`,
+  const btn = (
+    <button className="btn btn-accent mx-1" id="btn-delete" onClick={onDelete}>
+      Delete
+    </button>
+  );
+  const btnLoading = (
+    <button className="btn btn-accent mx-1 btn-disabled" id="btn-delete-loading">
+      <span className="loading loading-spinner"></span>
+      Delete
+    </button>
   );
 
   const title = (
@@ -59,15 +66,13 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
 
   const footer = (
     <div className="flex">
+      {loading ? btnLoading : btn}
       <button
         id="btn-cancel"
         className="btn-outline btn mx-1"
         onClick={onCancel}
       >
         Cancel
-      </button>
-      <button id="btn-delete" className={btnClass} onClick={onDelete}>
-        Delete
       </button>
     </div>
   );

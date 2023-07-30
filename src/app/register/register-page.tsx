@@ -76,9 +76,16 @@ export default function RegisterPage() {
       }
     },
   };
-  const btnClass = clsx(
-    "w-full btn",
-    `${loading ? "loading btn-disabled" : ""}`,
+  const btn = (
+    <button className="w-full btn">
+      Register
+    </button>
+  );
+  const btnLoading = (
+    <button className="w-full btn btn-disabled">
+      <span className="loading loading-spinner"></span>
+      Register
+    </button>
   );
 
   return (
@@ -122,7 +129,7 @@ export default function RegisterPage() {
               </Link>
             </span>
             <div>
-              <button className={btnClass}>Register</button>
+              {loading ? btnLoading : btn}
             </div>
           </form>
         </FormProvider>

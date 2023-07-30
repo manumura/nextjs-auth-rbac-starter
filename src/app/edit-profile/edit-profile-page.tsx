@@ -93,9 +93,16 @@ export default function EditProfilePage({ user }) {
       }
     },
   };
-  const btnClass = clsx(
-    "btn-primary btn",
-    `${loading ? "loading btn-disabled" : ""}`,
+  const btn = (
+    <button className="btn btn-primary">
+      Save
+    </button>
+  );
+  const btnLoading = (
+    <button className="w-full btn btn-disabled">
+      <span className="loading loading-spinner"></span>
+      Save
+    </button>
   );
 
   return (
@@ -129,6 +136,9 @@ export default function EditProfilePage({ user }) {
               />
               <div className="card-actions justify-end">
                 <div>
+                  {loading ? btnLoading : btn}
+                </div>
+                <div>
                   <button
                     type="button"
                     className="btn-outline btn-accent btn"
@@ -136,9 +146,6 @@ export default function EditProfilePage({ user }) {
                   >
                     Cancel
                   </button>
-                </div>
-                <div>
-                  <button className={btnClass}>Save</button>
                 </div>
               </div>
             </div>
