@@ -9,6 +9,20 @@ export default function ProfilePage({ user }) {
     router.push("/edit-profile");
   };
 
+  const avatar = user?.imageUrl ? (
+    <div className="avatar">
+      <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+        <img src={user.imageUrl} />
+      </div>
+    </div>
+  ) : (
+    <div className="avatar placeholder">
+      <div className="w-24 rounded-full bg-neutral-focus text-neutral-content ring ring-primary ring-offset-base-100 ring-offset-24">
+        <span className="text-3xl">{user?.name?.substring(0, 2).toUpperCase()}</span>
+      </div>
+    </div> 
+  );
+
   return (
     <section className="h-[calc(100vh-72px)] bg-slate-200">
       <div className="flex flex-col items-center py-20">
@@ -18,6 +32,12 @@ export default function ProfilePage({ user }) {
               <h1>My Profile</h1>
             </div>
             <div className="grid auto-cols-auto grid-cols-5 gap-4">
+              <div className="text-right">
+                <h2>Image:</h2>
+              </div>
+              <div className="col-span-4">
+                {avatar}
+              </div> 
               <div className="text-right">
                 <h2>Full Name:</h2>
               </div>

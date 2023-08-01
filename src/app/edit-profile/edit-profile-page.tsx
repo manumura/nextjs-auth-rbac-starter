@@ -44,6 +44,7 @@ export default function EditProfilePage({ user }) {
     setLoading(true);
     // TODO remove this
     await sleep(1000);
+
     // const res = await updateProfile(data.name, data.password);
     const body = {
       name: data.name,
@@ -54,7 +55,28 @@ export default function EditProfilePage({ user }) {
       body: JSON.stringify(body),
     });
 
-    if (res.ok) {
+    let success = true;
+
+    if (!res.ok) {
+      success = false;
+    } else {
+      // Upload profile image
+      if (data.image.length > 0) {
+        const formData = new FormData();
+        formData.append("image", data.image[0]);
+
+        const uploadRes = await fetch("/api/profile/image", {
+          method: "PUT",
+          body: formData,
+        });
+
+        if (!uploadRes.ok) {
+          success = false;
+        }
+      }
+    }
+
+    if (success) {
       toast(`Profile successfully updated!`, {
         type: "success",
         position: "top-center",
@@ -93,11 +115,7 @@ export default function EditProfilePage({ user }) {
       }
     },
   };
-  const btn = (
-    <button className="btn btn-primary">
-      Save
-    </button>
-  );
+  const btn = <button className="btn btn-primary">Save</button>;
   const btnLoading = (
     <button className="w-full btn btn-disabled">
       <span className="loading loading-spinner"></span>
@@ -134,14 +152,13 @@ export default function EditProfilePage({ user }) {
                 type="password"
                 constraints={passwordConfirmConstraints}
               />
+              <FormInput label="Image" name="image" type="file" />
               <div className="card-actions justify-end">
-                <div>
-                  {loading ? btnLoading : btn}
-                </div>
+                <div>{loading ? btnLoading : btn}</div>
                 <div>
                   <button
                     type="button"
-                    className="btn-outline btn-accent btn"
+                    className={`btn-outline btn-accent btn ${loading ? 'btn-disabled' : ''}`}
                     onClick={handleCancel}
                   >
                     Cancel
