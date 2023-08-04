@@ -1,14 +1,34 @@
 "use client";
 
-import clsx from "clsx";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import Dropzone from "react-dropzone";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormInput from "../../components/FormInput";
 import { sleep } from "../../lib/utils";
+import DropBox from "../../components/DropBox";
 
 export default function EditProfilePage({ user }) {
+  const [images, setImages] = useState([]);
+	const onDrop = useCallback((acceptedFiles) => {
+		acceptedFiles.map((file, index) => {
+
+      console.log(file);
+			const reader = new FileReader();
+
+			// reader.onload = function () {
+			// 	setImages((prevState) => [
+			// 		...prevState,
+			// 		{ id: index, src: e.target.result },
+			// 	]);
+			// };
+
+			reader.readAsDataURL(file);
+			return file;
+		});
+	}, []);
+  
   const router = useRouter();
   const methods = useForm({
     defaultValues: {
@@ -152,7 +172,11 @@ export default function EditProfilePage({ user }) {
                 type="password"
                 constraints={passwordConfirmConstraints}
               />
-              <FormInput label="Image" name="image" type="file" />
+              
+              Image
+              <DropBox onDrop={onDrop} />
+              {/* <FormInput label="Image" name="image" type="file" /> */}
+
               <div className="card-actions justify-end">
                 <div>{loading ? btnLoading : btn}</div>
                 <div>
