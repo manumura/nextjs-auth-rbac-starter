@@ -1,28 +1,29 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useCallback } from "react";
-import Dropzone from "react-dropzone";
+import { useCallback, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import DropBox from "../../components/DropBox";
 import FormInput from "../../components/FormInput";
 import { sleep } from "../../lib/utils";
-import DropBox from "../../components/DropBox";
 
 export default function EditProfilePage({ user }) {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState([] as any[]);
 	const onDrop = useCallback((acceptedFiles) => {
 		acceptedFiles.map((file, index) => {
-
-      console.log(file);
 			const reader = new FileReader();
 
-			// reader.onload = function () {
-			// 	setImages((prevState) => [
-			// 		...prevState,
-			// 		{ id: index, src: e.target.result },
-			// 	]);
-			// };
+			reader.onabort = () => console.log('file reading was aborted');
+      reader.onerror = () => console.error('file reading has failed');
+      // reader.onprogress = (e) => console.log('file reading in progress ', e);
+      reader.onload = () => {
+        // Do whatever you want with the file contents
+        // const binaryStr = reader.result;
+        // console.log(binaryStr);
+        // console.log(index, file);
+        setImages([...images, file]);
+      };
 
 			reader.readAsDataURL(file);
 			return file;
@@ -81,9 +82,10 @@ export default function EditProfilePage({ user }) {
       success = false;
     } else {
       // Upload profile image
-      if (data.image.length > 0) {
+      if (images.length > 0) {
+        console.log("Uploading image");
         const formData = new FormData();
-        formData.append("image", data.image[0]);
+        formData.append("image", images[0]);
 
         const uploadRes = await fetch("/api/profile/image", {
           method: "PUT",
@@ -174,7 +176,7 @@ export default function EditProfilePage({ user }) {
               />
               
               Image
-              <DropBox onDrop={onDrop} />
+              <DropBox onDrop={onDrop} imgSrc={user.imageUrl} />
               {/* <FormInput label="Image" name="image" type="file" /> */}
 
               <div className="card-actions justify-end">

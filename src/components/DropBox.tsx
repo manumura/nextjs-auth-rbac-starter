@@ -1,8 +1,8 @@
 import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useDropzone } from "react-dropzone";
 
-function DropBox({ onDrop }) {
+function DropBox({ onDrop, imgSrc = null }) {
   const {
     getRootProps,
     getInputProps,
@@ -49,10 +49,11 @@ function DropBox({ onDrop }) {
     return newFile;
   });
 
-  const avatar = files[0] ? (
+  const avatarImgSrc = files[0]?.preview || imgSrc;
+  const avatar = avatarImgSrc ? (
     <div className="avatar">
       <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-        <img src={files[0].preview} />
+        <img src={avatarImgSrc} />
       </div>
     </div>
   ) : (
