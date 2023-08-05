@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { getUserFromIdToken } from "../../lib/jwt.utils";
 import useUserStore from "../../lib/user-store";
 import { sleep } from "../../lib/utils";
+import { login } from "../../lib/api";
 
 export default function LoginPage({ error }) {
   const router = useRouter();
@@ -56,36 +57,39 @@ export default function LoginPage({ error }) {
       return;
     }
 
-    setLoading(true);
-    // TODO remove this
-    await sleep(1000);
-    // const res = await login(data.email, data.password);
-    const res = await fetch("/api/login", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    try {
+      setLoading(true);
+      // TODO remove this
+      await sleep(1000);
+      const res = await login(data.email, data.password);
+      const response = res?.data;
 
-    if (res.ok) {
-      const json = await res.json();
-      const user = await getUserFromIdToken(json.idToken);
+      if (response) {
+        const user = await getUserFromIdToken(response.idToken);
 
-      userStore.setUser(user);
-      toast(`Welcome ${user?.name}!`, {
-        type: "success",
-        position: "top-center",
-      });
-      saveIdToken(json.idToken);
+        userStore.setUser(user);
+        toast(`Welcome ${user?.name}!`, {
+          type: "success",
+          position: "top-center",
+        });
+        saveIdToken(response.idToken);
 
-      router.replace("/");
-      router.refresh();
-    } else {
+        router.replace("/");
+        router.refresh();
+      } else {
+        toast("Login failed! Please check your email and password", {
+          type: "error",
+          position: "top-center",
+        });
+      }
+    } catch (error) {
       toast("Login failed! Please check your email and password", {
         type: "error",
         position: "top-center",
       });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const emailConstraints = {
@@ -94,11 +98,7 @@ export default function LoginPage({ error }) {
   const passwordConstraints = {
     required: { value: true, message: "Password is required" },
   };
-  const btn = (
-    <button className="w-full btn">
-      Login
-    </button>
-  );
+  const btn = <button className="w-full btn">Login</button>;
   const btnLoading = (
     <button className="w-full btn btn-disabled">
       <span className="loading loading-spinner"></span>
@@ -135,9 +135,7 @@ export default function LoginPage({ error }) {
                 Forgot Password?
               </Link>
             </div>
-            <div>
-              {loading ? btnLoading : btn}
-            </div>
+            <div>{loading ? btnLoading : btn}</div>
             <span className="block">
               Need an account?{" "}
               <Link href="/register" className="text-secondary">

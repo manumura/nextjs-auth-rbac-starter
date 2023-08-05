@@ -8,6 +8,7 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { sleep } from "../../lib/utils";
+import { register } from "../../lib/api";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -25,30 +26,36 @@ export default function RegisterPage() {
       return;
     }
 
-    setLoading(true);
-    // TODO remove this
-    await sleep(1000);
-    // const res = await register(data.email, data.password, data.name);
-    const res = await fetch("/api/register", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    try {
+      setLoading(true);
+      // TODO remove this
+      await sleep(1000);
+      const res = await register(data.email, data.password, data.name);
+      const response = res?.data;
 
-    if (res.ok) {
-      const register = await res.json();
-      toast(`You are successfully registered ${register.name}!`, {
-        type: "success",
-        position: "top-center",
-      });
-      router.push("/login");
-    } else {
+      if (response) {
+        toast(`You are successfully registered ${response.name}!`, {
+          type: "success",
+          position: "top-center",
+        });
+        router.push("/login");
+      } else {
+        toast(
+          "Registration failed! Did you already register with this email?",
+          {
+            type: "error",
+            position: "top-center",
+          },
+        );
+      }
+    } catch (error) {
       toast("Registration failed! Did you already register with this email?", {
         type: "error",
         position: "top-center",
       });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const nameConstraints = {
@@ -76,11 +83,7 @@ export default function RegisterPage() {
       }
     },
   };
-  const btn = (
-    <button className="w-full btn">
-      Register
-    </button>
-  );
+  const btn = <button className="w-full btn">Register</button>;
   const btnLoading = (
     <button className="w-full btn btn-disabled">
       <span className="loading loading-spinner"></span>
@@ -128,9 +131,7 @@ export default function RegisterPage() {
                 Login Here
               </Link>
             </span>
-            <div>
-              {loading ? btnLoading : btn}
-            </div>
+            <div>{loading ? btnLoading : btn}</div>
           </form>
         </FormProvider>
       </div>

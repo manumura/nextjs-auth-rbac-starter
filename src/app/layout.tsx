@@ -9,7 +9,7 @@ import { getUserFromIdToken } from "../lib/jwt.utils";
 async function getProfile() {
   const cookieStore = cookies();
   const idTokenCookie = cookieStore.get("idToken");
-  if (!idTokenCookie || !idTokenCookie.value) {
+  if (!idTokenCookie?.value) {
     console.error("No idToken cookie found");
     return undefined;
   }

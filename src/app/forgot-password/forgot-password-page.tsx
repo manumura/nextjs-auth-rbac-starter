@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { sleep } from "../../lib/utils";
+import { forgotPassword } from "../../lib/api";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -31,37 +32,44 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    setLoading(true);
-    // TODO remove this
-    await sleep(1000);
-    // const res = await forgotPassword(data.email);
-    const res = await fetch("/api/forgot-password", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    try {
+      setLoading(true);
+      // TODO remove this
+      await sleep(1000);
+      const res = await forgotPassword(data.email);
+      const response = res?.data;
 
-    if (res.ok) {
-      toast(`Success! Please check the email sent at ${data.email}`, {
-        type: "success",
-        position: "top-center",
-      });
-      router.push("/");
-    } else {
+      if (response) {
+        toast(`Success! Please check the email sent at ${data.email}`, {
+          type: "success",
+          position: "top-center",
+        });
+        router.push("/");
+      } else {
+        toast("An error occured, please try again", {
+          type: "error",
+          position: "top-center",
+        });
+      }
+    } catch (error) {
       toast("An error occured, please try again", {
         type: "error",
         position: "top-center",
       });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const emailConstraints = {
     required: { value: true, message: "Email is required" },
   };
-  const btnClass = clsx(
-    "w-full btn",
-    `${loading ? "loading btn-disabled" : ""}`,
+  const btn = <button className="w-full btn">Submit</button>;
+  const btnLoading = (
+    <button className="w-full btn btn-disabled">
+      <span className="loading loading-spinner"></span>
+      Submit
+    </button>
   );
 
   return (
@@ -82,9 +90,7 @@ export default function ForgotPasswordPage() {
               constraints={emailConstraints}
             />
 
-            <div>
-              <button className={btnClass}>Submit</button>
-            </div>
+            <div>{loading ? btnLoading : btn}</div>
             <div className="text-center">
               <Link href="/login" className="text-secondary">
                 Cancel
