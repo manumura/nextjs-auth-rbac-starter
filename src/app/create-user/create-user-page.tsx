@@ -8,6 +8,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormSelect from "../../components/FormSelect";
 import { sleep } from "../../lib/utils";
+import { createUser } from "../../lib/api";
 
 export default function CreateUserPage() {
   const router = useRouter();
@@ -21,37 +22,28 @@ export default function CreateUserPage() {
       return;
     }
 
-    setLoading(true);
-    // TODO remove this
-    await sleep(1000);
-    // const res = await createUser(data.email, data.name, data.role);
-    const body = {
-      email: data.email,
-      name: data.name,
-      role: data.role,
-    };
-    const res = await fetch("/api/users", {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
-    const json = await res.json();
+    try {
+      setLoading(true);
+      // TODO remove this
+      await sleep(1000);
+      const res = await createUser(data.email, data.name, data.role);
+      const response = res?.data;
 
-    if (res.ok) {
-      toast(`User successfully created: ${json.name}`, {
+      toast(`User successfully created: ${response.name}`, {
         type: "success",
         position: "top-center",
       });
       // Go back to users page and refresh the list
       router.push("/users");
       router.refresh();
-    } else {
-      toast(`User creation failed: ${json.message}`, {
+    } catch (error) {
+      toast(`User creation failed: ${error?.response?.data?.message}`, {
         type: "error",
         position: "top-center",
       });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const nameConstraints = {
@@ -74,11 +66,7 @@ export default function CreateUserPage() {
     { label: "User", value: "USER" },
   ];
 
-  const btn = (
-    <button className="btn btn-primary mx-1">
-      Create
-    </button>
-  );
+  const btn = <button className="btn btn-primary mx-1">Create</button>;
   const btnLoading = (
     <button className="btn btn-primary mx-1 btn-disabled">
       <span className="loading loading-spinner"></span>

@@ -40,20 +40,13 @@ export default function ResetPasswordPage({ token }) {
       const res = await resetPassword(data.password, token);
       const response = res?.data;
 
-      if (response) {
-        toast("Password successfully updated!", {
-          type: "success",
-          position: "top-center",
-        });
-        router.push("/login");
-      } else {
-        toast("Password update failed", {
-          type: "error",
-          position: "top-center",
-        });
-      }
+      toast("Password successfully updated!", {
+        type: "success",
+        position: "top-center",
+      });
+      router.push("/login");
     } catch (error) {
-      toast("Password update failed", {
+      toast(`Password update failed: ${error?.response?.data?.message}`, {
         type: "error",
         position: "top-center",
       });

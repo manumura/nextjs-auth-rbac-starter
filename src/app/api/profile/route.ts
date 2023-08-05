@@ -23,27 +23,3 @@ export async function GET(request: NextRequest) {
 
   return response;
 }
-
-export async function PUT(request: NextRequest) {
-  const BASE_URL = appConfig.baseUrl;
-  const body = await request.text();
-
-  const res = await fetch(`${BASE_URL}/api/v1/profile`, {
-    method: "PUT",
-    body,
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: cookies() as any,
-    },
-  });
-
-  const json = await res.json();
-  const response = new NextResponse(JSON.stringify(json), {
-    status: res.status,
-    statusText: res.statusText,
-    headers: res.headers,
-  });
-
-  return response;
-}

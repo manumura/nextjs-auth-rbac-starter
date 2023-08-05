@@ -33,23 +33,13 @@ export default function RegisterPage() {
       const res = await register(data.email, data.password, data.name);
       const response = res?.data;
 
-      if (response) {
-        toast(`You are successfully registered ${response.name}!`, {
-          type: "success",
-          position: "top-center",
-        });
-        router.push("/login");
-      } else {
-        toast(
-          "Registration failed! Did you already register with this email?",
-          {
-            type: "error",
-            position: "top-center",
-          },
-        );
-      }
+      toast(`You are successfully registered ${response.name}!`, {
+        type: "success",
+        position: "top-center",
+      });
+      router.push("/login");
     } catch (error) {
-      toast("Registration failed! Did you already register with this email?", {
+      toast(`Registration failed! ${error?.response?.data?.message}`, {
         type: "error",
         position: "top-center",
       });

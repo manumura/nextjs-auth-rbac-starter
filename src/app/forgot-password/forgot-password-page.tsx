@@ -39,23 +39,19 @@ export default function ForgotPasswordPage() {
       const res = await forgotPassword(data.email);
       const response = res?.data;
 
-      if (response) {
-        toast(`Success! Please check the email sent at ${data.email}`, {
-          type: "success",
-          position: "top-center",
-        });
-        router.push("/");
-      } else {
-        toast("An error occured, please try again", {
-          type: "error",
-          position: "top-center",
-        });
-      }
-    } catch (error) {
-      toast("An error occured, please try again", {
-        type: "error",
+      toast(`Success! Please check the email sent at ${data.email}`, {
+        type: "success",
         position: "top-center",
       });
+      router.push("/");
+    } catch (error) {
+      toast(
+        `An error occured, please try again:  ${error?.response?.data?.message}`,
+        {
+          type: "error",
+          position: "top-center",
+        },
+      );
     } finally {
       setLoading(false);
     }

@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import FormInput from "../../../components/FormInput";
 import FormSelect from "../../../components/FormSelect";
 import { sleep } from "../../../lib/utils";
+import { updateUser } from "../../../lib/api";
 
 export default function EditUserPage({ user }) {
   const router = useRouter();
@@ -28,43 +29,33 @@ export default function EditUserPage({ user }) {
       return;
     }
 
-    setSubmitting(true);
-    // TODO remove this
-    await sleep(1000);
-    // const res = await updateUser(
-    //   user.id,
-    //   data.name,
-    //   data.email,
-    //   data.role,
-    //   data.password,
-    // );
-    const body = {
-      name: data.name,
-      email: data.email,
-      role: data.role,
-      ...(data.password ? { password: data.password } : {}),
-    };
-    const res = await fetch(`/api/users/${user.id}`, {
-      method: "PUT",
-      body: JSON.stringify(body),
-    });
-    const json = await res.json();
+    try {
+      setSubmitting(true);
+      // TODO remove this
+      await sleep(1000);
+      const res = await updateUser(
+        user.id,
+        data.name,
+        data.email,
+        data.role,
+        data.password,
+      );
+      const response = res?.data;
 
-    if (res.ok) {
-      toast(`User successfully updated: ${json.name}`, {
+      toast(`User successfully updated: ${response.name}`, {
         type: "success",
         position: "top-center",
       });
       router.back();
       router.refresh();
-    } else {
-      toast(`Error updating user: ${json.message}`, {
+    } catch (error) {
+      toast(`Update user failed! ${error?.response?.data?.message}`, {
         type: "error",
         position: "top-center",
       });
+    } finally {
+      setSubmitting(false);
     }
-
-    setSubmitting(false);
   };
 
   const onCancel = () => {
@@ -106,11 +97,7 @@ export default function EditUserPage({ user }) {
     { label: "User", value: "USER" },
   ];
 
-  const btn = (
-    <button className="btn btn-primary mx-1">
-      Save
-    </button>
-  );
+  const btn = <button className="btn btn-primary mx-1">Save</button>;
   const btnLoading = (
     <button className="btn btn-primary mx-1 btn-disabled">
       <span className="loading loading-spinner"></span>

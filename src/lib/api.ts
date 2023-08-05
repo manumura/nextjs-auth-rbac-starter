@@ -11,7 +11,7 @@ const axiosPublicInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  //   withCredentials: true,
+  withCredentials: true,
 });
 
 export const axiosInstance = axios.create({
@@ -105,8 +105,10 @@ export const updateProfile = async (name, password?) => {
 };
 
 export const updateProfileImage = async (image) => {
-  return axiosInstance.put("/v1/profile/image", {
-    image,
+  return axiosInstance.put("/v1/profile/image", image, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
 };
 

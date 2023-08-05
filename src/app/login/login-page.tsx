@@ -64,29 +64,24 @@ export default function LoginPage({ error }) {
       const res = await login(data.email, data.password);
       const response = res?.data;
 
-      if (response) {
-        const user = await getUserFromIdToken(response.idToken);
-
-        userStore.setUser(user);
-        toast(`Welcome ${user?.name}!`, {
-          type: "success",
-          position: "top-center",
-        });
-        saveIdToken(response.idToken);
-
-        router.replace("/");
-        router.refresh();
-      } else {
-        toast("Login failed! Please check your email and password", {
-          type: "error",
-          position: "top-center",
-        });
-      }
-    } catch (error) {
-      toast("Login failed! Please check your email and password", {
-        type: "error",
+      const user = await getUserFromIdToken(response.idToken);
+      userStore.setUser(user);
+      toast(`Welcome ${user?.name}!`, {
+        type: "success",
         position: "top-center",
       });
+      saveIdToken(response.idToken);
+
+      router.replace("/");
+      router.refresh();
+    } catch (error) {
+      toast(
+        `Login failed! ${error?.response?.data?.message}`,
+        {
+          type: "error",
+          position: "top-center",
+        },
+      );
     } finally {
       setLoading(false);
     }

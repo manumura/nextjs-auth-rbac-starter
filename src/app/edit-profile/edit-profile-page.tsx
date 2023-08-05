@@ -7,15 +7,16 @@ import { toast } from "react-toastify";
 import DropBox from "../../components/DropBox";
 import FormInput from "../../components/FormInput";
 import { sleep } from "../../lib/utils";
+import { updateProfile, updateProfileImage } from "../../lib/api";
 
 export default function EditProfilePage({ user }) {
   const [images, setImages] = useState([] as any[]);
-	const onDrop = useCallback((acceptedFiles) => {
-		acceptedFiles.map((file, index) => {
-			const reader = new FileReader();
+  const onDrop = useCallback((acceptedFiles) => {
+    acceptedFiles.map((file, index) => {
+      const reader = new FileReader();
 
-			reader.onabort = () => console.log('file reading was aborted');
-      reader.onerror = () => console.error('file reading has failed');
+      reader.onabort = () => console.log("file reading was aborted");
+      reader.onerror = () => console.error("file reading has failed");
       // reader.onprogress = (e) => console.log('file reading in progress ', e);
       reader.onload = () => {
         // Do whatever you want with the file contents
@@ -25,11 +26,11 @@ export default function EditProfilePage({ user }) {
         setImages([...images, file]);
       };
 
-			reader.readAsDataURL(file);
-			return file;
-		});
-	}, []);
-  
+      reader.readAsDataURL(file);
+      return file;
+    });
+  }, []);
+
   const router = useRouter();
   const methods = useForm({
     defaultValues: {
@@ -62,57 +63,51 @@ export default function EditProfilePage({ user }) {
       return;
     }
 
-    setLoading(true);
-    // TODO remove this
-    await sleep(1000);
+    try {
+      setLoading(true);
+      // TODO remove this
+      await sleep(1000);
 
-    // const res = await updateProfile(data.name, data.password);
-    const body = {
-      name: data.name,
-      ...(data.password ? { password: data.password } : {}),
-    };
-    const res = await fetch("/api/profile", {
-      method: "PUT",
-      body: JSON.stringify(body),
-    });
+      let success = true;
 
-    let success = true;
+      const res = await updateProfile(data.name, data.password);
+      if (res.status !== 200) {
+        success = false;
+      } else {
+        // Upload profile image
+        if (images.length > 0) {
+          console.log("Uploading image");
+          const formData = new FormData();
+          formData.append("image", images[0]);
 
-    if (!res.ok) {
-      success = false;
-    } else {
-      // Upload profile image
-      if (images.length > 0) {
-        console.log("Uploading image");
-        const formData = new FormData();
-        formData.append("image", images[0]);
-
-        const uploadRes = await fetch("/api/profile/image", {
-          method: "PUT",
-          body: formData,
-        });
-
-        if (!uploadRes.ok) {
-          success = false;
+          const uploadRes = await updateProfileImage(formData);
+          if (uploadRes.status !== 200) {
+            success = false;
+          }
         }
       }
-    }
 
-    if (success) {
-      toast(`Profile successfully updated!`, {
-        type: "success",
-        position: "top-center",
-      });
-      router.back();
-      router.refresh();
-    } else {
-      toast("Profile update failed!", {
+      if (success) {
+        toast(`Profile successfully updated!`, {
+          type: "success",
+          position: "top-center",
+        });
+        router.back();
+        router.refresh();
+      } else {
+        toast("Profile update failed!", {
+          type: "error",
+          position: "top-center",
+        });
+      }
+    } catch (error) {
+      toast(`Profile update failed!  ${error?.response?.data?.message}`, {
         type: "error",
         position: "top-center",
       });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const nameConstraints = {
@@ -174,17 +169,17 @@ export default function EditProfilePage({ user }) {
                 type="password"
                 constraints={passwordConfirmConstraints}
               />
-              
               Image
               <DropBox onDrop={onDrop} imgSrc={user.imageUrl} />
               {/* <FormInput label="Image" name="image" type="file" /> */}
-
               <div className="card-actions justify-end">
                 <div>{loading ? btnLoading : btn}</div>
                 <div>
                   <button
                     type="button"
-                    className={`btn-outline btn-accent btn ${loading ? 'btn-disabled' : ''}`}
+                    className={`btn-outline btn-accent btn ${
+                      loading ? "btn-disabled" : ""
+                    }`}
                     onClick={handleCancel}
                   >
                     Cancel

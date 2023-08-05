@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { sleep } from "../lib/utils";
 import Modal from "./Modal";
+import { deleteUser } from "../lib/api";
 
 const DeleteUserModal = ({ user, isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
@@ -16,28 +17,26 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
       return;
     }
 
-    setLoading(true);
-    // TODO remove this
-    await sleep(1000);
-    // const res = await deleteUser(user?.id);
-    const res = await fetch(`/api/users/${user.id}`, {
-      method: "DELETE",
-    });
-    const json = await res.json();
-    setLoading(false);
+    try {
+      setLoading(true);
+      // TODO remove this
+      await sleep(1000);
+      const res = await deleteUser(user?.id);
+      const response = res?.data;
 
-    if (res.ok) {
-      toast(`User successfully deleted: ${json.name}`, {
+      toast(`User successfully deleted: ${response.name}`, {
         type: "success",
         position: "top-center",
       });
       onClose(true);
-    } else {
-      toast(`Error deleting user: ${json.message}`, {
+    } catch (error) {
+      toast(`Delete user failed!  ${error?.response?.data?.message}`, {
         type: "error",
         position: "top-center",
       });
-    }    
+    } finally {
+      setLoading(false);
+    }
   };
 
   const btn = (
@@ -46,7 +45,10 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
     </button>
   );
   const btnLoading = (
-    <button className="btn btn-accent mx-1 btn-disabled" id="btn-delete-loading">
+    <button
+      className="btn btn-accent mx-1 btn-disabled"
+      id="btn-delete-loading"
+    >
       <span className="loading loading-spinner"></span>
       Delete
     </button>
