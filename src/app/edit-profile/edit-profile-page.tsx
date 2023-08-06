@@ -11,6 +11,7 @@ import { updateProfile, updateProfileImage } from "../../lib/api";
 
 export default function EditProfilePage({ user }) {
   const [images, setImages] = useState([] as any[]);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const onDrop = useCallback((acceptedFiles) => {
     acceptedFiles.map((file, index) => {
       const reader = new FileReader();
@@ -22,7 +23,6 @@ export default function EditProfilePage({ user }) {
         // Do whatever you want with the file contents
         // const binaryStr = reader.result;
         // console.log(binaryStr);
-        // console.log(index, file);
         setImages([...images, file]);
       };
 
@@ -30,6 +30,13 @@ export default function EditProfilePage({ user }) {
       return file;
     });
   }, []);
+  const onUploadProgress = (progressEvent) => {
+    const { loaded, total } = progressEvent;
+    if (progressEvent.bytes) {
+      const progress = Math.round((loaded / total) * 100);
+      setUploadProgress(progress);
+    }
+  };
 
   const router = useRouter();
   const methods = useForm({
@@ -80,7 +87,10 @@ export default function EditProfilePage({ user }) {
           const formData = new FormData();
           formData.append("image", images[0]);
 
-          const uploadRes = await updateProfileImage(formData);
+          const uploadRes = await updateProfileImage(
+            formData,
+            onUploadProgress,
+          );
           if (uploadRes.status !== 200) {
             success = false;
           }
@@ -139,9 +149,13 @@ export default function EditProfilePage({ user }) {
       Save
     </button>
   );
+  const uploadProgressStyle = {
+    "--size": "3.2rem",
+    "--value": uploadProgress,
+  } as React.CSSProperties;
 
   return (
-    <section className="h-[calc(100vh-72px)] bg-slate-200">
+    <section className="h-section bg-slate-200">
       <FormProvider {...methods}>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -173,6 +187,11 @@ export default function EditProfilePage({ user }) {
               <DropBox onDrop={onDrop} imgSrc={user.imageUrl} />
               {/* <FormInput label="Image" name="image" type="file" /> */}
               <div className="card-actions justify-end">
+                {uploadProgress > 0 && (
+                  <div className="radial-progress" style={uploadProgressStyle}>
+                    {uploadProgress}%
+                  </div>
+                )}
                 <div>{loading ? btnLoading : btn}</div>
                 <div>
                   <button

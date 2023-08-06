@@ -25,13 +25,14 @@ function DropBox({ onDrop, imgSrc = null }) {
   const baseClasses =
     "hero bg-base-100 border-dashed border-4 border-neutral rounded-box border-opacity-50";
   const getStyle = (props) => {
-    if (props.isDragAccept) {
+    const { isDragAccept, isFocused, isDragReject } = props;
+    if (isDragAccept) {
       return clsx(baseClasses, "border-primary");
     }
-    if (props.isDragReject) {
+    if (isDragReject) {
       return clsx(baseClasses, "border-accent");
     }
-    if (props.isFocused) {
+    if (isFocused) {
       return clsx(baseClasses, "border-secondary");
     }
     return clsx(baseClasses, "border-neutral");

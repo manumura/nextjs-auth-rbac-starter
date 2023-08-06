@@ -24,7 +24,7 @@ export default function ProfilePage({ user }) {
   );
 
   return (
-    <section className="h-[calc(100vh-72px)] bg-slate-200">
+    <section className="h-section bg-slate-200">
       <div className="flex flex-col items-center py-20">
         <div className="card m-5 w-3/4 max-w-screen-lg bg-slate-50 shadow-xl">
           <div className="card-body">

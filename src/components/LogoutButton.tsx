@@ -32,19 +32,16 @@ const LogoutButton = () => {
         type: "success",
         position: "top-center",
       });
-
-      clearStorage();
-      userStore.setUser(undefined);
     } catch (error) {
-      clearStorage();
-      userStore.setUser(undefined);
-
       toast(`Logout failed! ${error?.response?.data?.message}`, {
         type: "error",
         position: "top-center",
       });
     } finally {
       setLoading(false);
+
+      clearStorage();
+      userStore.setUser(undefined);
 
       if (pathname !== "/") {
         router.push("/");

@@ -69,7 +69,7 @@ export default function ForgotPasswordPage() {
   );
 
   return (
-    <section className="h-[calc(100vh-72px)] bg-slate-200 py-20">
+    <section className="h-section bg-slate-200 py-20">
       <div className="w-full">
         <FormProvider {...methods}>
           <form

@@ -10,7 +10,7 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <section className="h-[calc(100vh-72px)] bg-slate-200">
+    <section className="h-section bg-slate-200">
       <div className="flex flex-col items-center py-20">
         <h1 className="mb-4 text-center text-4xl font-[600]">
           An error occurred

@@ -7,3 +7,7 @@
 html {
   font-family: Poppins, sans-serif;
 }
+
+.h-section {
+  @apply h-[calc(100vh-80px)];
+}

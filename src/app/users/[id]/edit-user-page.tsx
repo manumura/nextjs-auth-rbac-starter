@@ -159,7 +159,7 @@ export default function EditUserPage({ user }) {
   );
 
   return (
-    <section className="h-[calc(100vh-72px)] bg-slate-200">
+    <section className="h-section bg-slate-200">
       {editUserForm}
     </section>
   );

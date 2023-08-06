@@ -55,7 +55,7 @@ axiosInstance.interceptors.response.use(
         const data: LoginResponse = response.data;
         config.headers = {
           ...config.headers,
-          Cookie: getCookiesAsString(data),
+        //   Cookie: getCookiesAsString(data),
           "set-cookie": response.headers["set-cookie"],
         };
       }
@@ -69,9 +69,9 @@ axiosInstance.interceptors.response.use(
   },
 );
 
-const getCookiesAsString = (data: LoginResponse) => {
-  return `accessToken=${data.accessToken}; refreshToken=${data.refreshToken}; accessTokenExpiresAt=${data.accessTokenExpiresAt}; idToken=${data.idToken}`;
-};
+// const getCookiesAsString = (data: LoginResponse) => {
+//   return `accessToken=${data.accessToken}; refreshToken=${data.refreshToken}; accessTokenExpiresAt=${data.accessTokenExpiresAt}; idToken=${data.idToken}`;
+// };
 
 ////////////////////////////////////////////////////////////////
 // Public APIs
@@ -104,11 +104,12 @@ export const updateProfile = async (name, password?) => {
   });
 };
 
-export const updateProfileImage = async (image) => {
+export const updateProfileImage = async (image, onUploadProgress) => {
   return axiosInstance.put("/v1/profile/image", image, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
+    onUploadProgress,
   });
 };
 
