@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 type DrawerOpenState = {
   open: boolean | undefined;
@@ -7,7 +7,7 @@ type DrawerOpenState = {
 
 const useDrawerOpenStore = create<DrawerOpenState>((set) => ({
   open: false,
-  setOpen: (open) => set((state) => ({ ...state, open })),
+  setOpen: (open): void => set((state) => ({ ...state, open })),
 }));
 
 export default useDrawerOpenStore;

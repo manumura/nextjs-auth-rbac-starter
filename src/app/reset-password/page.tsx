@@ -1,22 +1,23 @@
-import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { getClientBaseUrl } from "../../lib/utils";
-import ResetPasswordPage from "./reset-password-page";
+import { cookies, headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { getClientBaseUrl } from '../../lib/utils';
+import ResetPasswordPage from './reset-password-page';
+import { IUser } from '../../lib/user-store';
 
-async function isAuthenticated() {
+async function isAuthenticated(): Promise<boolean> {
   // Redirect if user is authenticated
-  const accessToken = cookies().get("accessToken")?.value;
+  const accessToken = cookies().get('accessToken')?.value;
   return !!accessToken;
 }
 
-async function getUserByToken(token) {
+async function getUserByToken(token): Promise<IUser | undefined> {
   const baseUrl = getClientBaseUrl(headers());
   const res = await fetch(`${baseUrl}/api/token/${token}`, {
-    method: "GET",
+    method: 'GET',
   });
 
   if (!res.ok) {
-    console.error(`Reset password getServerSideProps error: `, res.statusText);
+    console.error(`Reset password getServerSideProps error: ${res.statusText}`);
     return undefined;
   }
 
@@ -28,16 +29,16 @@ export default async function ResetPassword({ searchParams }) {
   // Fetch data directly in a Server Component
   const isAuth = await isAuthenticated();
   if (isAuth) {
-    redirect("/");
+    redirect('/');
   }
 
   if (!searchParams?.token) {
-    redirect("/login?error=404");
+    redirect('/login?error=404');
   }
 
   const user = await getUserByToken(searchParams?.token);
   if (!user) {
-    redirect("/login?error=404");
+    redirect('/login?error=404');
   }
 
   // Forward fetched data to your Client Component

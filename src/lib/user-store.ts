@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 export type IUser = {
   id: number;
@@ -15,7 +15,7 @@ type UserState = {
 
 const useUserStore = create<UserState>((set) => ({
   user: null,
-  setUser: (user) => set((state) => ({ ...state, user })),
+  setUser: (user): void => set((state) => ({ ...state, user })),
 }));
 
 export default useUserStore;

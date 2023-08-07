@@ -1,18 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
-import appConfig from "../../../config/config";
+import { NextRequest, NextResponse } from 'next/server';
+import appConfig from '../../../config/config';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   const BASE_URL = appConfig.baseUrl;
   const params = request.nextUrl.searchParams;
 
   const res = await fetch(`${BASE_URL}/api/v1/users?` + params, {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Cookie: request.cookies.toString(),
     },
-    cache: "no-cache",
+    cache: 'no-cache',
   });
 
   const json = await res.json();

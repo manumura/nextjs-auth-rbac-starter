@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import { Pagination } from "@/components/Pagination";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { FiDelete, FiEdit, FiPlusCircle } from "react-icons/fi";
-import DeleteUserModal from "../../components/DeleteUserModal";
+import { Pagination } from '@/components/Pagination';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { FiDelete, FiEdit, FiPlusCircle } from 'react-icons/fi';
+import DeleteUserModal from '../../components/DeleteUserModal';
 
 export default function UsersPage({ users, totalElements, page, pageSize }) {
   const router = useRouter();
   const [selectedUser, setSelectedUser] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const onPageSelect = (pageSelected) => {
+  const onPageSelect = (pageSelected): void => {
     router.push(`users?page=${pageSelected}`);
   };
 
-  const openDeleteModal = (user) => {
+  const openDeleteModal = (user): void => {
     setSelectedUser(user);
     setIsDeleteModalOpen(true);
   };
 
-  const onDeleteModalClose = (isSuccess) => {
+  const onDeleteModalClose = (isSuccess): void => {
     setIsDeleteModalOpen(false);
     if (isSuccess) {
       // Refresh page
@@ -28,17 +28,17 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
     }
   };
 
-  const onEditUser = (userId) => {
+  const onEditUser = (userId): void => {
     router.push(`users/${userId}`);
   };
 
-  const onCreateUser = () => {
-    router.push("create-user");
+  const onCreateUser = (): void => {
+    router.push('create-user');
   };
 
   const noUserRow = (
     <tr>
-      <td colSpan={5} className="text-center font-bold">
+      <td colSpan={5} className='text-center font-bold'>
         No Users found
       </td>
     </tr>
@@ -51,17 +51,17 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
       <td>{user.email}</td>
       <td>{user.role}</td>
       <td>
-        <div className="flex justify-end space-x-1">
+        <div className='flex justify-end space-x-1'>
           <button
-            className="btn-primary btn-sm btn gap-2"
-            onClick={() => onEditUser(user.id)}
+            className='btn-primary btn-sm btn gap-2'
+            onClick={(): void => onEditUser(user.id)}
           >
             <FiEdit />
             Edit
           </button>
           <button
-            className="btn-accent btn-sm btn gap-2"
-            onClick={() => openDeleteModal(user)}
+            className='btn-accent btn-sm btn gap-2'
+            onClick={(): void => openDeleteModal(user)}
           >
             <FiDelete />
             Delete
@@ -72,8 +72,8 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
   ));
 
   const usersTable = (
-    <div className="overflow-x-auto bg-slate-50 p-10 md:container md:mx-auto">
-      <table className="table-zebra table w-full">
+    <div className='overflow-x-auto bg-slate-50 p-10 md:container md:mx-auto'>
+      <table className='table-zebra table w-full'>
         <thead>
           <tr>
             <th></th>
@@ -81,8 +81,8 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
             <th>Email</th>
             <th>Role</th>
             <th>
-              <div className="flex justify-end space-x-1">
-                <button className="btn gap-2" onClick={onCreateUser}>
+              <div className='flex justify-end space-x-1'>
+                <button className='btn gap-2' onClick={onCreateUser}>
                   <FiPlusCircle />
                   Create User
                 </button>
@@ -92,7 +92,7 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
         </thead>
         <tbody>{users && users.length > 0 ? userRows : noUserRow}</tbody>
       </table>
-      <div className="flex justify-end">
+      <div className='flex justify-end'>
         {users && users.length > 0 && (
           <Pagination
             currentPage={page}
@@ -106,7 +106,7 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
   );
 
   return (
-    <section className="h-section bg-slate-200">
+    <section className='h-section bg-slate-200'>
       {usersTable}
       <DeleteUserModal
         user={selectedUser}

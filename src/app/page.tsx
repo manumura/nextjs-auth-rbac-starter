@@ -1,15 +1,15 @@
-import { headers } from "next/headers";
-import HomePage from "./home-page";
-import { getClientBaseUrl } from "../lib/utils";
+import { headers } from 'next/headers';
+import HomePage from './home-page';
+import { getClientBaseUrl } from '../lib/utils';
 
 async function getAppInfos() {
-  let message = "Welcome fallback!";
+  let message = 'Welcome fallback!';
   let information = {};
 
   const baseUrl = getClientBaseUrl(headers());
 
   const welcomeRes = await fetch(`${baseUrl}/api/welcome`, {
-    method: "GET",
+    method: 'GET',
   });
 
   if (welcomeRes.ok) {
@@ -18,7 +18,7 @@ async function getAppInfos() {
   }
 
   const infoRes = await fetch(`${baseUrl}/api/info`, {
-    method: "GET",
+    method: 'GET',
   });
 
   if (infoRes.ok) {
@@ -33,7 +33,7 @@ async function getAppInfos() {
     message,
     information,
   };
-};
+}
 
 export default async function Home() {
   // Fetch data directly in a Server Component

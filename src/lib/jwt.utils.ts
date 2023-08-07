@@ -1,11 +1,11 @@
-import * as jose from "jose";
-import appConfig from "../config/config";
-import { appConstant } from "../config/constant";
-import { IUser } from "./user-store";
+import * as jose from 'jose';
+import appConfig from '../config/config';
+import { appConstant } from '../config/constant';
+import { IUser } from './user-store';
 
 export const getUserFromIdToken = async (idToken: string): Promise<IUser | undefined> => {
   if (!idToken) {
-    console.error("No idToken found");
+    console.error('No idToken found');
     return undefined;
   }
 

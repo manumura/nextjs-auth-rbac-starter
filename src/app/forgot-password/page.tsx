@@ -1,10 +1,10 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import ForgotPasswordPage from "./forgot-password-page";
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import ForgotPasswordPage from './forgot-password-page';
 
-async function isAuthenticated() {
+async function isAuthenticated(): Promise<boolean> {
   // Redirect if user is authenticated
-  const accessToken = cookies().get("accessToken")?.value;
+  const accessToken = cookies().get('accessToken')?.value;
   return !!accessToken;
 }
 
@@ -12,7 +12,7 @@ export default async function ForgotPassword() {
   // Fetch data directly in a Server Component
   const isAuth = await isAuthenticated();
   if (isAuth) {
-    redirect("/");
+    redirect('/');
   }
 
   // Forward fetched data to your Client Component

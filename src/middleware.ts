@@ -1,25 +1,25 @@
-import moment from "moment";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
-import appConfig from "./config/config";
+import moment from 'moment';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import appConfig from './config/config';
 import {
   clearCookies,
   setRequestAuthCookies,
   setResponseAuthCookies,
-} from "./lib/cookies.utils.";
-import { getUserFromIdToken } from "./lib/jwt.utils";
-import { isAdmin } from "./lib/utils";
+} from './lib/cookies.utils.';
+import { getUserFromIdToken } from './lib/jwt.utils';
+import { isAdmin } from './lib/utils';
 
-export async function middleware(request: NextRequest) {
-  const accessTokenCookie = request.cookies.get("accessToken");
-  const idTokenCookie = request.cookies.get("idToken");
+export async function middleware(request: NextRequest): Promise<NextResponse> {
+  const accessTokenCookie = request.cookies.get('accessToken');
+  const idTokenCookie = request.cookies.get('idToken');
   const accessTokenExpiresAtCookie = request.cookies.get(
-    "accessTokenExpiresAt",
+    'accessTokenExpiresAt',
   );
   const nextResponse = NextResponse.next();
-  const redirectHomeResponse = NextResponse.redirect(new URL("/", request.url));
+  const redirectHomeResponse = NextResponse.redirect(new URL('/', request.url));
   const redirectLoginResponse = NextResponse.redirect(
-    new URL("/login?error=401", request.url),
+    new URL('/login?error=401', request.url),
   );
 
   // Refresh token if expired
@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
 
     // Check validity of token
     if (accessTokenExpiresAt.isBefore(now)) {
-      console.log("Middleware: access token is expired");
+      console.log('Middleware: access token is expired');
       const response = await refreshToken(request);
       return response;
     }
@@ -85,11 +85,11 @@ async function refreshToken(request: NextRequest): Promise<NextResponse> {
   try {
     const BASE_URL = appConfig.baseUrl;
     const res = await fetch(`${BASE_URL}/api/v1/refresh-token`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({}),
-      credentials: "include",
+      credentials: 'include',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Cookie: request.cookies.toString(),
       },
     });
@@ -113,14 +113,14 @@ async function refreshToken(request: NextRequest): Promise<NextResponse> {
     
     return nextResponse;
   } catch (err) {
-    console.error("Error refreshing token: ", err);
+    console.error('Error refreshing token: ', err);
     const nextResponse = NextResponse.next();
     clearCookies(nextResponse);
     return nextResponse;
   }
 }
 
-function isAdminRoute(request: NextRequest) {
+function isAdminRoute(request: NextRequest): boolean {
   for (const adminRoute of appConfig.adminRoutes) {
     if (request.nextUrl.pathname.startsWith(adminRoute)) {
       return true;
@@ -129,7 +129,7 @@ function isAdminRoute(request: NextRequest) {
   return false;
 }
 
-function isProtectedRoute(request: NextRequest) {
+function isProtectedRoute(request: NextRequest): boolean {
   for (const protectedRoute of appConfig.protectedRoutes) {
     if (request.nextUrl.pathname.startsWith(protectedRoute)) {
       return true;
@@ -138,7 +138,7 @@ function isProtectedRoute(request: NextRequest) {
   return false;
 }
 
-function isPublicRoute(request: NextRequest) {
+function isPublicRoute(request: NextRequest): boolean {
   for (const publicRoute of appConfig.publicRoutes) {
     if (request.nextUrl.pathname.startsWith(publicRoute)) {
       return true;
@@ -147,13 +147,13 @@ function isPublicRoute(request: NextRequest) {
   return false;
 }
 
-function isAPIRoute(request: NextRequest) {
-  return request.nextUrl.pathname.startsWith("/api");
-}
+// function isAPIRoute(request: NextRequest): boolean {
+//   return request.nextUrl.pathname.startsWith('/api');
+// }
 
-// See "Matching Paths" below to learn more
+// See 'Matching Paths' below to learn more
 export const config = {
   // matcher solution for public, api, assets and _next exclusion
-  matcher: "/((?!api|static|.*\\..*|_next).*)",
-  // matcher: "/((?!static|.*\\..*|_next).*)",
+  matcher: '/((?!api|static|.*\\..*|_next).*)',
+  // matcher: '/((?!static|.*\\..*|_next).*)',
 };

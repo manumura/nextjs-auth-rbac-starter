@@ -1,6 +1,7 @@
-import clsx from "clsx";
-import { useMemo } from "react";
-import { useDropzone } from "react-dropzone";
+import clsx from 'clsx';
+import Image from 'next/image';
+import { useMemo } from 'react';
+import { useDropzone } from 'react-dropzone';
 
 function DropBox({ onDrop, imgSrc = null }) {
   const {
@@ -13,7 +14,7 @@ function DropBox({ onDrop, imgSrc = null }) {
     isDragReject,
   } = useDropzone({
     accept: {
-      "image/*": [],
+      'image/*': [],
     },
     maxFiles: 1,
     multiple: false,
@@ -23,19 +24,19 @@ function DropBox({ onDrop, imgSrc = null }) {
   });
 
   const baseClasses =
-    "hero bg-base-100 border-dashed border-4 border-neutral rounded-box border-opacity-50";
-  const getStyle = (props) => {
+    'hero bg-base-100 border-dashed border-4 border-neutral rounded-box border-opacity-50';
+  const getStyle = (props): string => {
     const { isDragAccept, isFocused, isDragReject } = props;
     if (isDragAccept) {
-      return clsx(baseClasses, "border-primary");
+      return clsx(baseClasses, 'border-primary');
     }
     if (isDragReject) {
-      return clsx(baseClasses, "border-accent");
+      return clsx(baseClasses, 'border-accent');
     }
     if (isFocused) {
-      return clsx(baseClasses, "border-secondary");
+      return clsx(baseClasses, 'border-secondary');
     }
-    return clsx(baseClasses, "border-neutral");
+    return clsx(baseClasses, 'border-neutral');
   };
   const style = useMemo(
     () => getStyle({ isDragAccept, isFocused, isDragReject }),
@@ -52,15 +53,15 @@ function DropBox({ onDrop, imgSrc = null }) {
 
   const avatarImgSrc = files[0]?.preview || imgSrc;
   const avatar = avatarImgSrc ? (
-    <div className="avatar">
-      <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-        <img src={avatarImgSrc} />
+    <div className='avatar'>
+      <div className='w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2'>
+        <Image alt='myAvatarImage' src={avatarImgSrc} />
       </div>
     </div>
   ) : (
-    <div className="avatar placeholder">
-      <div className="w-24 rounded-full bg-base-200 text-neutral-content ring ring-primary ring-offset-base-100 ring-offset-24">
-        <span className="text-3xl" />
+    <div className='avatar placeholder'>
+      <div className='w-24 rounded-full bg-base-200 text-neutral-content ring ring-primary ring-offset-base-100 ring-offset-24'>
+        <span className='text-3xl' />
       </div>
     </div>
   );
@@ -75,29 +76,29 @@ function DropBox({ onDrop, imgSrc = null }) {
 
   return (
     <>
-      {" "}
+      {' '}
       <section>
         <div
           className={style}
           {...getRootProps({ isDragAccept, isFocused, isDragReject })}
         >
           <input {...getInputProps()} />
-          <div className="hero-content flex-col lg:flex-row">
+          <div className='hero-content flex-col lg:flex-row'>
             {avatar}
-            {/* <img src="/images/stock/photo-1635805737707-575885ab0820.jpg" className="max-w-sm rounded-lg shadow-2xl" /> */}
+            {/* <img src='/images/stock/photo-1635805737707-575885ab0820.jpg' className='max-w-sm rounded-lg shadow-2xl' /> */}
             <div>
-              <h1 className="text-3xl font-bold mb-2">
+              <h1 className='text-3xl font-bold mb-2'>
                 Drag 'n' drop your image here
               </h1>
-              <p className="mb-5">Or click to select a file</p>
-              {/* <button type="button" className="btn btn-neutral" onClick={open}>
+              <p className='mb-5'>Or click to select a file</p>
+              {/* <button type='button' className='btn btn-neutral' onClick={open}>
                 Click to select file
               </button> */}
             </div>
           </div>
         </div>
       </section>
-      <aside className="text-center">{fileInfos}</aside>
+      <aside className='text-center'>{fileInfos}</aside>
     </>
   );
 }

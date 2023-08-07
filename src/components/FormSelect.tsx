@@ -1,5 +1,5 @@
-import React from "react";
-import { useFormContext } from "react-hook-form";
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
 
 const FormSelect = ({
   label,
@@ -13,12 +13,12 @@ const FormSelect = ({
   } = useFormContext();
 
   return (
-    <div className="">
-      <label htmlFor={name} className="text-ct-blue-600 mb-3 block">
+    <div className=''>
+      <label htmlFor={name} className='text-ct-blue-600 mb-3 block'>
         {label}
       </label>
       <select
-        className="block w-full appearance-none rounded-2xl py-2 px-4 focus:outline-none"
+        className='block w-full appearance-none rounded-2xl py-2 px-4 focus:outline-none'
         // value={value} onChange={onChange}
         {...register(name, constraints)}
       >
@@ -29,7 +29,7 @@ const FormSelect = ({
         ))}
       </select>
       {errors[name] && (
-        <span className="block pt-1 text-xs text-red-600">
+        <span className='block pt-1 text-xs text-red-600'>
           {errors[name]?.message as string}
         </span>
       )}

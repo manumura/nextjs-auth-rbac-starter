@@ -4,4 +4,4 @@ export const appConstant = {
     REFRESH_TOKEN: 'refreshToken',
     ACCESS_TOKEN_EXPIRES_AT: 'accessTokenExpiresAt',
     ID_TOKEN: 'idToken',
-}
+};

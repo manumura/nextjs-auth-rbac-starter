@@ -13,44 +13,44 @@ export const Pagination = ({
   const nextPage = previousPage < lastPage ? +currentPage + 1 : lastPage;
 
   return (
-    <div className="my-2">
-      <div className="flex items-center gap-2">
-        <div className="btn-sm btn-group">
+    <div className='my-2'>
+      <div className='flex items-center gap-2'>
+        <div className='btn-sm btn-group'>
           {/* button to go to first page */}
           <button
-            className="btn btn-sm"
-            onClick={() => onPageSelect(1)}
+            className='btn btn-sm'
+            onClick={(): void => onPageSelect(1)}
             disabled={!canGoToPreviousPage}
           >
-            {"<<"}
+            {'<<'}
           </button>
           {/* button to go previous page */}
           <button
-            className="btn btn-sm"
-            onClick={() => onPageSelect(previousPage)}
+            className='btn btn-sm'
+            onClick={(): void => onPageSelect(previousPage)}
             disabled={!canGoToPreviousPage}
           >
-            {"<"}
+            {'<'}
           </button>
           {/* button to go next page */}
           <button
-            className="btn btn-sm"
-            onClick={() => onPageSelect(nextPage)}
+            className='btn btn-sm'
+            onClick={(): void => onPageSelect(nextPage)}
             disabled={!canGoToNextPage}
           >
-            {">"}
+            {'>'}
           </button>
           {/* button to go last page */}
           <button
-            className="btn btn-sm"
-            onClick={() => onPageSelect(lastPage)}
+            className='btn btn-sm'
+            onClick={(): void => onPageSelect(lastPage)}
             disabled={!canGoToNextPage}
           >
-            {">>"}
+            {'>>'}
           </button>
         </div>
         {/* page info */}
-        <span className="flex items-center gap-1">
+        <span className='flex items-center gap-1'>
           <div>Page</div>
           <strong>
             {currentPage} of {lastPage}

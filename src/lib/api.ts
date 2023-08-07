@@ -1,15 +1,14 @@
-import axios from "axios";
-import appConfig from "../config/config";
-import { LoginResponse } from "../types/LoginResponse";
+import axios, { AxiosResponse } from 'axios';
+import appConfig from '../config/config';
 
 const BASE_URL = appConfig.baseUrl;
-const REFRESH_TOKEN_ENDPOINT = "/v1/refresh-token";
+const REFRESH_TOKEN_ENDPOINT = '/v1/refresh-token';
 
 // No interceptor for refresh token
 const axiosPublicInstance = axios.create({
   baseURL: `${BASE_URL}/api`,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
   withCredentials: true,
 });
@@ -17,7 +16,7 @@ const axiosPublicInstance = axios.create({
 export const axiosInstance = axios.create({
   baseURL: `${BASE_URL}/api`,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
   withCredentials: true, // for cookies
 });
@@ -43,7 +42,7 @@ axiosInstance.interceptors.response.use(
         {
           baseURL: `${BASE_URL}/api`,
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             Cookie: config.headers.Cookie,
           },
           withCredentials: true, // for cookies
@@ -52,18 +51,18 @@ axiosInstance.interceptors.response.use(
 
       // Update cookies
       if (response?.status === 200 && response?.data) {
-        const data: LoginResponse = response.data;
+        // const data: LoginResponse = response.data;
         config.headers = {
           ...config.headers,
         //   Cookie: getCookiesAsString(data),
-          "set-cookie": response.headers["set-cookie"],
+          'set-cookie': response.headers['set-cookie'],
         };
       }
 
       // retun config;
       return axiosInstance(config);
     } catch (err) {
-      console.error("Axios interceptor error: ", err?.response?.data);
+      console.error('Axios interceptor error: ', err?.response?.data);
       return Promise.reject(err);
     }
   },
@@ -75,49 +74,49 @@ axiosInstance.interceptors.response.use(
 
 ////////////////////////////////////////////////////////////////
 // Public APIs
-export const login = async (email, password) => {
-  return axiosPublicInstance.post("/v1/login", { email, password });
+export const login = async (email, password): Promise<AxiosResponse> => {
+  return axiosPublicInstance.post('/v1/login', { email, password });
 };
 
-export const register = async (email, password, name) => {
-  return axiosPublicInstance.post("/v1/register", { email, password, name });
+export const register = async (email, password, name): Promise<AxiosResponse> => {
+  return axiosPublicInstance.post('/v1/register', { email, password, name });
 };
 
-export const forgotPassword = async (email) => {
-  return axiosPublicInstance.post("/v1/forgot-password", { email });
+export const forgotPassword = async (email): Promise<AxiosResponse> => {
+  return axiosPublicInstance.post('/v1/forgot-password', { email });
 };
 
-export const resetPassword = async (password, token) => {
-  return axiosPublicInstance.post("/v1/new-password", { password, token });
+export const resetPassword = async (password, token): Promise<AxiosResponse> => {
+  return axiosPublicInstance.post('/v1/new-password', { password, token });
 };
 
 ////////////////////////////////////////////////////////////////
 // Authenticated-only APIs
-export const logout = async () => {
-  return axiosInstance.post("/v1/logout");
+export const logout = async (): Promise<AxiosResponse> => {
+  return axiosInstance.post('/v1/logout');
 };
 
-export const updateProfile = async (name, password?) => {
-  return axiosInstance.put("/v1/profile", {
+export const updateProfile = async (name, password?): Promise<AxiosResponse> => {
+  return axiosInstance.put('/v1/profile', {
     name,
     ...(password ? { password } : {}),
   });
 };
 
-export const updateProfileImage = async (image, onUploadProgress) => {
-  return axiosInstance.put("/v1/profile/image", image, {
+export const updateProfileImage = async (image, onUploadProgress): Promise<AxiosResponse> => {
+  return axiosInstance.put('/v1/profile/image', image, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
     onUploadProgress,
   });
 };
 
-export const createUser = async (email, name, role) => {
-  return axiosInstance.post("/v1/users", { email, name, role });
+export const createUser = async (email, name, role): Promise<AxiosResponse> => {
+  return axiosInstance.post('/v1/users', { email, name, role });
 };
 
-export const updateUser = async (id, name, email, role, password?) => {
+export const updateUser = async (id, name, email, role, password?): Promise<AxiosResponse> => {
   return axiosInstance.put(`/v1/users/${id}`, {
     name,
     email,
@@ -126,6 +125,6 @@ export const updateUser = async (id, name, email, role, password?) => {
   });
 };
 
-export const deleteUser = async (userId) => {
+export const deleteUser = async (userId): Promise<AxiosResponse> => {
   return axiosInstance.delete(`/v1/users/${userId}`);
 };

@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
-import appConfig from "../../../../config/config";
+import { NextRequest, NextResponse } from 'next/server';
+import appConfig from '../../../../config/config';
 
-export async function GET(request: NextRequest, { params }) {
+export async function GET(request: NextRequest, { params }): Promise<Response> {
   const BASE_URL = appConfig.baseUrl;
   const token = params.token;
 
   const res = await fetch(`${BASE_URL}/api/v1/token/${token}`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   });
 

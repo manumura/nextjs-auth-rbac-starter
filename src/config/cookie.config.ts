@@ -1,4 +1,4 @@
-import { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
+import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 
 const COOKIE_MAX_AGE = 60 * 60 * 8; // 8 hours
 

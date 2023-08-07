@@ -1,16 +1,17 @@
-import { cookies } from "next/headers";
-import DrawerLayout from "../components/DrawerLayout";
-import "../styles/globals.css";
+import { cookies } from 'next/headers';
+import DrawerLayout from '../components/DrawerLayout';
+import '../styles/globals.css';
 
 // To avoid tailwind to purge toastify styles
-import "react-toastify/dist/ReactToastify.min.css";
-import { getUserFromIdToken } from "../lib/jwt.utils";
+import 'react-toastify/dist/ReactToastify.min.css';
+import { getUserFromIdToken } from '../lib/jwt.utils';
+import { IUser } from '../lib/user-store';
 
-async function getProfile() {
+async function getProfile(): Promise<IUser | undefined> {
   const cookieStore = cookies();
-  const idTokenCookie = cookieStore.get("idToken");
+  const idTokenCookie = cookieStore.get('idToken');
   if (!idTokenCookie?.value) {
-    console.error("No idToken cookie found");
+    console.error('No idToken cookie found');
     return undefined;
   }
 
@@ -28,7 +29,7 @@ export default async function RootLayout({
   const user = await getProfile();
 
   return (
-    <html lang="en" data-theme="emerald">
+    <html lang='en' data-theme='emerald'>
       <body>
         <DrawerLayout user={user}>{children}</DrawerLayout>
       </body>
@@ -37,6 +38,6 @@ export default async function RootLayout({
 }
 
 export const metadata = {
-  title: "MyApp",
-  description: "Welcome to MyApp",
+  title: 'MyApp',
+  description: 'Welcome to MyApp',
 };

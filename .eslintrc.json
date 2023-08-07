@@ -4,17 +4,18 @@
     "next/core-web-vitals",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended"
+    // "plugin:deprecation/recommended"
   ],
-  "plugins": ["@typescript-eslint", "deprecation"],
+  "plugins": ["@typescript-eslint"],
   "parserOptions": {
-    "ecmaVersion": 2019,
+    "ecmaVersion": 2020,
     "sourceType": "module",
-    "project": "./tsconfig.build.json"
+    "project": "./tsconfig.json"
   },
   "rules": {
     "semi": ["error", "always"],
     "quotes": ["error", "single"],
-    "@typescript-eslint/explicit-function-return-type": "on",
+    "@typescript-eslint/explicit-function-return-type": 1,
     "@typescript-eslint/no-explicit-any": 1,
     "@typescript-eslint/no-inferrable-types": [
       "warn",
@@ -22,7 +23,6 @@
         "ignoreParameters": true
       }
     ],
-    "@typescript-eslint/no-unused-vars": "warn",
-    "deprecation/deprecation": "warn"
+    "@typescript-eslint/no-unused-vars": "warn"
   }
 }

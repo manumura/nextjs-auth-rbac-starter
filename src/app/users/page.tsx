@@ -1,12 +1,18 @@
-import { cookies, headers } from "next/headers";
-import { Suspense } from "react";
-import { URLSearchParams } from "url";
-import LoadingOverlay from "../../components/LoadingOverlay";
-import appConfig from "../../config/config";
-import { getClientBaseUrl } from "../../lib/utils";
-import UsersPage from "./users-page";
+import { cookies, headers } from 'next/headers';
+import { Suspense } from 'react';
+import { URLSearchParams } from 'url';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import appConfig from '../../config/config';
+import { getClientBaseUrl } from '../../lib/utils';
+import UsersPage from './users-page';
+import { IUser } from '../../lib/user-store';
 
-async function getUsers(page, pageSize, role) {
+type IGetUsersResponse = {
+  users: IUser[];
+  totalElements: number;
+};
+
+async function getUsers(page, pageSize, role): Promise<IGetUsersResponse> {
   const baseUrl = getClientBaseUrl(headers());
   const cookieStore = cookies();
   const params = new URLSearchParams({
@@ -16,16 +22,16 @@ async function getUsers(page, pageSize, role) {
   });
 
   const res = await fetch(`${baseUrl}/api/users?` + params, {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: {
       Cookie: cookieStore as any,
     },
-    cache: "no-cache",
+    cache: 'no-cache',
   });
 
   if (!res.ok) {
-    console.error(`Get Users getServerSideProps error: `, res.statusText);
+    console.error(`Get Users getServerSideProps error: ${res.statusText}`);
     return { users: [], totalElements: 0 };
   }
 
@@ -46,7 +52,7 @@ export default async function Users({ searchParams }) {
 
   // Forward fetched data to your Client Component
   return (
-    <Suspense fallback={<LoadingOverlay label="Loading..." />}>
+    <Suspense fallback={<LoadingOverlay label='Loading...' />}>
       <UsersPage
         users={users}
         totalElements={totalElements}

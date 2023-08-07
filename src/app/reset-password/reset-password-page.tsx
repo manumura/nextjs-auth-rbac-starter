@@ -1,14 +1,13 @@
-"use client";
+'use client';
 
-import FormInput from "@/components/FormInput";
-import clsx from "clsx";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import { sleep } from "../../lib/utils";
-import { resetPassword } from "../../lib/api";
+import FormInput from '@/components/FormInput';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import { resetPassword } from '../../lib/api';
+import { sleep } from '../../lib/utils';
 
 export default function ResetPasswordPage({ token }) {
   const router = useRouter();
@@ -28,7 +27,7 @@ export default function ResetPasswordPage({ token }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitSuccessful]);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data): Promise<void> => {
     if (!data || loading) {
       return;
     }
@@ -38,17 +37,17 @@ export default function ResetPasswordPage({ token }) {
       // TODO remove this
       await sleep(1000);
       const res = await resetPassword(data.password, token);
-      const response = res?.data;
+      // const response = res?.data;
 
-      toast("Password successfully updated!", {
-        type: "success",
-        position: "top-center",
+      toast('Password successfully updated!', {
+        type: 'success',
+        position: 'top-center',
       });
-      router.push("/login");
+      router.push('/login');
     } catch (error) {
       toast(`Password update failed: ${error?.response?.data?.message}`, {
-        type: "error",
-        position: "top-center",
+        type: 'error',
+        position: 'top-center',
       });
     } finally {
       setLoading(false);
@@ -56,55 +55,55 @@ export default function ResetPasswordPage({ token }) {
   };
 
   const passwordConstraints = {
-    required: { value: true, message: "Password is required" },
+    required: { value: true, message: 'Password is required' },
     minLength: {
       value: 8,
-      message: "Password is min 8 characters",
+      message: 'Password is min 8 characters',
     },
   };
   const passwordConfirmConstraints = {
-    required: { value: true, message: "Confirm Password is required" },
-    validate: (value) => {
-      if (watch("password") !== value) {
-        return "Passwords do no match";
+    required: { value: true, message: 'Confirm Password is required' },
+    validate: (value): string | undefined => {
+      if (watch('password') !== value) {
+        return 'Passwords do no match';
       }
     },
   };
-  const btn = <button className="w-full btn">Submit</button>;
+  const btn = <button className='w-full btn'>Submit</button>;
   const btnLoading = (
-    <button className="w-full btn btn-disabled">
-      <span className="loading loading-spinner"></span>
+    <button className='w-full btn btn-disabled'>
+      <span className='loading loading-spinner'></span>
       Submit
     </button>
   );
 
   return (
-    <section className="h-section bg-slate-200 py-20">
-      <div className="w-full">
+    <section className='h-section bg-slate-200 py-20'>
+      <div className='w-full'>
         <FormProvider {...methods}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg"
+            className='mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg'
           >
-            <h1 className="mb-4 text-center text-4xl font-[600]">
+            <h1 className='mb-4 text-center text-4xl font-[600]'>
               Reset password
             </h1>
             <FormInput
-              label="New Password"
-              name="password"
-              type="password"
+              label='New Password'
+              name='password'
+              type='password'
               constraints={passwordConstraints}
             />
             <FormInput
-              label="Confirm New Password"
-              name="passwordConfirm"
-              type="password"
+              label='Confirm New Password'
+              name='passwordConfirm'
+              type='password'
               constraints={passwordConfirmConstraints}
             />
 
             <div>{loading ? btnLoading : btn}</div>
-            <div className="text-center">
-              <Link href="/" className="text-secondary">
+            <div className='text-center'>
+              <Link href='/' className='text-secondary'>
                 Cancel
               </Link>
             </div>
