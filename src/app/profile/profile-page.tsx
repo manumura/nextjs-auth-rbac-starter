@@ -13,7 +13,7 @@ export default function ProfilePage({ user }) {
   const avatar = user?.imageUrl ? (
     <div className='avatar'>
       <div className='w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2'>
-        <Image alt="myAvatarImage" src={user.imageUrl} />
+        <Image alt="my avatar image" fill={true} src={user.imageUrl} className='rounded-full' />
       </div>
     </div>
   ) : (
