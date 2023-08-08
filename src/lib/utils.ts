@@ -12,6 +12,6 @@ export const getClientBaseUrl = (headers: Headers): string => {
   // const activePath = headersList.get('x-invoke-path');
   // const url = headersList.get('referer');
   const host = headers.get('host');
-  const protocol = headers.get('x-forwarded-proto') || defaultProto;
+  const protocol = headers.get('x-forwarded-proto') ?? defaultProto;
   return `${protocol}://${host}`;
 };
