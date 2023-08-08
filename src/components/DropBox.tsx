@@ -88,7 +88,7 @@ function DropBox({ onDrop, imgSrc = null }) {
             {/* <img src='/images/stock/photo-1635805737707-575885ab0820.jpg' className='max-w-sm rounded-lg shadow-2xl' /> */}
             <div>
               <h1 className='text-3xl font-bold mb-2'>
-                Drag 'n' drop your image here
+                {'Drag \'n\' drop your image here'}
               </h1>
               <p className='mb-5'>Or click to select a file</p>
               {/* <button type='button' className='btn btn-neutral' onClick={open}>
