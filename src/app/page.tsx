@@ -3,31 +3,31 @@ import HomePage from './home-page';
 import { getClientBaseUrl } from '../lib/utils';
 
 async function getAppInfos() {
-  const message = 'Welcome to MyApp!';
-  const information = {};
+  let message = 'Welcome to MyApp!';
+  let information = {};
 
-  // try {
-  //   const baseUrl = getClientBaseUrl(headers());
-  //   console.log('baseUrl: ', baseUrl);
-  //   const welcomeRes = await fetch(`${baseUrl}/api/welcome`, {
-  //     method: 'GET',
-  //   });
+  try {
+    const baseUrl = getClientBaseUrl(headers());
+    console.log('baseUrl: ', baseUrl);
+    const welcomeRes = await fetch(`${baseUrl}/api/welcome`, {
+      method: 'GET',
+    });
 
-  //   if (welcomeRes.ok) {
-  //     const welcomeAsJson = await welcomeRes.json();
-  //     message = welcomeAsJson.message;
-  //   }
+    if (welcomeRes.ok) {
+      const welcomeAsJson = await welcomeRes.json();
+      message = welcomeAsJson.message;
+    }
 
-  //   const infoRes = await fetch(`${baseUrl}/api/info`, {
-  //     method: 'GET',
-  //   });
+    const infoRes = await fetch(`${baseUrl}/api/info`, {
+      method: 'GET',
+    });
 
-  //   if (infoRes.ok) {
-  //     information = await infoRes.json();
-  //   }
-  // } catch (error) {
-  //   console.error(error);
-  // }
+    if (infoRes.ok) {
+      information = await infoRes.json();
+    }
+  } catch (error) {
+    console.error(error);
+  }
 
   return {
     message,
