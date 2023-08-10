@@ -22,7 +22,7 @@ export async function GET(request: Request): Promise<Response> {
     console.error(error);
     const response = new NextResponse(undefined, {
       status: 500,
-      statusText: 'Internal Server Error - /index',
+      statusText: 'Internal Server Error - GET /welcome',
       
     });
     return response;

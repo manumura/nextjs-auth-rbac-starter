@@ -1,11 +1,11 @@
 import { cookies } from 'next/headers';
 import DrawerLayout from '../components/DrawerLayout';
+import { getUserFromIdToken } from '../lib/jwt.utils';
+import { IUser } from '../lib/user-store';
 import '../styles/globals.css';
 
 // To avoid tailwind to purge toastify styles
 import 'react-toastify/dist/ReactToastify.min.css';
-import { getUserFromIdToken } from '../lib/jwt.utils';
-import { IUser } from '../lib/user-store';
 
 async function getProfile(): Promise<IUser | undefined> {
   const cookieStore = cookies();
