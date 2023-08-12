@@ -25,8 +25,7 @@ function DropBox({ onDrop, imgSrc = null }) {
 
   const baseClasses =
     'hero bg-base-100 border-dashed border-4 border-neutral rounded-box border-opacity-50';
-  const getStyle = (props): string => {
-    const { isDragAccept, isFocused, isDragReject } = props;
+  const getStyle = ({ isDragAccept, isFocused, isDragReject }): string => {
     if (isDragAccept) {
       return clsx(baseClasses, 'border-primary');
     }
@@ -54,7 +53,7 @@ function DropBox({ onDrop, imgSrc = null }) {
   const avatarImgSrc = files[0]?.preview || imgSrc;
   const avatar = avatarImgSrc ? (
     <div className='avatar'>
-      <div className='w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden'>
+      <div className='w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden relative'>
         <Image alt='my avatar image' fill={true} src={avatarImgSrc} className='rounded-full' />
       </div>
     </div>

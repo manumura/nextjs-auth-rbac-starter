@@ -11,7 +11,6 @@ async function getAppInfos() {
 
   try {
     const baseUrl = getClientBaseUrl(headers());
-    console.log('baseUrl: ', baseUrl);
     const welcomeRes = await fetch(`${baseUrl}/api/welcome`, {
       method: 'GET',
     });
