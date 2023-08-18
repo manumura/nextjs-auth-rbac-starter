@@ -11,7 +11,7 @@ const appConfig: {
   defaultRowsPerPage: 5,
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL as string,
   idTokenPublicKey: Buffer.from(idTokenPublicKeyAsBase64, 'base64').toString('utf8'),
-  publicRoutes: ['/login', '/register', '/forgot-password', '/reset-password'],
+  publicRoutes: ['/', '/login', '/register', '/forgot-password', '/reset-password'],
   protectedRoutes: ['/profile', '/edit-profile', '/users', '/create-user'],
   adminRoutes: ['/users', '/create-user'],
 };
