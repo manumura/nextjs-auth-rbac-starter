@@ -42,7 +42,7 @@ export default function LoginPage({ error }) {
         toastId: '404',
       });
     }
-  }, [error, userStore]);
+  }, [error]);
 
   useEffect(() => {
     if (isSubmitSuccessful) {

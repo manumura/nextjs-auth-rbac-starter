@@ -22,6 +22,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     new URL('/login?error=401', request.url),
   );
 
+  // Redirect if user is authenticated
+  if (isPublicRoute(request) && accessTokenCookie) {
+    console.error(`Already logged in (navigating ${request.nextUrl.pathname})`);
+    return redirectHomeResponse;
+  }
+
   // Refresh token if expired
   if (!isPublicRoute(request)) {
     const accessTokenExpiresAt = moment(
@@ -35,17 +41,18 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       const response = await refreshToken(request);
       return response;
     }
-  }
 
-  if (isAdminRoute(request)) {
-    if (!accessTokenCookie || !accessTokenCookie.value) {
+    // Redirect if user is not authenticated
+    if (!accessTokenCookie?.value) {
       console.error(
         `No access token found (navigating ${request.nextUrl.pathname})`,
       );
       return redirectLoginResponse;
     }
+  }
 
-    if (!idTokenCookie || !idTokenCookie.value) {
+  if (isAdminRoute(request)) {
+    if (!idTokenCookie?.value) {
       console.error(
         `No idToken found (navigating ${request.nextUrl.pathname})`,
       );
@@ -62,20 +69,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
 
     return nextResponse;
-  }
-
-  // Redirect if user is not authenticated
-  if (isProtectedRoute(request) && !accessTokenCookie) {
-    console.error(
-      `No access token found (navigating ${request.nextUrl.pathname})`,
-    );
-    return redirectLoginResponse;
-  }
-
-  // Redirect if user is authenticated
-  if (isPublicRoute(request) && accessTokenCookie) {
-    console.error(`Already logged in (navigating ${request.nextUrl.pathname})`);
-    return redirectHomeResponse;
   }
 
   return nextResponse;
