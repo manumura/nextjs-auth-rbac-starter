@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   // Refresh token if expired
-  if (!isPublicRoute(request)) {
+  if (!isPublicRoute(request) && !isHomeRoute(request)) {
     const accessTokenExpiresAt = moment(
       accessTokenExpiresAtCookie?.value,
     ).utc();
@@ -51,6 +51,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
+  // Check if user is admin
   if (isAdminRoute(request)) {
     if (!idTokenCookie?.value) {
       console.error(
@@ -91,13 +92,6 @@ async function refreshToken(request: NextRequest): Promise<NextResponse> {
     const nextResponse = NextResponse.next();
 
     if (res.ok) {
-      // const requestHeaders = new Headers(request.headers);
-      // requestHeaders.set('x-new-access-token', json.accessToken);
-      // const nextResponse = NextResponse.next({
-      //   request: {
-      //       headers: requestHeaders,
-      //   },
-      // });
       setResponseAuthCookies(nextResponse, json);
       setRequestAuthCookies(request, json);
     } else {
@@ -122,15 +116,6 @@ function isAdminRoute(request: NextRequest): boolean {
   return false;
 }
 
-function isProtectedRoute(request: NextRequest): boolean {
-  for (const protectedRoute of appConfig.protectedRoutes) {
-    if (request.nextUrl.pathname.startsWith(protectedRoute)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 function isPublicRoute(request: NextRequest): boolean {
   for (const publicRoute of appConfig.publicRoutes) {
     if (request.nextUrl.pathname.startsWith(publicRoute)) {
@@ -138,6 +123,10 @@ function isPublicRoute(request: NextRequest): boolean {
     }
   }
   return false;
+}
+
+function isHomeRoute(request: NextRequest): boolean {
+  return request.nextUrl.pathname === appConfig.homeRoute;
 }
 
 // function isAPIRoute(request: NextRequest): boolean {

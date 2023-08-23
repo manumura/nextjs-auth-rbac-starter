@@ -44,7 +44,7 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
     </tr>
   );
 
-  const userRows = users && users.map((user) => (
+  const userRows = users?.map((user) => (
     <tr key={user.id}>
       <th>{user.id}</th>
       <td>{user.name}</td>

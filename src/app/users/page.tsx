@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { URLSearchParams } from 'url';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import appConfig from '../../config/config';
-import { getClientBaseUrl } from '../../lib/utils';
+import { getClientBaseUrl, sleep } from '../../lib/utils';
 import UsersPage from './users-page';
 import { IUser } from '../../lib/user-store';
 
@@ -21,6 +21,8 @@ async function getUsers(page, pageSize, role): Promise<IGetUsersResponse> {
     ...(role ? { role } : {}),
   });
 
+  // TODO remove this
+  await sleep(1000);
   const res = await fetch(`${baseUrl}/api/users?` + params, {
     method: 'GET',
     credentials: 'include',
