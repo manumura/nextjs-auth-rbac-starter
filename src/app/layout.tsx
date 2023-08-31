@@ -15,7 +15,7 @@ async function getProfile(): Promise<IUser | undefined> {
     return undefined;
   }
 
-  const user = await getUserFromIdToken(idTokenCookie?.value as string);
+  const user = await getUserFromIdToken(idTokenCookie?.value);
   return user;
 }
 
