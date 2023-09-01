@@ -116,8 +116,8 @@ export const createUser = async (email, name, role): Promise<AxiosResponse> => {
   return axiosInstance.post('/v1/users', { email, name, role });
 };
 
-export const updateUser = async (id, name, email, role, password?): Promise<AxiosResponse> => {
-  return axiosInstance.put(`/v1/users/${id}`, {
+export const updateUser = async (uuid, name, email, role, password?): Promise<AxiosResponse> => {
+  return axiosInstance.put(`/v1/users/${uuid}`, {
     name,
     email,
     role,
@@ -125,6 +125,6 @@ export const updateUser = async (id, name, email, role, password?): Promise<Axio
   });
 };
 
-export const deleteUser = async (userId): Promise<AxiosResponse> => {
-  return axiosInstance.delete(`/v1/users/${userId}`);
+export const deleteUser = async (userUuid): Promise<AxiosResponse> => {
+  return axiosInstance.delete(`/v1/users/${userUuid}`);
 };

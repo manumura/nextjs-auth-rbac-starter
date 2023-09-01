@@ -28,8 +28,8 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
     }
   };
 
-  const onEditUser = (userId): void => {
-    router.push(`users/${userId}`);
+  const onEditUser = (userUuid): void => {
+    router.push(`users/${userUuid}`);
   };
 
   const onCreateUser = (): void => {
@@ -45,8 +45,8 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
   );
 
   const userRows = users?.map((user) => (
-    <tr key={user.id}>
-      <th>{user.id}</th>
+    <tr key={user.uuid}>
+      <th>{user.uuid}</th>
       <td>{user.name}</td>
       <td>{user.email}</td>
       <td>{user.role}</td>
@@ -54,7 +54,7 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
         <div className='flex justify-end space-x-1'>
           <button
             className='btn-primary btn-sm btn gap-2'
-            onClick={(): void => onEditUser(user.id)}
+            onClick={(): void => onEditUser(user.uuid)}
           >
             <FiEdit />
             Edit

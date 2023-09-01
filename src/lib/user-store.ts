@@ -1,7 +1,8 @@
+import { UUID } from 'crypto';
 import { create } from 'zustand';
 
 export type IUser = {
-  id: number;
+  uuid: UUID;
   name: string;
   email: string;
   role: string;

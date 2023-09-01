@@ -33,7 +33,7 @@ export default function EditUserPage({ user }) {
       // TODO remove this
       await sleep(1000);
       const res = await updateUser(
-        user.id,
+        user.uuid,
         data.name,
         data.email,
         data.role,

@@ -24,10 +24,9 @@ const LogoutButton = () => {
       // TODO remove this
       await sleep(1000);
 
-      const res = await logout();
-      const response = res?.data;
+      await logout();
 
-      toast(`Logout successfull ${response.name}!`, {
+      toast('Logout successfull!', {
         type: 'success',
         position: 'top-center',
       });
