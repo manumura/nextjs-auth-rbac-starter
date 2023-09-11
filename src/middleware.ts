@@ -22,6 +22,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     new URL('/login?error=401', request.url),
   );
 
+  if (isHomeRoute(request)) {
+    console.log('Middleware: env=', process.env.NODE_ENV);
+  }
+
   // Redirect if user is authenticated
   if (isPublicRoute(request) && accessTokenCookie) {
     console.error(`Already logged in (navigating ${request.nextUrl.pathname})`);

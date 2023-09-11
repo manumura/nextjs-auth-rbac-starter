@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { ToastContainer } from 'react-toastify';
 import useDrawerOpenStore from '../lib/drawer-open-store';
 import { isAdmin } from '../lib/utils';
@@ -9,12 +9,14 @@ import LogoutButton from './LogoutButton';
 import Navbar from './Navbar';
 
 const DrawerLayout = ({ user, children }) => {
+  const router = useRouter();
   //initialize state here. we use a key and a default state
   const { open, setOpen } = useDrawerOpenStore();
   const toggleDrawer = (): void => setOpen(!open);
 
   const handleLogin = (): void => {
-    redirect('/login');
+    console.log('login');
+    router.push('/login');
   };
 
   return (
@@ -30,9 +32,7 @@ const DrawerLayout = ({ user, children }) => {
 
       <div className='drawer-content flex flex-col'>
         <Navbar user={user} />
-        {/* <Suspense fallback={<LoadingOverlay />}> */}
           {children}
-        {/* </Suspense> */}
       </div>
 
       <div className='drawer-side'>
