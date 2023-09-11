@@ -15,7 +15,9 @@ export async function GET(request: Request): Promise<Response> {
     const response = new NextResponse(JSON.stringify(json), {
       status: res.status,
       statusText: res.statusText,
-      headers: res.headers,
+      headers: {
+        ...res.headers,
+      },
     });
     return response;
   } catch (error) {
