@@ -17,6 +17,7 @@ async function getProfile(): Promise<IUser | undefined> {
   });
 
   console.log('res get profile: ', res);
+  console.log('res.ok get profile: ', res.ok);
 
   if (!res.ok) {
     console.error(`Get Profile getServerSideProps error: ${res.statusText}`);
