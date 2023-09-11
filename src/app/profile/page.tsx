@@ -16,12 +16,17 @@ async function getProfile(): Promise<IUser | undefined> {
     },
   });
 
+  console.log('res get profile: ', res);
+
   if (!res.ok) {
     console.error(`Get Profile getServerSideProps error: ${res.statusText}`);
     return undefined;
   }
 
   const json = await res.json();
+
+  console.log('json get profile: ', json);
+
   return json;
 }
 

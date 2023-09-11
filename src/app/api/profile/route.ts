@@ -15,11 +15,11 @@ export async function GET(request: NextRequest): Promise<Response> {
       },
     });
 
-    console.log('res get profile: ', res);
+    console.log('res get profile api: ', res);
 
     const json = await res.json();
 
-    console.log('json get profile: ', json);
+    console.log('json get profile api: ', json);
     const response = new NextResponse(JSON.stringify(json), {
       status: res.status,
       statusText: res.statusText,
