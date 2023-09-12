@@ -8,11 +8,14 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { register } from '../../lib/api';
 import { sleep } from '../../lib/utils';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { verifyCaptcha } from '../../lib/captcha.utils';
 
 export default function RegisterPage() {
   const router = useRouter();
   const methods = useForm();
   const [loading, setLoading] = useState(false);
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const {
     handleSubmit,
@@ -21,7 +24,19 @@ export default function RegisterPage() {
   } = methods;
 
   const onSubmit = async (data): Promise<void> => {
-    if (!data || loading) {
+    if (!data || loading || !executeRecaptcha) {
+      return;
+    }
+
+    const token = await executeRecaptcha('onSubmit');
+    // validate the token via the server action we've created previously
+    const verified = await verifyCaptcha(token);
+
+    if (!verified) {
+      toast('Captcha verification failed!', {
+        type: 'error',
+        position: 'top-center',
+      });
       return;
     }
 

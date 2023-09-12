@@ -15,7 +15,6 @@ const DrawerLayout = ({ user, children }) => {
   const toggleDrawer = (): void => setOpen(!open);
 
   const handleLogin = (): void => {
-    console.log('login');
     router.push('/login');
   };
 

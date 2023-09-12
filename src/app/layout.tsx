@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import DrawerLayout from '../components/DrawerLayout';
+import { Providers } from '../components/Providers';
 import { getUserFromIdToken } from '../lib/jwt.utils';
 import { IUser } from '../lib/user-store';
 import '../styles/globals.css';
@@ -31,7 +32,9 @@ export default async function RootLayout({
   return (
     <html lang='en' data-theme='emerald'>
       <body>
-        <DrawerLayout user={user}>{children}</DrawerLayout>
+        <Providers>
+          <DrawerLayout user={user}>{children}</DrawerLayout>
+        </Providers>
       </body>
     </html>
   );
