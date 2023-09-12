@@ -18,8 +18,6 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
 
     try {
       setLoading(true);
-      // TODO remove this
-      await sleep(1000);
       const res = await deleteUser(user?.uuid);
       const response = res?.data;
 

@@ -58,8 +58,6 @@ export default function LoginPage({ error }) {
 
     try {
       setLoading(true);
-      // TODO remove this
-      await sleep(1000);
       const res = await login(data.email, data.password);
       const response = res?.data;
 

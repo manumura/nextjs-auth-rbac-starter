@@ -72,9 +72,6 @@ export default function EditProfilePage({ user }) {
 
     try {
       setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-
       let success = true;
 
       const res = await updateProfile(data.name, data.password);

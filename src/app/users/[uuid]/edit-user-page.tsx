@@ -30,8 +30,6 @@ export default function EditUserPage({ user }) {
 
     try {
       setSubmitting(true);
-      // TODO remove this
-      await sleep(1000);
       const res = await updateUser(
         user.uuid,
         data.name,

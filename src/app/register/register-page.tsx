@@ -42,8 +42,6 @@ export default function RegisterPage() {
 
     try {
       setLoading(true);
-      // TODO remove this
-      await sleep(1000);
       const res = await register(data.email, data.password, data.name);
       const response = res?.data;
 

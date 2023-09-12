@@ -21,9 +21,7 @@ const LogoutButton = () => {
 
     try {
       setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-
+      // await sleep(1000);
       await logout();
 
       toast('Logout successfull!', {

@@ -24,8 +24,6 @@ export default function CreateUserPage() {
 
     try {
       setLoading(true);
-      // TODO remove this
-      await sleep(1000);
       const res = await createUser(data.email, data.name, data.role);
       const response = res?.data;
 

@@ -21,8 +21,6 @@ async function getUsers(page, pageSize, role): Promise<IGetUsersResponse> {
     ...(role ? { role } : {}),
   });
 
-  // TODO remove this
-  await sleep(1000);
   const res = await fetch(`${baseUrl}/api/users?` + params, {
     method: 'GET',
     credentials: 'include',

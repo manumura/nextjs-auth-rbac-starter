@@ -34,9 +34,7 @@ export default function ResetPasswordPage({ token }) {
 
     try {
       setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      const res = await resetPassword(data.password, token);
+      await resetPassword(data.password, token);
       // const response = res?.data;
 
       toast('Password successfully updated!', {

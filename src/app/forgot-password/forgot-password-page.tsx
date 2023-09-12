@@ -33,9 +33,7 @@ export default function ForgotPasswordPage() {
 
     try {
       setLoading(true);
-      // TODO remove this
-      await sleep(1000);
-      const res = await forgotPassword(data.email);
+      await forgotPassword(data.email);
       // const response = res?.data;
 
       toast(`Success! Please check the email sent at ${data.email}`, {
