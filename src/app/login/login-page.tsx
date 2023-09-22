@@ -61,7 +61,7 @@ export default function LoginPage({ error }) {
       const res = await login(data.email, data.password);
       const response = res?.data;
 
-      const user = await getUserFromIdToken(response.idToken);
+      const user = await getUserFromIdToken(response?.idToken);
       userStore.setUser(user);
       toast(`Welcome ${user?.name}!`, {
         type: 'success',

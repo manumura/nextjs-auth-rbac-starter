@@ -8,6 +8,10 @@ import '../styles/globals.css';
 // To avoid tailwind to purge toastify styles
 import 'react-toastify/dist/ReactToastify.min.css';
 
+// Fix for Error: connect ECONNREFUSED ::1:9002 on localhost with node > 16
+// import dns from 'node:dns';
+// dns.setDefaultResultOrder('ipv4first');
+
 async function getProfile(): Promise<IUser | undefined> {
   const cookieStore = cookies();
   const idTokenCookie = cookieStore.get('idToken');
