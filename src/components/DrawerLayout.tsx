@@ -9,6 +9,7 @@ import LogoutButton from './LogoutButton';
 import Navbar from './Navbar';
 
 const DrawerLayout = ({ user, children }) => {
+  console.log('user DrawerLayout', user);
   const router = useRouter();
   //initialize state here. we use a key and a default state
   const { open, setOpen } = useDrawerOpenStore();

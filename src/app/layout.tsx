@@ -21,6 +21,7 @@ async function getProfile(): Promise<IUser | undefined> {
   }
 
   const user = await getUserFromIdToken(idTokenCookie?.value);
+  console.log('user getProfile', user);
   return user;
 }
 
@@ -32,6 +33,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const user = await getProfile();
+  console.log('user RootLayout', user);
 
   return (
     <html lang='en' data-theme='emerald'>
