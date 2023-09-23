@@ -1,13 +1,11 @@
 'use client';
 
 import FormInput from '@/components/FormInput';
-import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import FormSelect from '../../components/FormSelect';
-import { sleep } from '../../lib/utils';
 import { createUser } from '../../lib/api';
 
 export default function CreateUserPage() {

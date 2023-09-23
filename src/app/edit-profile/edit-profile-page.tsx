@@ -6,7 +6,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import DropBox from '../../components/DropBox';
 import FormInput from '../../components/FormInput';
-import { sleep } from '../../lib/utils';
 import { updateProfile, updateProfileImage } from '../../lib/api';
 
 export default function EditProfilePage({ user }) {

@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 import { logout } from '../lib/api';
 import { clearStorage } from '../lib/storage';
 import useUserStore from '../lib/user-store';
-import { sleep } from '../lib/utils';
 
 const LogoutButton = () => {
   const router = useRouter();

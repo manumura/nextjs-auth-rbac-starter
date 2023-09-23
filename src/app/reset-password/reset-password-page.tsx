@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { resetPassword } from '../../lib/api';
-import { sleep } from '../../lib/utils';
 
 export default function ResetPasswordPage({ token }) {
   const router = useRouter();

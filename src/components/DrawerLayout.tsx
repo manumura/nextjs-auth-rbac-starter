@@ -8,7 +8,7 @@ import { isAdmin } from '../lib/utils';
 import LogoutButton from './LogoutButton';
 import Navbar from './Navbar';
 
-const DrawerLayout = ({ user, children }) => {
+export default function DrawerLayout({ user, children }) {
   console.log('user DrawerLayout', user);
   const router = useRouter();
   //initialize state here. we use a key and a default state
@@ -81,6 +81,4 @@ const DrawerLayout = ({ user, children }) => {
       <ToastContainer />
     </div>
   );
-};
-
-export default DrawerLayout;
+}

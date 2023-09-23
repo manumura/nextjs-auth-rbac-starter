@@ -10,7 +10,6 @@ import { toast } from 'react-toastify';
 import { login } from '../../lib/api';
 import { getUserFromIdToken } from '../../lib/jwt.utils';
 import useUserStore from '../../lib/user-store';
-import { sleep } from '../../lib/utils';
 
 export default function LoginPage({ error }) {
   const router = useRouter();

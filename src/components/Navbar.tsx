@@ -7,7 +7,7 @@ import { isAdmin } from '../lib/utils';
 import LogoutButton from './LogoutButton';
 import useDrawerOpenStore from '../lib/drawer-open-store';
 
-const Navbar = ({ user }) => {
+export default function Navbar({ user }) {
   const router = useRouter();
   // https://reacthustle.com/blog/how-to-create-a-responsive-navbar-in-react-with-tailwindcss-daisyui
   // toggle our drawer using useSessionStorage global state
@@ -91,6 +91,4 @@ const Navbar = ({ user }) => {
       </div>
     </div>
   );
-};
-
-export default Navbar;
+}

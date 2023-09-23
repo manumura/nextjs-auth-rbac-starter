@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import FormInput from '../../../components/FormInput';
 import FormSelect from '../../../components/FormSelect';
 import { updateUser } from '../../../lib/api';
-import { sleep } from '../../../lib/utils';
 
 export default function EditUserPage({ user }) {
   const router = useRouter();

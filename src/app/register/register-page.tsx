@@ -4,11 +4,10 @@ import FormInput from '@/components/FormInput';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { register } from '../../lib/api';
-import { sleep } from '../../lib/utils';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { verifyCaptcha } from '../../lib/captcha.utils';
 
 export default function RegisterPage() {
