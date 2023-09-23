@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:local": "next dev --hostname www.myapp.com --experimental-https",
+    "dev:host": "next dev --hostname www.myapp.com --experimental-https",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

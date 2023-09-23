@@ -19,6 +19,40 @@ const DrawerLayout = ({ user, children }) => {
     router.push('/login');
   };
 
+  const adminButtons = isAdmin(user) ? (
+    <li>
+    <Link href='/users' className='text-neutral'>
+      Users
+    </Link>
+  </li>
+  ) : null;
+  const buttons = user ? (
+    <>
+      {adminButtons}
+      <li>
+        <Link href='/profile' className='text-neutral'>
+          Profile
+        </Link>
+      </li>
+      <li>
+        <LogoutButton />
+      </li>
+    </>
+  ) : (
+    <>
+      <li>
+        <Link href='/register' className='text-neutral'>
+          Register
+        </Link>
+      </li>
+      <li>
+        <button className='btn-outline btn' onClick={handleLogin}>
+          Login
+        </button>
+      </li>
+    </>
+  );
+
   return (
     <div className='drawer'>
       <input
@@ -32,7 +66,7 @@ const DrawerLayout = ({ user, children }) => {
 
       <div className='drawer-content flex flex-col'>
         <Navbar user={user} />
-          {children}
+        {children}
       </div>
 
       <div className='drawer-side'>
@@ -41,39 +75,7 @@ const DrawerLayout = ({ user, children }) => {
           className='menu w-80 overflow-y-auto bg-slate-50 p-4'
           onClick={toggleDrawer}
         >
-          {!user && (
-            <>
-              <li>
-                <Link href='/register' className='text-neutral'>
-                  Register
-                </Link>
-              </li>
-              <li>
-                <button className='btn-outline btn' onClick={handleLogin}>
-                  Login
-                </button>
-              </li>
-            </>
-          )}
-          {user && (
-            <>
-              {isAdmin(user) && (
-                <li>
-                  <Link href='/users' className='text-neutral'>
-                    Users
-                  </Link>
-                </li>
-              )}
-              <li>
-                <Link href='/profile' className='text-neutral'>
-                  Profile
-                </Link>
-              </li>
-              <li>
-                <LogoutButton />
-              </li>
-            </>
-          )}
+          {buttons}
         </ul>
       </div>
       <ToastContainer />

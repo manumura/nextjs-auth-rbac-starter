@@ -9,8 +9,8 @@ import '../styles/globals.css';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 // Fix for Error: connect ECONNREFUSED ::1:9002 on localhost with node > 16
-// import dns from 'node:dns';
-// dns.setDefaultResultOrder('ipv4first');
+import dns from 'node:dns';
+dns.setDefaultResultOrder('ipv4first');
 
 async function getProfile(): Promise<IUser | undefined> {
   const cookieStore = cookies();

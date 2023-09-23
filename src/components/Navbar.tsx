@@ -18,6 +18,40 @@ const Navbar = ({ user }) => {
     router.push('/login');
   };
 
+  const adminButtons = isAdmin(user) ? (
+    <li>
+      <Link href='/users' className='text-neutral'>
+        Users
+      </Link>
+    </li>
+  ) : null;
+  const buttons = user ? (
+    <>
+      {adminButtons}
+      <li>
+        <Link href='/profile' className='text-neutral'>
+          Profile
+        </Link>
+      </li>
+      <li>
+        <LogoutButton />
+      </li>
+    </>
+  ) : (
+    <>
+      <li>
+        <Link href='/register' className='text-neutral'>
+          Register
+        </Link>
+      </li>
+      <li>
+        <button className='btn-outline btn' onClick={handleLogin}>
+          Login
+        </button>
+      </li>
+    </>
+  );
+
   return (
     <div className='navbar'>
       {/* Mobile menu button only shows for lg and below devices */}
@@ -53,41 +87,7 @@ const Navbar = ({ user }) => {
       </div>
       {/* Desktop menu only shows for lg and up devices */}
       <div className='hidden flex-none lg:block'>
-        <ul className='menu rounded-box menu-horizontal p-2'>
-          {!user && (
-            <>
-              <li>
-                <Link href='/register' className='text-neutral'>
-                  Register
-                </Link>
-              </li>
-              <li>
-                <button className='btn-outline btn' onClick={handleLogin}>
-                  Login
-                </button>
-              </li>
-            </>
-          )}
-          {user && (
-            <>
-              {isAdmin(user) && (
-                <li>
-                  <Link href='/users' className='text-neutral'>
-                    Users
-                  </Link>
-                </li>
-              )}
-              <li>
-                <Link href='/profile' className='text-neutral'>
-                  Profile
-                </Link>
-              </li>
-              <li>
-                <LogoutButton />
-              </li>
-            </>
-          )}
-        </ul>
+        <ul className='menu rounded-box menu-horizontal p-2'>{buttons}</ul>
       </div>
     </div>
   );
