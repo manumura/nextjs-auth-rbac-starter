@@ -7,7 +7,7 @@ import { logout } from '../lib/api';
 import { clearStorage } from '../lib/storage';
 import useUserStore from '../lib/user-store';
 
-const LogoutButton = () => {
+const LogoutButton = ({ id }) => {
   const router = useRouter();
   const pathname = usePathname();
   const userStore = useUserStore();
@@ -46,12 +46,12 @@ const LogoutButton = () => {
   };
 
   const btn = (
-    <button className='btn-outline btn' onClick={handleLogout}>
+    <button className='btn-outline btn' id={id} onClick={handleLogout}>
       Logout
     </button>
   );
   const btnLoading = (
-    <button className='btn-outline btn'>
+    <button className='btn-outline btn' id={id}>
       <span className='loading loading-spinner'></span>
       Logout
     </button>

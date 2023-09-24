@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify';
 import useDrawerOpenStore from '../lib/drawer-open-store';
 import { isAdmin } from '../lib/utils';
 import LogoutButton from './LogoutButton';
-import Navbar from './Navbar';
+import Navbar from './Navbar3';
 
 export default function DrawerLayout({ user, children }) {
   console.log('user DrawerLayout', user);
@@ -35,7 +35,7 @@ export default function DrawerLayout({ user, children }) {
         </Link>
       </li>
       <li>
-        <LogoutButton />
+        <LogoutButton id="" />
       </li>
     </>
   ) : (
