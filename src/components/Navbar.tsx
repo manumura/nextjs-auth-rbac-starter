@@ -3,68 +3,37 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import logo from '../../public/next.svg';
+import useDrawerOpenStore from '../lib/drawer-open-store';
 
-export default function Navbar({ navItems }) {
-  console.log('navItems Navbar2', navItems);
-  // const { open, setOpen } = useDrawerOpenStore();
-  // const toggleDrawer = (): void => setOpen(!open);
+export default function Navbar({ navItems, children }) {
+  const { open, setOpen } = useDrawerOpenStore();
+  const toggleDrawer = (): void => setOpen(!open);
 
   const navItemsList = navItems.map((item: JSX.Element) => {
     return <li key={item.props.id}>{item}</li>;
   });
 
-  // const adminButtons = isAdmin(user) ? (
-  //   <li>
-  //     <Link href='/users' className='text-neutral'>
-  //       Users
-  //     </Link>
-  //   </li>
-  // ) : null;
-  // const buttons = user ? (
-  //   <>
-  //     {adminButtons}
-  //     <li>
-  //       <Link href='/profile' className='text-neutral'>
-  //         Profile
-  //       </Link>
-  //     </li>
-  //     <li>
-  //       <LogoutButton />
-  //     </li>
-  //   </>
-  // ) : (
-  //   <>
-  //     <li>
-  //       <Link href='/register' className='text-neutral'>
-  //         Register
-  //       </Link>
-  //     </li>
-  //     <li>
-  //       <LoginButton />
-  //     </li>
-  //   </>
-  // );
-
-  console.log('navItemsList Navbar2', navItemsList);
-
   const navbar = (
     <div className='w-full navbar'>
-      <div className='flex-none lg:hidden'>
-        <label htmlFor='my-drawer' className='btn btn-square btn-ghost'>
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            fill='none'
-            viewBox='0 0 24 24'
-            className='inline-block w-6 h-6 stroke-current'
-          >
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              strokeWidth='2'
-              d='M4 6h16M4 12h16M4 18h16'
-            ></path>
-          </svg>
-        </label>
+      <div
+        className='flex-none btn btn-square btn-ghost lg:hidden'
+        onClick={toggleDrawer}
+      >
+        {/* <label htmlFor='my-drawer' className='btn btn-square btn-ghost'> */}
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          fill='none'
+          viewBox='0 0 24 24'
+          className='inline-block w-6 h-6 stroke-current'
+        >
+          <path
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            strokeWidth='2'
+            d='M4 6h16M4 12h16M4 18h16'
+          ></path>
+        </svg>
+        {/* </label> */}
       </div>
       {/* Website logo */}
       <div className='mx-2 flex-1 px-2'>
@@ -88,11 +57,23 @@ export default function Navbar({ navItems }) {
 
   return (
     <div className='drawer'>
-      <input id='my-drawer' type='checkbox' className='drawer-toggle' />
-      <div className='flex flex-col drawer-content'>{navbar}</div>
+      <input
+        id='my-drawer'
+        type='checkbox'
+        className='drawer-toggle'
+        checked={open}
+        onChange={toggleDrawer}
+      />
+      <div className='flex flex-col drawer-content'>
+        {navbar}
+        {children}
+      </div>
       <div className='drawer-side'>
-        <label htmlFor='my-drawer' className='drawer-overlay z-100'></label>
-        <ul className='menu w-80 min-h-full bg-slate-100 p-4'>
+        <label htmlFor='my-drawer' className='drawer-overlay'></label>
+        <ul
+          className='menu w-80 min-h-full bg-slate-100 p-4'
+          onClick={toggleDrawer}
+        >
           {navItemsList}
         </ul>
       </div>
