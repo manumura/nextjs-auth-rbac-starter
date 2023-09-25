@@ -1,17 +1,13 @@
-import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
-import appConfig from '../../../config/config';
+import { NextResponse } from 'next/server';
+import appConfig from '../../../../config/config';
 
-export async function GET(request: NextRequest): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
   try {
     const BASE_URL = appConfig.baseUrl;
-
-    const res = await fetch(`${BASE_URL}/api/v1/profile`, {
+    const res = await fetch(`${BASE_URL}/api/v1/index`, {
       method: 'GET',
-      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        Cookie: cookies() as any,
       },
     });
 
@@ -23,13 +19,13 @@ export async function GET(request: NextRequest): Promise<Response> {
         ...res.headers,
       },
     });
-
     return response;
   } catch (error) {
     console.error(error);
     const response = new NextResponse(undefined, {
       status: 500,
-      statusText: 'Internal Server Error - GET /profile',
+      statusText: 'Internal Server Error - GET /welcome',
+      
     });
     return response;
   }

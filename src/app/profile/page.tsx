@@ -14,6 +14,7 @@ async function getProfile(): Promise<IUser | undefined> {
     headers: {
       Cookie: cookieStore as any,
     },
+    cache: 'no-cache',
   });
 
   if (!res.ok) {

@@ -19,7 +19,6 @@ import 'react-toastify/dist/ReactToastify.min.css';
 async function getProfile(): Promise<IUser | undefined> {
   const cookieStore = cookies();
   const idTokenCookie = cookieStore.get('idToken');
-console.log('idTokenCookie', idTokenCookie?.value);
 
   if (!idTokenCookie?.value) {
     console.error('No idToken cookie found');
@@ -27,7 +26,6 @@ console.log('idTokenCookie', idTokenCookie?.value);
   }
 
   const user = await getUserFromIdToken(idTokenCookie?.value);
-  console.log('user getProfile', user);
   return user;
 }
 

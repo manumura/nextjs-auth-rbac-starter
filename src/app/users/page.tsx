@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { URLSearchParams } from 'url';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import appConfig from '../../config/config';
-import { getClientBaseUrl, sleep } from '../../lib/utils';
+import { getClientBaseUrl } from '../../lib/utils';
 import UsersPage from './users-page';
 import { IUser } from '../../lib/user-store';
 

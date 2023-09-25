@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import appConfig from '../../../config/config';
+import appConfig from '../../../../config/config';
 
 export async function GET(request: Request): Promise<Response> {
   try {
     const BASE_URL = appConfig.baseUrl;
-    const res = await fetch(`${BASE_URL}/api/v1/index`, {
+    const res = await fetch(`${BASE_URL}/api/v1/info`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -24,8 +24,7 @@ export async function GET(request: Request): Promise<Response> {
     console.error(error);
     const response = new NextResponse(undefined, {
       status: 500,
-      statusText: 'Internal Server Error - GET /welcome',
-      
+      statusText: 'Internal Server Error - GET /info',
     });
     return response;
   }

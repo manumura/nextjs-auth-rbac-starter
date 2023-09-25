@@ -15,6 +15,7 @@ async function getUserByUuid(uuid: UUID): Promise<IUser | undefined> {
     headers: {
       Cookie: cookieStore as any,
     },
+    cache: 'no-cache',
   });
 
   if (!res.ok) {

@@ -22,9 +22,9 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     new URL('/login?error=401', request.url),
   );
 
-  if (isHomeRoute(request)) {
-    console.log('Middleware: env=', process.env.NODE_ENV);
-  }
+  // if (isHomeRoute(request)) {
+  //   console.log('Middleware: env=', process.env.NODE_ENV);
+  // }
 
   // Redirect if user is authenticated
   if (isPublicRoute(request) && accessTokenCookie) {
@@ -79,6 +79,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   return nextResponse;
 }
 
+// https://github.com/vercel/next.js/discussions/49843
 async function refreshToken(request: NextRequest): Promise<NextResponse> {
   try {
     const BASE_URL = appConfig.baseUrl;
@@ -90,6 +91,7 @@ async function refreshToken(request: NextRequest): Promise<NextResponse> {
         'Content-Type': 'application/json',
         Cookie: request.cookies.toString(),
       },
+      cache: 'no-cache',
     });
 
     const json = await res.json();

@@ -2,11 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import logo from '../../public/next.svg';
-import useDrawerOpenStore from '../lib/drawer-open-store';
 
 export default function Navbar({ navItems, children }) {
-  const { open, setOpen } = useDrawerOpenStore();
+  const [ open, setOpen ] = useState(false);
   const toggleDrawer = (): void => setOpen(!open);
 
   const navItemsList = navItems.map((item: JSX.Element) => {

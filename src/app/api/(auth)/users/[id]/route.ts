@@ -1,16 +1,20 @@
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import appConfig from '../../../../config/config';
+import appConfig from '../../../../../config/config';
 
 export async function GET(request: NextRequest, { params }): Promise<Response> {
   try {
     const BASE_URL = appConfig.baseUrl;
-    const token = params.token;
+    const id = params.id;
 
-    const res = await fetch(`${BASE_URL}/api/v1/token/${token}`, {
+    const res = await fetch(`${BASE_URL}/api/v1/users/${id}`, {
       method: 'GET',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        Cookie: cookies() as any,
       },
+      cache: 'no-cache',
     });
 
     const json = await res.json();
@@ -26,7 +30,7 @@ export async function GET(request: NextRequest, { params }): Promise<Response> {
     console.error(error);
     const response = new NextResponse(undefined, {
       status: 500,
-      statusText: 'Internal Server Error - GET /token/{token}',
+      statusText: 'Internal Server Error - GET /users/{id}',
     });
     return response;
   }
