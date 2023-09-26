@@ -2,14 +2,14 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import logo from '../../public/next.svg';
 
 export default function Navbar({ navItems, children }) {
   const [ open, setOpen ] = useState(false);
   const toggleDrawer = (): void => setOpen(!open);
 
-  const navItemsList = navItems.map((item: JSX.Element) => {
+  const navItemsList = navItems.map((item: React.JSX.Element) => {
     return <li key={item.props.id}>{item}</li>;
   });
 

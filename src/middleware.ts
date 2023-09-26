@@ -64,8 +64,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       return redirectLoginResponse;
     }
 
-    const user = await getUserFromIdToken(idTokenCookie?.value as string);
-    // const user = await fetchUser(request, nextResponse);
+    const user = await getUserFromIdToken(idTokenCookie?.value);
     if (!isAdmin(user)) {
       console.error(
         `User is not an admin: ${user?.email} (navigating ${request.nextUrl.pathname})`,
