@@ -29,8 +29,8 @@ async function getProfile(): Promise<IUser | undefined> {
   return user;
 }
 
-function getNavItems(user: IUser | undefined): JSX.Element[] {
-  const navItems: JSX.Element[] = [];
+function getNavItems(user: IUser | undefined): React.JSX.Element[] {
+  const navItems: React.JSX.Element[] = [];
   
   if (user) {
     if (isAdmin(user)) {
