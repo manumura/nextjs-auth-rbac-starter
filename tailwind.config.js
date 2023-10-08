@@ -11,8 +11,7 @@ module.exports = {
     require("@tailwindcss/typography"),
     require("@tailwindcss/forms"),
     require("@tailwindcss/aspect-ratio"),
-    require("daisyui"),
-    require("prettier-plugin-tailwindcss")
+    require("daisyui")
   ],
   // daisyUI config (optional - here are the default values)
   daisyui: {
