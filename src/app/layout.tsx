@@ -13,9 +13,6 @@ import '../styles/globals.css';
 import dns from 'node:dns';
 dns.setDefaultResultOrder('ipv4first');
 
-// To avoid tailwind to purge toastify styles
-import 'react-toastify/dist/ReactToastify.min.css';
-
 async function getProfile(): Promise<IUser | undefined> {
   const cookieStore = cookies();
   const idTokenCookie = cookieStore.get('idToken');
