@@ -1,15 +1,15 @@
 import { UUID } from 'crypto';
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import appConfig from '../../../config/config';
 import { IUser } from '../../../lib/user-store';
-import { getClientBaseUrl } from '../../../lib/utils';
 import EditUserPage from './edit-user-page';
 
 async function getUserByUuid(uuid: UUID): Promise<IUser | undefined> {
-  const baseUrl = getClientBaseUrl(headers());
+  const BASE_URL = appConfig.baseUrl;
   const cookieStore = cookies();
 
-  const res = await fetch(`${baseUrl}/api/users/${uuid}`, {
+  const res = await fetch(`${BASE_URL}/api/v1/users/${uuid}`, {
     method: 'GET',
     credentials: 'include',
     headers: {

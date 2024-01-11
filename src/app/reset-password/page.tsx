@@ -1,8 +1,8 @@
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getClientBaseUrl } from '../../lib/utils';
-import ResetPasswordPage from './reset-password-page';
+import appConfig from '../../config/config';
 import { IUser } from '../../lib/user-store';
+import ResetPasswordPage from './reset-password-page';
 
 async function isAuthenticated(): Promise<boolean> {
   // Redirect if user is authenticated
@@ -11,8 +11,8 @@ async function isAuthenticated(): Promise<boolean> {
 }
 
 async function getUserByToken(token): Promise<IUser | undefined> {
-  const baseUrl = getClientBaseUrl(headers());
-  const res = await fetch(`${baseUrl}/api/token/${token}`, {
+  const BASE_URL = appConfig.baseUrl;
+  const res = await fetch(`${BASE_URL}/api/v1/token/${token}`, {
     method: 'GET',
   });
 
