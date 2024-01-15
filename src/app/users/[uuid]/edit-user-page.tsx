@@ -1,16 +1,39 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import FormInput from '../../../components/FormInput';
 import FormSelect from '../../../components/FormSelect';
-import { updateUser } from '../../../lib/api';
+import { updateUserAction } from '../../../lib/actions';
+
+export function SaveButton({ isValid }) {
+  const { pending } = useFormStatus();
+  const btn = <button className='btn btn-primary mx-1'>Save</button>;
+  const btnDisabled = <button className='btn btn-disabled btn-primary mx-1'>Save</button>;
+  const btnLoading = (
+    <button className='btn btn-disabled btn-primary mx-1'>
+      <span className='loading loading-spinner'></span>
+      Save
+    </button>
+  );
+
+  return !isValid ? btnDisabled : (pending ? btnLoading : btn);
+}
 
 export default function EditUserPage({ user }) {
+  const updateUserActionWithUuid = updateUserAction.bind(null, user.uuid);
+  const initialState = {
+    message: '',
+    error: false,
+  };
+  const [state, formAction] = useFormState(
+    updateUserActionWithUuid,
+    initialState,
+  );
   const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
   const methods = useForm({
     defaultValues: {
       name: user.name,
@@ -19,40 +42,26 @@ export default function EditUserPage({ user }) {
       passwordConfirm: '',
       role: user.role,
     },
+    mode: 'all',
   });
-  const { handleSubmit, watch } = methods;
+  const {
+    watch,
+    formState: { isValid, errors },
+    setError,
+  } = methods;
 
-  const onSubmit = async (data): Promise<void> => {
-    if (!data || submitting) {
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      const res = await updateUser(
-        user.uuid,
-        data.name,
-        data.email,
-        data.role,
-        data.password,
-      );
-      const response = res?.data;
-
-      toast(`User successfully updated: ${response.name}`, {
-        type: 'success',
+  useEffect(() => {
+    if (state?.message) {
+      toast(state.message, {
+        type: state.error ? 'error' : 'success',
         position: 'top-center',
       });
-      router.back();
-      router.refresh();
-    } catch (error) {
-      toast(`Update user failed! ${error?.response?.data?.message}`, {
-        type: 'error',
-        position: 'top-center',
-      });
-    } finally {
-      setSubmitting(false);
+
+      if (!state.error) {
+        router.replace('/users');
+      }
     }
-  };
+  }, [state, router]);
 
   const onCancel = (): void => {
     router.back();
@@ -67,6 +76,10 @@ export default function EditUserPage({ user }) {
   };
   const emailConstraints = {
     required: { value: true, message: 'Email is required' },
+    pattern: {
+      value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+      message: 'Email address is invalid',
+    },
   };
   const passwordConstraints = {
     // required: { value: true, message: 'Password is required' },
@@ -93,19 +106,11 @@ export default function EditUserPage({ user }) {
     { label: 'User', value: 'USER' },
   ];
 
-  const btn = <button className='btn btn-primary mx-1'>Save</button>;
-  const btnLoading = (
-    <button className='btn btn-primary mx-1 btn-disabled'>
-      <span className='loading loading-spinner'></span>
-      Save
-    </button>
-  );
-
   const editUserForm = (
     <div className='w-full py-10'>
       <FormProvider {...methods}>
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          action={formAction}
           className='mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg'
         >
           <h2 className='mb-4 text-center text-2xl font-[600]'>Edit user</h2>
@@ -139,11 +144,11 @@ export default function EditUserPage({ user }) {
             constraints={roleConstraints}
           />
           <div className='flex justify-center space-x-5'>
-            {submitting ? btnLoading : btn}
+            <SaveButton isValid={isValid} />
             <button
               type='button'
               id='btn-cancel'
-              className='btn-outline btn mx-1'
+              className='btn btn-outline mx-1'
               onClick={onCancel}
             >
               Cancel
@@ -154,9 +159,5 @@ export default function EditUserPage({ user }) {
     </div>
   );
 
-  return (
-    <section className='h-section bg-slate-200'>
-      {editUserForm}
-    </section>
-  );
+  return <section className='h-section bg-slate-200'>{editUserForm}</section>;
 }
