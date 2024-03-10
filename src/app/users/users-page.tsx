@@ -72,7 +72,7 @@ export default function UsersPage({ users, totalElements, page, pageSize }) {
   ));
 
   const usersTable = (
-    <div className='overflow-x-auto bg-slate-50 p-10 md:container md:mx-auto'>
+    <div className='overflow-x-auto bg-slate-50 p-10 mt-10 md:container md:mx-auto rounded-lg'>
       <table className='table-zebra table w-full'>
         <thead>
           <tr>

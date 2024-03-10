@@ -96,10 +96,16 @@ export const logout = async (): Promise<AxiosResponse> => {
   return axiosInstance.post('/v1/logout');
 };
 
-export const updateProfile = async (name, password?): Promise<AxiosResponse> => {
+export const updateProfile = async (name): Promise<AxiosResponse> => {
   return axiosInstance.put('/v1/profile', {
     name,
-    ...(password ? { password } : {}),
+  });
+};
+
+export const updatePassword = async (oldPassword, newPassword): Promise<AxiosResponse> => {
+  return axiosInstance.put('/v1/profile/password', {
+    oldPassword,
+    newPassword,
   });
 };
 
