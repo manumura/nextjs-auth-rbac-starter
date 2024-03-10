@@ -163,7 +163,7 @@ export default function EditProfilePage({ user }) {
     } finally {
       setLoading(false);
     }
-  }
+  };
   // ------------------------------------------------
 
   const nameConstraints = {
