@@ -24,6 +24,7 @@ export function SaveButton({ isValid }) {
 }
 
 export default function EditUserPage({ user }) {
+  const router = useRouter();
   const updateUserActionWithUuid = updateUserAction.bind(null, user.uuid);
   const initialState = {
     message: '',
@@ -33,7 +34,6 @@ export default function EditUserPage({ user }) {
     updateUserActionWithUuid,
     initialState,
   );
-  const router = useRouter();
   const methods = useForm({
     defaultValues: {
       name: user.name,

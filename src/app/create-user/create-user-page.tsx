@@ -2,44 +2,58 @@
 
 import FormInput from '@/components/FormInput';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import FormSelect from '../../components/FormSelect';
-import { createUser } from '../../lib/api';
+import { createUserAction } from '../../lib/actions';
+
+export function SaveButton({ isValid }) {
+  const { pending } = useFormStatus();
+  const btn = <button className='btn btn-primary mx-1'>Save</button>;
+  const btnDisabled = <button className='btn btn-disabled btn-primary mx-1'>Save</button>;
+  const btnLoading = (
+    <button className='btn btn-disabled btn-primary mx-1'>
+      <span className='loading loading-spinner'></span>
+      Save
+    </button>
+  );
+
+  return !isValid ? btnDisabled : (pending ? btnLoading : btn);
+}
 
 export default function CreateUserPage() {
   const router = useRouter();
+  const initialState = {
+    message: '',
+    error: false,
+  };
+  const [state, formAction] = useFormState(
+    createUserAction,
+    initialState,
+  );
   const methods = useForm();
-  const [loading, setLoading] = useState(false);
 
-  const { handleSubmit } = methods;
+  const {
+    formState: { isValid },
+  } = methods;
 
-  const onSubmit = async (data): Promise<void> => {
-    if (!data || loading) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const res = await createUser(data.email, data.name, data.role);
-      const response = res?.data;
-
-      toast(`User successfully created: ${response.name}`, {
-        type: 'success',
+  useEffect(() => {
+    if (state?.message) {
+      toast(state.message, {
+        type: state.error ? 'error' : 'success',
         position: 'top-center',
       });
-      // Go back to users page and refresh the list
-      router.push('/users');
-      router.refresh();
-    } catch (error) {
-      toast(`User creation failed: ${error?.response?.data?.message}`, {
-        type: 'error',
-        position: 'top-center',
-      });
-    } finally {
-      setLoading(false);
+
+      if (!state.error) {
+        router.replace('/users');
+      }
     }
+  }, [state, router]);
+
+  const onCancel = (): void => {
+    router.back();
   };
 
   const nameConstraints = {
@@ -62,24 +76,12 @@ export default function CreateUserPage() {
     { label: 'User', value: 'USER' },
   ];
 
-  const btn = <button className='btn btn-primary mx-1'>Create</button>;
-  const btnLoading = (
-    <button className='btn btn-primary mx-1 btn-disabled'>
-      <span className='loading loading-spinner'></span>
-      Create
-    </button>
-  );
-
-  const onCancel = (): void => {
-    router.back();
-  };
-
   return (
     <section className='h-section bg-slate-200 py-20'>
       <div className='w-full'>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit(onSubmit)}
+            action={formAction}
             className='mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg'
           >
             <h2 className='mb-4 text-center text-2xl font-[600]'>
@@ -103,7 +105,7 @@ export default function CreateUserPage() {
               constraints={roleConstraints}
             />
             <div className='flex justify-center space-x-5'>
-              {loading ? btnLoading : btn}
+              <SaveButton isValid={isValid} />
               <button
                 type='button'
                 id='btn-cancel'

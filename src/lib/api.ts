@@ -118,18 +118,18 @@ export const updateProfileImage = async (image, onUploadProgress): Promise<Axios
   });
 };
 
-export const createUser = async (email, name, role): Promise<AxiosResponse> => {
-  return axiosInstance.post('/v1/users', { email, name, role });
-};
+// export const createUser = async (email, name, role): Promise<AxiosResponse> => {
+//   return axiosInstance.post('/v1/users', { email, name, role });
+// };
 
-export const updateUser = async (uuid, name, email, role, password?): Promise<AxiosResponse> => {
-  return axiosInstance.put(`/v1/users/${uuid}`, {
-    name,
-    email,
-    role,
-    ...(password ? { password } : {}),
-  });
-};
+// export const updateUser = async (uuid, name, email, role, password?): Promise<AxiosResponse> => {
+//   return axiosInstance.put(`/v1/users/${uuid}`, {
+//     name,
+//     email,
+//     role,
+//     ...(password ? { password } : {}),
+//   });
+// };
 
 export const deleteUser = async (userUuid): Promise<AxiosResponse> => {
   return axiosInstance.delete(`/v1/users/${userUuid}`);
