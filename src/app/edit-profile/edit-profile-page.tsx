@@ -59,11 +59,11 @@ export default function EditProfilePage({ user }) {
   } = editProfileMethods;
 
   const onProfileEdited = async (data): Promise<void> => {
-    if (!data || loading) {
+    if (loading) {
       return;
     }
 
-    if (!data.name || images.length <= 0) {
+    if (!data?.name && images.length <= 0) {
       setEditProfileError('name', { message: 'Please edit at least 1 field' });
       // setError('password', { message: 'Please edit at least 1 field' });
       return;
