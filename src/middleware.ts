@@ -4,8 +4,7 @@ import { NextResponse } from 'next/server';
 import appConfig from './config/config';
 import {
   clearCookies,
-  setRequestAuthCookies,
-  setResponseAuthCookies,
+  setAuthCookies,
 } from './lib/cookies.utils.';
 import { getUserFromIdToken } from './lib/jwt.utils';
 import { isAdmin } from './lib/utils';
@@ -97,8 +96,8 @@ async function refreshToken(request: NextRequest): Promise<NextResponse> {
     const nextResponse = NextResponse.next();
 
     if (res.ok) {
-      setResponseAuthCookies(nextResponse, json);
-      setRequestAuthCookies(request, json);
+      setAuthCookies(nextResponse.cookies, json);
+      setAuthCookies(request.cookies, json);
     } else {
       clearCookies(nextResponse);
     }

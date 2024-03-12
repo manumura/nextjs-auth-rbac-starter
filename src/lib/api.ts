@@ -74,13 +74,13 @@ axiosInstance.interceptors.response.use(
 
 ////////////////////////////////////////////////////////////////
 // Public APIs
-export const login = async (email, password): Promise<AxiosResponse> => {
-  return axiosPublicInstance.post('/v1/login', { email, password });
-};
+// export const login = async (email, password): Promise<AxiosResponse> => {
+//   return axiosPublicInstance.post('/v1/login', { email, password });
+// };
 
-export const register = async (email, password, name): Promise<AxiosResponse> => {
-  return axiosPublicInstance.post('/v1/register', { email, password, name });
-};
+// export const register = async (email, password, name): Promise<AxiosResponse> => {
+//   return axiosPublicInstance.post('/v1/register', { email, password, name });
+// };
 
 export const forgotPassword = async (email): Promise<AxiosResponse> => {
   return axiosPublicInstance.post('/v1/forgot-password', { email });

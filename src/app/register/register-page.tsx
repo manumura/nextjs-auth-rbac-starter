@@ -3,14 +3,26 @@
 import FormInput from '@/components/FormInput';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { register } from '../../lib/api';
-import { verifyCaptcha } from '../../lib/captcha.utils';
+import { registerAction } from '../../lib/actions';
 
-export default function RegisterPage() {
+export function RegisterButton({ isValid, loading }): React.ReactElement {
+  const btn = <button className='w-full btn btn-primary'>Register</button>;
+  const btnDisabled = <button className='w-full btn btn-disabled btn-primary'>Register</button>;
+  const btnLoading = (
+    <button className='w-full btn btn-disabled btn-primary'>
+      <span className='loading loading-spinner'></span>
+      Register
+    </button>
+  );
+
+  return !isValid ? btnDisabled : (loading ? btnLoading : btn);
+}
+
+export default function RegisterPage(): React.ReactElement {
   const router = useRouter();
   const methods = useForm();
   const [loading, setLoading] = useState(false);
@@ -18,7 +30,7 @@ export default function RegisterPage() {
 
   const {
     handleSubmit,
-    // formState: { errors, isSubmitSuccessful },
+    formState: { isValid },
     watch,
   } = methods;
 
@@ -28,34 +40,26 @@ export default function RegisterPage() {
     }
 
     const token = await executeRecaptcha('onSubmit');
-    // validate the token via the server action we've created previously
-    const verified = await verifyCaptcha(token);
 
-    if (!verified) {
-      toast('Captcha verification failed!', {
-        type: 'error',
+    const formData = new FormData();
+    formData.append('token', token);
+    formData.append('name', data.name);
+    formData.append('email', data.email);
+    formData.append('password', data.password);
+
+    setLoading(true);
+    const state = await registerAction(null, formData);
+    setLoading(false);
+    
+    if (state?.message) {
+      toast(state.message, {
+        type: state.error ? 'error' : 'success',
         position: 'top-center',
       });
-      return;
     }
 
-    try {
-      setLoading(true);
-      const res = await register(data.email, data.password, data.name);
-      const response = res?.data;
-
-      toast(`You are successfully registered ${response.name}!`, {
-        type: 'success',
-        position: 'top-center',
-      });
+    if (!state?.error) {
       router.push('/login');
-    } catch (error) {
-      toast(`Registration failed! ${error?.response?.data?.message}`, {
-        type: 'error',
-        position: 'top-center',
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -84,13 +88,6 @@ export default function RegisterPage() {
       }
     },
   };
-  const btn = <button className='w-full btn'>Register</button>;
-  const btnLoading = (
-    <button className='w-full btn btn-disabled'>
-      <span className='loading loading-spinner'></span>
-      Register
-    </button>
-  );
 
   return (
     <section className='h-section bg-slate-200 py-20'>
@@ -132,7 +129,7 @@ export default function RegisterPage() {
                 Login Here
               </Link>
             </span>
-            <div>{loading ? btnLoading : btn}</div>
+            <RegisterButton isValid={isValid} loading={loading} />
           </form>
         </FormProvider>
       </div>

@@ -1,6 +1,8 @@
 import moment from 'moment';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 // import setCookie from 'set-cookie-parser';
+import { RequestCookies, ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies';
+import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 import { appConstant } from '../config/constant';
 import { COOKIE_OPTIONS } from '../config/cookie.config';
 import { LoginResponse } from '../types/LoginResponse';
@@ -21,18 +23,11 @@ export const clearCookies = (response: NextResponse): void => {
   }
 };
 
-export const setResponseAuthCookies = (response: NextResponse, login: LoginResponse): void => {
-  response.cookies.set(appConstant.ACCESS_TOKEN, login.accessToken, COOKIE_OPTIONS);
-  response.cookies.set(appConstant.ACCESS_TOKEN_EXPIRES_AT, moment(login.accessTokenExpiresAt).format(), COOKIE_OPTIONS);
-  response.cookies.set(appConstant.REFRESH_TOKEN, login.refreshToken, COOKIE_OPTIONS);
-  response.cookies.set(appConstant.ID_TOKEN, login.idToken, COOKIE_OPTIONS);
-};
-
-export const setRequestAuthCookies = (request: NextRequest, login: LoginResponse): void => {
-  request.cookies.set(appConstant.ACCESS_TOKEN, login.accessToken);
-  request.cookies.set(appConstant.ACCESS_TOKEN_EXPIRES_AT, moment(login.accessTokenExpiresAt).format());
-  request.cookies.set(appConstant.REFRESH_TOKEN, login.refreshToken);
-  request.cookies.set(appConstant.ID_TOKEN, login.idToken);
+export const setAuthCookies = (cookies: ResponseCookies | RequestCookies | ReadonlyRequestCookies, login: LoginResponse): void => {
+  cookies.set(appConstant.ACCESS_TOKEN, login.accessToken, COOKIE_OPTIONS);
+  cookies.set(appConstant.ACCESS_TOKEN_EXPIRES_AT, moment(login.accessTokenExpiresAt).format(), COOKIE_OPTIONS);
+  cookies.set(appConstant.REFRESH_TOKEN, login.refreshToken, COOKIE_OPTIONS);
+  cookies.set(appConstant.ID_TOKEN, login.idToken, COOKIE_OPTIONS);
 };
 
 // export const getCookiesFromSetCookieHeader = () => {

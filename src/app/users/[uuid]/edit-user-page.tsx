@@ -9,7 +9,7 @@ import FormInput from '../../../components/FormInput';
 import FormSelect from '../../../components/FormSelect';
 import { updateUserAction } from '../../../lib/actions';
 
-export function SaveButton({ isValid }) {
+export function SaveButton({ isValid }): React.ReactElement {
   const { pending } = useFormStatus();
   const btn = <button className='btn btn-primary mx-1'>Save</button>;
   const btnDisabled = <button className='btn btn-disabled btn-primary mx-1'>Save</button>;
@@ -23,7 +23,7 @@ export function SaveButton({ isValid }) {
   return !isValid ? btnDisabled : (pending ? btnLoading : btn);
 }
 
-export default function EditUserPage({ user }) {
+export default function EditUserPage({ user }): React.ReactElement {
   const router = useRouter();
   const updateUserActionWithUuid = updateUserAction.bind(null, user.uuid);
   const initialState = {

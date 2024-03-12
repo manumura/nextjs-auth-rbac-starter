@@ -4,23 +4,44 @@ import FormInput from '@/components/FormInput';
 import { clearStorage, saveIdToken } from '@/lib/storage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { login } from '../../lib/api';
-import { getUserFromIdToken } from '../../lib/jwt.utils';
+import { loginAction } from '../../lib/actions';
 import useUserStore from '../../lib/user-store';
 
-export default function LoginPage({ error }) {
+export function LoginButton({ isValid }): React.ReactElement {
+  const { pending } = useFormStatus();
+  const btn = <button className='w-full btn btn-primary'>Login</button>;
+  const btnDisabled = <button className='w-full btn btn-disabled btn-primary'>Login</button>;
+  const btnLoading = (
+    <button className='w-full btn btn-disabled btn-primary'>
+      <span className='loading loading-spinner'></span>
+      Login
+    </button>
+  );
+
+  return !isValid ? btnDisabled : (pending ? btnLoading : btn);
+}
+
+export default function LoginPage({ error }): React.ReactElement {
   const router = useRouter();
+  const initialState = {
+    message: '',
+    error: false,
+    user: null,
+    idToken: null,
+  };
+  const [state, formAction] = useFormState(
+    loginAction,
+    initialState,
+  );
   const methods = useForm();
   const {
-    reset,
-    handleSubmit,
-    formState: { isSubmitSuccessful },
+    formState: { isValid },
   } = methods;
   const userStore = useUserStore();
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Handle access token expired
@@ -44,44 +65,19 @@ export default function LoginPage({ error }) {
   }, [error]);
 
   useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSubmitSuccessful]);
-
-  const onSubmit = async (data): Promise<void> => {
-    if (!data || loading) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const res = await login(data.email, data.password);
-      const response = res?.data;
-
-      const user = await getUserFromIdToken(response?.idToken);
-      userStore.setUser(user);
-      toast(`Welcome ${user?.name}!`, {
-        type: 'success',
+    if (state?.message) {
+      toast(state.message, {
+        type: state.error ? 'error' : 'success',
         position: 'top-center',
       });
-      saveIdToken(response.idToken);
 
-      router.replace('/');
-      router.refresh();
-    } catch (error) {
-      toast(
-        `Login failed! ${error?.response?.data?.message}`,
-        {
-          type: 'error',
-          position: 'top-center',
-        },
-      );
-    } finally {
-      setLoading(false);
+      if (!state?.error) {
+        userStore.setUser(state?.user);
+        saveIdToken(state?.idToken);
+        router.replace('/');
+      }
     }
-  };
+  }, [state, router]);
 
   const emailConstraints = {
     required: { value: true, message: 'Email is required' },
@@ -89,20 +85,13 @@ export default function LoginPage({ error }) {
   const passwordConstraints = {
     required: { value: true, message: 'Password is required' },
   };
-  const btn = <button className='w-full btn'>Login</button>;
-  const btnLoading = (
-    <button className='w-full btn btn-disabled'>
-      <span className='loading loading-spinner'></span>
-      Login
-    </button>
-  );
 
   return (
     <section className='h-section bg-slate-200 py-20'>
       <div className='w-full'>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit(onSubmit)}
+            action={formAction}
             className='mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg'
           >
             <h1 className='mb-4 text-center text-4xl font-[600]'>
@@ -126,7 +115,7 @@ export default function LoginPage({ error }) {
                 Forgot Password?
               </Link>
             </div>
-            <div>{loading ? btnLoading : btn}</div>
+            <LoginButton isValid={isValid} />
             <span className='block'>
               Need an account?{' '}
               <Link href='/register' className='text-secondary'>
