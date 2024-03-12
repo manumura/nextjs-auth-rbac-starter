@@ -71,7 +71,8 @@ export async function registerAction(
     };
   } catch (error) {
     console.error('Register server action error: ', error);
-    const message = error?.response?.data?.message ? `Register failed! ${error?.response?.data?.message}`: 'Register failed!';
+    // const message = error?.response?.data?.message ? `Register failed! ${error?.response?.data?.message}`: 'Register failed!';
+    const message = 'Register failed!';
     return {
       message,
       error: true,

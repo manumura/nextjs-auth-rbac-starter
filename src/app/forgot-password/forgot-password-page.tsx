@@ -8,7 +8,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { forgotPassword } from '../../lib/api';
 
-export default function ForgotPasswordPage() {
+export default function ForgotPasswordPage(): React.ReactElement {
   const router = useRouter();
   const methods = useForm();
   const {
