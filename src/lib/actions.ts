@@ -54,8 +54,10 @@ export async function registerAction(
     if (!res.ok) {
       const response = await res.json();
       console.error('Register server action error: ', response);
+      // const message = response.message ? `Register failed! ${response.message}`: 'Register failed!';
+      const message = 'Register failed!';
       return {
-        message: `Register failed! ${response.message}`,
+        message,
         error: true,
       };
     }
