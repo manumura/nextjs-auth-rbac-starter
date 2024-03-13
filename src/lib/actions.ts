@@ -54,8 +54,8 @@ export async function registerAction(
     if (!res.ok) {
       const response = await res.json();
       console.error('Register server action error: ', response);
-      // const message = response.message ? `Register failed! ${response.message}`: 'Register failed!';
-      const message = 'Register failed!';
+      // const message = response.message ? `Registration failed! ${response.message}`: 'Registration failed!';
+      const message = 'Registration failed! Please verify your email and try again.';
       return {
         message,
         error: true,
@@ -73,8 +73,8 @@ export async function registerAction(
     };
   } catch (error) {
     console.error('Register server action error: ', error);
-    // const message = error?.response?.data?.message ? `Register failed! ${error?.response?.data?.message}`: 'Register failed!';
-    const message = 'Register failed!';
+    // const message = error?.response?.data?.message ? `Registration failed! ${error?.response?.data?.message}`: 'Registration failed!';
+    const message = 'Registration failed! Please verify your email and try again.';
     return {
       message,
       error: true,
@@ -267,6 +267,132 @@ export async function createUserAction(
   } catch (error) {
     console.error('Create User server action error: ', error);
     const message = error?.response?.data?.message ? `Create user failed! ${error?.response?.data?.message}`: 'Create user failed!';
+    return {
+      message,
+      error: true,
+    };
+  }
+}
+
+export async function forgotPasswordAction(
+  prevState: any,
+  formData: FormData,
+): Promise<any> {
+  try {
+    console.log('Forgot password server action');
+    const BASE_URL = appConfig.baseUrl;
+
+    // validate the token via the server action we've created previously
+    const token = formData.get('token') as string;
+    const isCaptchaValid = await validateCaptcha(token);
+    console.log('isCaptchaValid', isCaptchaValid);
+
+    if (!isCaptchaValid) {
+      return {
+        message: 'Captcha verification failed!',
+        error: true,
+      };
+    }
+
+    const email = formData.get('email');
+    const payload = {
+      email,
+    };
+    const body = JSON.stringify(payload);
+
+    // await sleep(3000);
+
+    const res = await fetch(`${BASE_URL}/api/v1/forgot-password`, {
+      method: 'POST',
+      body,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        // Cookie: cookieStore as any,
+      },
+      cache: 'no-cache',
+    });
+
+    if (!res.ok) {
+      const response = await res.json();
+      console.error('Forgot password server action error: ', response);
+      const message = response ? `An error occured, please try again:  ${response}` : 'An error occured, please try again';
+      return {
+        message,
+        error: true,
+      };
+    }
+
+    const user = await res.json();
+    console.log('Forgot password response: ', user);
+    const message = `Success! Please check the email sent at ${email}`;
+
+    // revalidatePath('/');
+    return {
+      message,
+      error: false,
+    };
+  } catch (error) {
+    console.error('Forgot password server action error: ', error);
+    const message = error?.response?.data?.message ? `An error occured, please try again:  ${error?.response?.data?.message}` : 'An error occured, please try again';
+    return {
+      message,
+      error: true,
+    };
+  }
+}
+
+export async function resetPasswordAction(
+  prevState: any,
+  formData: FormData,
+): Promise<any> {
+  try {
+    console.log('Reset password server action');
+    const BASE_URL = appConfig.baseUrl;
+
+    const token = formData.get('token');
+    const password = formData.get('password');
+    const payload = {
+      token,
+      password,
+    };
+    const body = JSON.stringify(payload);
+
+    // await sleep(3000);
+
+    const res = await fetch(`${BASE_URL}/api/v1/new-password`, {
+      method: 'POST',
+      body,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        // Cookie: cookieStore as any,
+      },
+      cache: 'no-cache',
+    });
+
+    if (!res.ok) {
+      const response = await res.json();
+      console.error('Reset password server action error: ', response);
+      const message = response ? `Password update failed: ${response}` : 'Password update failed';
+      return {
+        message,
+        error: true,
+      };
+    }
+
+    const user = await res.json();
+    console.log('Reset password response: ', user);
+    const message = 'Password successfully updated!';
+
+    // revalidatePath('/');
+    return {
+      message,
+      error: false,
+    };
+  } catch (error) {
+    console.error('Reset password server action error: ', error);
+    const message = error?.response?.data?.message ? `Password update failed: ${error?.response?.data?.message}` : 'Password update failed';
     return {
       message,
       error: true,

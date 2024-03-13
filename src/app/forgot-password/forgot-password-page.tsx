@@ -3,66 +3,67 @@
 import FormInput from '@/components/FormInput';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { forgotPassword } from '../../lib/api';
+import { forgotPasswordAction } from '../../lib/actions';
+
+export function SubmitButton({ isValid, loading }): React.ReactElement {
+  const btn = <button className='w-full btn btn-primary'>Submit</button>;
+  const btnDisabled = <button className='w-full btn btn-disabled btn-primary'>Submit</button>;
+  const btnLoading = (
+    <button className='w-full btn btn-disabled btn-primary'>
+      <span className='loading loading-spinner'></span> 
+      Submit
+    </button>
+  );
+
+  return !isValid ? btnDisabled : (loading ? btnLoading : btn);
+}
 
 export default function ForgotPasswordPage(): React.ReactElement {
   const router = useRouter();
   const methods = useForm();
-  const {
-    reset,
-    handleSubmit,
-    formState: { isSubmitSuccessful },
-  } = methods;
   const [loading, setLoading] = useState(false);
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSubmitSuccessful]);
+  const {
+    handleSubmit,
+    formState: { isValid },
+  } = methods;
 
   const onSubmit = async (data): Promise<void> => {
-    if (!data || loading) {
+    if (!data || loading || !executeRecaptcha) {
       return;
     }
 
-    try {
-      setLoading(true);
-      await forgotPassword(data.email);
-      // const response = res?.data;
+    const token = await executeRecaptcha('onSubmit');
 
-      toast(`Success! Please check the email sent at ${data.email}`, {
-        type: 'success',
+    const formData = new FormData();
+    formData.append('token', token);
+    formData.append('name', data.name);
+    formData.append('email', data.email);
+
+    setLoading(true);
+    const state = await forgotPasswordAction(null, formData);
+    setLoading(false);
+
+    if (state?.message) {
+      toast(state.message, {
+        type: state.error ? 'error' : 'success',
         position: 'top-center',
       });
+    }
+
+    if (!state?.error) {
       router.push('/');
-    } catch (error) {
-      toast(
-        `An error occured, please try again:  ${error?.response?.data?.message}`,
-        {
-          type: 'error',
-          position: 'top-center',
-        },
-      );
-    } finally {
-      setLoading(false);
     }
   };
 
   const emailConstraints = {
     required: { value: true, message: 'Email is required' },
   };
-  const btn = <button className='w-full btn'>Submit</button>;
-  const btnLoading = (
-    <button className='w-full btn btn-disabled'>
-      <span className='loading loading-spinner'></span>
-      Submit
-    </button>
-  );
 
   return (
     <section className='h-section bg-slate-200 py-20'>
@@ -82,7 +83,7 @@ export default function ForgotPasswordPage(): React.ReactElement {
               constraints={emailConstraints}
             />
 
-            <div>{loading ? btnLoading : btn}</div>
+            <SubmitButton isValid={isValid} loading={loading} />
             <div className='text-center'>
               <Link href='/login' className='text-secondary'>
                 Cancel

@@ -82,13 +82,13 @@ axiosInstance.interceptors.response.use(
 //   return axiosPublicInstance.post('/v1/register', { email, password, name });
 // };
 
-export const forgotPassword = async (email): Promise<AxiosResponse> => {
-  return axiosPublicInstance.post('/v1/forgot-password', { email });
-};
+// export const forgotPassword = async (email): Promise<AxiosResponse> => {
+//   return axiosPublicInstance.post('/v1/forgot-password', { email });
+// };
 
-export const resetPassword = async (password, token): Promise<AxiosResponse> => {
-  return axiosPublicInstance.post('/v1/new-password', { password, token });
-};
+// export const resetPassword = async (password, token): Promise<AxiosResponse> => {
+//   return axiosPublicInstance.post('/v1/new-password', { password, token });
+// };
 
 ////////////////////////////////////////////////////////////////
 // Authenticated-only APIs

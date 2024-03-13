@@ -14,7 +14,7 @@ export function RegisterButton({ isValid, loading }): React.ReactElement {
   const btnDisabled = <button className='w-full btn btn-disabled btn-primary'>Register</button>;
   const btnLoading = (
     <button className='w-full btn btn-disabled btn-primary'>
-      <span className='loading loading-spinner'></span>
+      <span className='loading loading-spinner'></span> 
       Register
     </button>
   );

@@ -3,51 +3,57 @@
 import FormInput from '@/components/FormInput';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { resetPassword } from '../../lib/api';
+import { resetPasswordAction } from '../../lib/actions';
+
+export function SubmitButton({ isValid, loading }): React.ReactElement {
+  const btn = <button className='w-full btn btn-primary'>Submit</button>;
+  const btnDisabled = <button className='w-full btn btn-disabled btn-primary'>Submit</button>;
+  const btnLoading = (
+    <button className='w-full btn btn-disabled btn-primary'>
+      <span className='loading loading-spinner'></span> 
+      Submit
+    </button>
+  );
+
+  return !isValid ? btnDisabled : (loading ? btnLoading : btn);
+}
 
 export default function ResetPasswordPage({ token }): React.ReactElement {
   const router = useRouter();
   const methods = useForm();
-  const {
-    reset,
-    handleSubmit,
-    formState: { isSubmitSuccessful },
-    watch,
-  } = methods;
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSubmitSuccessful]);
+  const {
+    watch,
+    handleSubmit,
+    formState: { isValid },
+  } = methods;
 
   const onSubmit = async (data): Promise<void> => {
     if (!data || loading) {
       return;
     }
 
-    try {
-      setLoading(true);
-      await resetPassword(data.password, token);
-      // const response = res?.data;
+    const formData = new FormData();
+    formData.append('token', token);
+    formData.append('password', data.password);
 
-      toast('Password successfully updated!', {
-        type: 'success',
+    setLoading(true);
+    const state = await resetPasswordAction(null, formData);
+    setLoading(false);
+
+    if (state?.message) {
+      toast(state.message, {
+        type: state.error ? 'error' : 'success',
         position: 'top-center',
       });
+    }
+
+    if (!state?.error) {
       router.push('/login');
-    } catch (error) {
-      toast(`Password update failed: ${error?.response?.data?.message}`, {
-        type: 'error',
-        position: 'top-center',
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -66,13 +72,6 @@ export default function ResetPasswordPage({ token }): React.ReactElement {
       }
     },
   };
-  const btn = <button className='w-full btn'>Submit</button>;
-  const btnLoading = (
-    <button className='w-full btn btn-disabled'>
-      <span className='loading loading-spinner'></span>
-      Submit
-    </button>
-  );
 
   return (
     <section className='h-section bg-slate-200 py-20'>
@@ -98,7 +97,7 @@ export default function ResetPasswordPage({ token }): React.ReactElement {
               constraints={passwordConfirmConstraints}
             />
 
-            <div>{loading ? btnLoading : btn}</div>
+            <SubmitButton isValid={isValid} loading={loading} />
             <div className='text-center'>
               <Link href='/' className='text-secondary'>
                 Cancel
