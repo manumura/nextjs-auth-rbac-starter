@@ -1,28 +1,5 @@
 {
-  "parser": "@typescript-eslint/parser",
   "extends": [
-    "next/core-web-vitals",
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-    // "plugin:deprecation/recommended"
-  ],
-  "plugins": ["@typescript-eslint"],
-  "parserOptions": {
-    "ecmaVersion": 2020,
-    "sourceType": "module",
-    "project": "./tsconfig.json"
-  },
-  "rules": {
-    "semi": ["error", "always"],
-    "quotes": ["error", "single"],
-    "@typescript-eslint/explicit-function-return-type": 1,
-    "@typescript-eslint/no-explicit-any": 1,
-    "@typescript-eslint/no-inferrable-types": [
-      "warn",
-      {
-        "ignoreParameters": true
-      }
-    ],
-    "@typescript-eslint/no-unused-vars": "warn"
-  }
+    "next/core-web-vitals"
+  ]
 }
