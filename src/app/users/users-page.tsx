@@ -10,6 +10,8 @@ import { FiDelete, FiEdit, FiPlusCircle } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import DeleteUserModal from '../../components/DeleteUserModal';
 import { subscribe, userChangeEventAbortController } from '../../lib/sse';
+import { UUID } from 'crypto';
+import { getSavedUserEvents, saveUserEvents } from '../../lib/storage';
 
 // Disable SWR caching on this page
 export const dynamic = 'force-dynamic';
@@ -20,9 +22,6 @@ export default function UsersPage({ users, totalElements, page, pageSize, curren
   const [selectedUser, setSelectedUser] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [usersToDisplay, setUsersToDisplay] = useState(users);
-
-  // Store notifications to prevent duplicate notifications
-  const notifications: string[] = [];
 
   useEffect(() => {
     setUsersToDisplay(users);
@@ -62,77 +61,124 @@ export default function UsersPage({ users, totalElements, page, pageSize, curren
     router.push('create-user');
   };
 
-  async function subscribeUserChangeEvents() {
-    console.log('Subscribing to user change events');
-    const onMessage = (message: EventSourceMessage) => {
-      if (!message.event || !message.data || !message.id) {
-        return;
-      }
+  const onMessage = (message: EventSourceMessage) => {
+    const shouldProcess = shouldProcessMessage(message);
+    if (!shouldProcess) {
+      return;
+    }
 
-      // TODO store notifications in a global store
-      if (notifications.includes(message.id)) {
-        console.log('Notification already processed');
-        return;
-      }
-      notifications.push(message.id);
+    processMessage(message);
+  };
 
-      const data = JSON.parse(message.data);
-      const userFromEvent = data.user;
-      const auditUserUuid = data.auditUserUuid;
+  const shouldProcessMessage = (message: EventSourceMessage): boolean => {
+    if (!message.event || !message.data || !message.id) {
+      console.log('Invalid message:', message);
+      return false;
+    }
 
-      if (auditUserUuid === currentUser.uuid) {
-        console.log('Ignoring event from current user');
-        return;
-      }
+    const data = JSON.parse(message.data);
+    const auditUserUuid = data.auditUserUuid;
 
-      const userInList = usersToDisplay.find((u) => u.uuid === userFromEvent.uuid);
-      const isUserModified = userInList && userInList.updatedAt !== userFromEvent.updatedAt;
+    if (auditUserUuid === currentUser.uuid) {
+      console.log('Ignoring event from current user');
+      return false;
+    }
 
-      // if (message.event === 'USER_CREATED' && !userInList && +page === 1) {
-      //   // Add user to list
-      //   console.log('Adding user to list');
-      //   // Remove last record if page is full
-      //   if (usersToDisplay.length >= pageSize) {
-      //     usersToDisplay.pop();
-      //   }
-      //   setUsersToDisplay([userFromEvent, ...usersToDisplay]);
-      // }
-      if (message.event === 'USER_CREATED') {
-        const msg = `New user has been created: ${userFromEvent.email}`;
-        console.log(msg);
-        toast(msg, {
-          type: 'info',
-          position: 'top-center',
-          autoClose: false,
-        });
-      }
-      
-      if (message.event === 'USER_UPDATED' && isUserModified) {
-        // Update user in list
-        console.log('Updating user in list');
+    // Store notifications to prevent duplicate notifications
+    const userEventsMap = getSavedUserEvents() || new Map<UUID, string[]>();
+    const events = userEventsMap?.get(currentUser.uuid) || [];
+
+    if (events.includes(message.id)) {
+      console.log('Event already processed:', message.id);
+      return false;
+    }
+
+    const newEvents = [message.id, ...events];
+    // TODO constant
+    if (newEvents.length >= 1000) {
+      newEvents.pop();
+    }
+    userEventsMap.set(currentUser.uuid, newEvents);
+    saveUserEvents(userEventsMap);
+
+    return true;
+  };
+
+  const processMessage = (message: EventSourceMessage): void => {
+    const data = JSON.parse(message.data);
+    const type = message.event;
+    const userFromEvent = data.user;
+
+    const userInList = usersToDisplay.find((u) => u.uuid === userFromEvent.uuid);
+    const isUserModified = userInList && userInList.updatedAt !== userFromEvent.updatedAt;
+
+    // if (type === 'USER_CREATED' && !userInList && +page === 1) {
+    //   // Add user to list
+    //   console.log('Adding user to list');
+    //   // Remove last record if page is full
+    //   if (usersToDisplay.length >= pageSize) {
+    //     usersToDisplay.pop();
+    //   }
+    //   setUsersToDisplay([userFromEvent, ...usersToDisplay]);
+    // }
+    if (type === 'USER_CREATED') {
+      const msg = `New user has been created: ${userFromEvent.email}`;
+      console.log(msg);
+      toast(msg, {
+        type: 'info',
+        position: 'top-center',
+        autoClose: false,
+      });
+    }
+    
+    if (type === 'USER_UPDATED') {
+      const msg = `User has been updated: ${userFromEvent.email}`;
+      console.log(msg);
+      toast(msg, {
+        type: 'info',
+        position: 'top-center',
+        autoClose: false,
+      });
+
+      if (isUserModified) {
         const index = usersToDisplay.indexOf(userInList);
+        console.log('index:',index, usersToDisplay[index], userFromEvent);
         usersToDisplay[index] = userFromEvent;
         setUsersToDisplay([...usersToDisplay]);
       }
-      
-      // if (message.event === 'USER_DELETED' && userInList) {
-      //   // Remove user from list
-      //   console.log('Removing user from list');
-      //   const index = usersToDisplay.indexOf(userInList);
-      //   usersToDisplay.splice(index, 1);
-      //   setUsersToDisplay([...usersToDisplay]);
-      // }
-      if (message.event === 'USER_DELETED') {
-        const msg = `User has been deleted: ${userFromEvent.email}`;
-        console.log(msg);
-        toast(msg, {
-          type: 'warning',
-          position: 'top-center',
-          autoClose: false,
-        });
-      }
-    };
+    }
+    
+    // if (type === 'USER_DELETED' && userInList) {
+    //   // Remove user from list
+    //   console.log('Removing user from list');
+    //   const index = usersToDisplay.indexOf(userInList);
+    //   usersToDisplay.splice(index, 1);
+    //   setUsersToDisplay([...usersToDisplay]);
+    // }
+    if (type === 'USER_DELETED') {
+      const msg = `User has been deleted: ${userFromEvent.email}`;
+      console.log(msg);
+      toast(msg, {
+        type: 'warning',
+        position: 'top-center',
+        autoClose: false,
+      });
+    }
+  };
 
+  // TODO
+  const hightlightRow = (userUuid: string) => {
+    const row = document.getElementById('user-' + userUuid);
+    if (row) {
+      row.classList.add('highlight-row');
+      row.onanimationend = () => {
+        row.classList.remove('highlight-row');
+      };
+    }
+  };
+
+  async function subscribeUserChangeEvents() {
+    console.log('Subscribing to user change events');
     subscribe(
       // TODO url from config
       'http://localhost:9002/api/v1/events/users',
@@ -151,7 +197,7 @@ export default function UsersPage({ users, totalElements, page, pageSize, curren
   );
 
   const userRows = usersToDisplay?.map((user) => (
-    <tr key={user.uuid}>
+    <tr key={user.uuid} id={`user-${user.uuid}`}>
       <th>{user.uuid}</th>
       <td>{user.name}</td>
       <td>{user.email}</td>

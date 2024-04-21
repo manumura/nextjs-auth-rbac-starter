@@ -157,7 +157,7 @@ export async function loginAction(
     // throw new Error(message);
   }
 
-  // TODO workaround for form state not updating (why is it working on edit-user-page???)
+  // TODO workaround for form state not updating
   revalidatePath('/');
   redirect('/');
 }
@@ -211,12 +211,11 @@ export async function updateUserAction(
     console.log('User updated: ', user);
     const message = `User successfully updated: ${user.name}`;
 
-    //   revalidatePath(`/users/${uuid}`);
-    revalidatePath('/users');
-    return {
-      message,
-      error: false,
-    };
+    // revalidatePath('/users');
+    // return {
+    //   message,
+    //   error: false,
+    // };
   } catch (error) {
     console.error('Update User server action error: ', error);
     const message = error?.response?.data?.message ? `Update user failed! ${error?.response?.data?.message}`: 'Update user failed!';
@@ -225,6 +224,9 @@ export async function updateUserAction(
       error: true,
     };
   }
+
+  revalidatePath('/users');
+  redirect('/users');
 }
 
 export async function createUserAction(

@@ -25,10 +25,10 @@ const LogoutButton = ({ id }) => {
       userChangeEventAbortController.abort();
       await logout();
 
-      // toast('Logout successfull!', {
-      //   type: 'success',
-      //   position: 'top-center',
-      // });
+      toast('Logout successfull', {
+        type: 'success',
+        position: 'top-center',
+      });
     } catch (error) {
       toast(`Logout failed! ${error?.response?.data?.message}`, {
         type: 'error',

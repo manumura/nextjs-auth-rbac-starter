@@ -1,7 +1,20 @@
+import { UUID } from "crypto";
+
 const KEY = {
   ACCESS_TOKEN: 'accessToken',
   REFRESH_TOKEN: 'refreshToken',
   ID_TOKEN: 'idToken',
+  USER_EVENTS: 'userEvents',
+};
+
+// Map of user UUID to list of events
+export const saveUserEvents = (userEventsMap: Map<UUID, string[]>): void => {
+  window.localStorage.setItem(KEY.USER_EVENTS, JSON.stringify([...userEventsMap]));
+};
+
+export const getSavedUserEvents = (): Map<UUID, string[]> => {
+  const mapAsString = window.localStorage.getItem(KEY.USER_EVENTS);
+  return mapAsString ? new Map(JSON.parse(mapAsString)) : new Map<UUID, string[]>();
 };
 
 export const saveIdToken = (idToken): void => {

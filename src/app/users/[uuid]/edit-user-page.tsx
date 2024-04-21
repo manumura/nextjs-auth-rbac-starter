@@ -51,7 +51,6 @@ export default function EditUserPage({ user }): React.ReactElement {
   } = methods;
 
   useEffect(() => {
-    console.log('state', state);
     if (state?.message) {
       toast(state.message, {
         type: state.error ? 'error' : 'success',
