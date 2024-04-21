@@ -33,7 +33,9 @@ export default function CreateUserPage(): React.ReactElement {
     createUserAction,
     initialState,
   );
-  const methods = useForm();
+  const methods = useForm({
+    mode: 'all',
+  });
 
   const {
     formState: { isValid },

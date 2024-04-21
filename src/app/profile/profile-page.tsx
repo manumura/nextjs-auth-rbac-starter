@@ -3,6 +3,10 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+// Disable SWR caching on this page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function ProfilePage({ user }) {
   const router = useRouter();
 

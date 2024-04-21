@@ -3,14 +3,14 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { logout } from '../lib/api';
 import { clearStorage } from '../lib/storage';
-import useUserStore from '../lib/user-store';
+import { logout } from '../lib/api';
+import { userChangeEventAbortController } from '../lib/sse';
 
 const LogoutButton = ({ id }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const userStore = useUserStore();
+  // const userStore = useUserStore();
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async (): Promise<void> => {
@@ -21,12 +21,14 @@ const LogoutButton = ({ id }) => {
     try {
       setLoading(true);
       // await sleep(1000);
+      // TODO server action
+      userChangeEventAbortController.abort();
       await logout();
 
-      toast('Logout successfull!', {
-        type: 'success',
-        position: 'top-center',
-      });
+      // toast('Logout successfull!', {
+      //   type: 'success',
+      //   position: 'top-center',
+      // });
     } catch (error) {
       toast(`Logout failed! ${error?.response?.data?.message}`, {
         type: 'error',
@@ -34,9 +36,8 @@ const LogoutButton = ({ id }) => {
       });
     } finally {
       setLoading(false);
-
       clearStorage();
-      userStore.setUser(undefined);
+      // userStore.setUser(undefined);
 
       if (pathname !== '/') {
         router.push('/');

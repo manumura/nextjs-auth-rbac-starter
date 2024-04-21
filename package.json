@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@microsoft/fetch-event-source": "^2.0.1",
     "axios": "^1.6.8",
     "clsx": "^2.1.0",
     "cookie": "^0.6.0",

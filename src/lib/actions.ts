@@ -7,6 +7,8 @@ import appConfig from '../config/config';
 import { validateCaptcha } from './captcha.utils';
 import { setAuthCookies } from './cookies.utils.';
 import { getUserFromIdToken } from './jwt.utils';
+import { redirect } from 'next/navigation';
+import { userChangeEventAbortController } from './sse';
 
 export async function registerAction(
   prevState: any,
@@ -88,6 +90,10 @@ export async function loginAction(
 ): Promise<any> {
   try {
     console.log('Login server action');
+
+    // TODO remove test
+    console.log('test abort controller', userChangeEventAbortController);
+
     const BASE_URL = appConfig.baseUrl;
     const cookieStore = cookies();
 
@@ -122,21 +128,25 @@ export async function loginAction(
       };
     }
 
-    const response = await res.json();
-    console.log('Login response: ', response);
-    setAuthCookies(cookieStore, response);
+    const data = await res.json();
+    // console.log('Login response: ', data);
+    setAuthCookies(cookieStore, data);
 
-    const idToken = response.idToken;
+    const idToken = data.idToken;
     const user = await getUserFromIdToken(idToken);
     const message = `Welcome ${user?.name}!`;
 
-    revalidatePath('/');
-    return {
+    const response = {
       message,
       error: false,
       user,
       idToken,
     };
+    console.log('Login response', response);
+
+    // revalidatePath('/');
+    // return response;
+    
   } catch (error) {
     console.error('Login server action error: ', error);
     const message = error?.response?.data?.message ? `Login failed! ${error?.response?.data?.message}`: 'Login failed!';
@@ -144,7 +154,12 @@ export async function loginAction(
       message,
       error: true,
     };
+    // throw new Error(message);
   }
+
+  // TODO workaround for form state not updating (why is it working on edit-user-page???)
+  revalidatePath('/');
+  redirect('/');
 }
 
 export async function updateUserAction(
@@ -258,12 +273,11 @@ export async function createUserAction(
     console.log('User created: ', user);
     const message = `User successfully created: ${user.name}`;
 
-    //   revalidatePath(`/users/${uuid}`);
-    revalidatePath('/users');
-    return {
-      message,
-      error: false,
-    };
+    // revalidatePath('/users');
+    // return {
+    //   message,
+    //   error: false,
+    // };
   } catch (error) {
     console.error('Create User server action error: ', error);
     const message = error?.response?.data?.message ? `Create user failed! ${error?.response?.data?.message}`: 'Create user failed!';
@@ -272,6 +286,9 @@ export async function createUserAction(
       error: true,
     };
   }
+
+  revalidatePath('/users');
+  redirect('/users');
 }
 
 export async function forgotPasswordAction(

@@ -9,7 +9,6 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { loginAction } from '../../lib/actions';
-import useUserStore from '../../lib/user-store';
 
 export function LoginButton({ isValid }): React.ReactElement {
   const { pending } = useFormStatus();
@@ -37,17 +36,34 @@ export default function LoginPage({ error }): React.ReactElement {
     loginAction,
     initialState,
   );
-  const methods = useForm();
+  const methods = useForm({
+    mode: 'all',
+  });
   const {
     formState: { isValid },
   } = methods;
-  const userStore = useUserStore();
+  // const userStore = useUserStore();
+
+  useEffect(() => {
+    if (state?.message) {
+      toast(state.message, {
+        type: state.error ? 'error' : 'success',
+        position: 'top-center',
+      });
+
+      if (!state?.error) {
+        // userStore.setUser(state?.user);
+        saveIdToken(state?.idToken);
+        router.replace('/');
+      }
+    }
+  }, [state, router]);
 
   useEffect(() => {
     // Handle access token expired
     if (error === '401') {
       clearStorage();
-      userStore.setUser(undefined);
+      // userStore.setUser(undefined);
       toast('Session expired, please login again.', {
         type: 'error',
         position: 'top-center',
@@ -63,21 +79,6 @@ export default function LoginPage({ error }): React.ReactElement {
       });
     }
   }, [error]);
-
-  useEffect(() => {
-    if (state?.message) {
-      toast(state.message, {
-        type: state.error ? 'error' : 'success',
-        position: 'top-center',
-      });
-
-      if (!state?.error) {
-        userStore.setUser(state?.user);
-        saveIdToken(state?.idToken);
-        router.replace('/');
-      }
-    }
-  }, [state, router]);
 
   const emailConstraints = {
     required: { value: true, message: 'Email is required' },

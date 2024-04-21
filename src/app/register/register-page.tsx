@@ -24,7 +24,9 @@ export function RegisterButton({ isValid, loading }): React.ReactElement {
 
 export default function RegisterPage(): React.ReactElement {
   const router = useRouter();
-  const methods = useForm();
+  const methods = useForm({
+    mode: 'all',
+  });
   const [loading, setLoading] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
 

@@ -4,6 +4,11 @@ import appConfig from '../../config/config';
 import { IUser } from '../../lib/user-store';
 import EditProfilePage from './edit-profile-page';
 
+// TODO disable SWR caching on this page
+// Disable SWR caching on this page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getUser(): Promise<IUser | undefined> {
   const BASE_URL = appConfig.baseUrl;
   const cookieStore = cookies();
@@ -14,6 +19,7 @@ async function getUser(): Promise<IUser | undefined> {
     headers: {
       Cookie: cookieStore as any,
     },
+    cache: 'no-store',
   });
 
   if (!res.ok) {

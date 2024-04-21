@@ -18,6 +18,7 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
     try {
       setLoading(true);
       const res = await deleteUser(user?.uuid);
+      setLoading(false);
       const response = res?.data;
 
       toast(`User successfully deleted: ${response.name}`, {
@@ -26,12 +27,11 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
       });
       onClose(true);
     } catch (error) {
+      setLoading(false);
       toast(`Delete user failed!  ${error?.response?.data?.message}`, {
         type: 'error',
         position: 'top-center',
       });
-    } finally {
-      setLoading(false);
     }
   };
 

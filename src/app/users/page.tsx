@@ -6,14 +6,21 @@ import LoadingOverlay from '../../components/LoadingOverlay';
 import appConfig from '../../config/config';
 import { IUser } from '../../lib/user-store';
 import UsersPage from './users-page';
+import { getUserFromIdToken } from '../../lib/jwt.utils';
+
+// Disable SWR caching on this page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 type IGetUsersResponse = {
   users: IUser[];
   totalElements: number;
+  currentUser: IUser | undefined;
 };
 
 async function getUsers(page, pageSize, role): Promise<IGetUsersResponse> {
   unstable_noStore(); // Disable SWR caching
+
   const BASE_URL = appConfig.baseUrl;
   const cookieStore = cookies();
   const params = new URLSearchParams({
@@ -28,18 +35,26 @@ async function getUsers(page, pageSize, role): Promise<IGetUsersResponse> {
     headers: {
       Cookie: cookieStore as any,
     },
-    cache: 'no-cache',
+    cache: 'no-store',
+    // next: { revalidate: 0 },
   });
 
   if (!res.ok) {
     console.error(`Get Users getServerSideProps error: ${res.statusText}`);
-    return { users: [], totalElements: 0 };
+    return { users: [], totalElements: 0, currentUser: undefined};
   }
 
   const json = await res.json();
   const users = json.elements;
   const totalElements = json.totalElements;
-  return { users, totalElements };
+
+  let currentUser;
+  const idTokenCookie = cookieStore.get('idToken');
+  if (idTokenCookie?.value) {
+    currentUser = await getUserFromIdToken(idTokenCookie.value);
+  }
+  
+  return { users, totalElements, currentUser };
 }
 
 async function Users({ searchParams }) {
@@ -49,7 +64,7 @@ async function Users({ searchParams }) {
   // TODO filter by role
   const role = undefined;
 
-  const { users, totalElements } = await getUsers(page, pageSize, role);
+  const { users, totalElements, currentUser } = await getUsers(page, pageSize, role);
 
   // Forward fetched data to your Client Component
   return (
@@ -58,6 +73,7 @@ async function Users({ searchParams }) {
       totalElements={totalElements}
       page={page}
       pageSize={pageSize}
+      currentUser={currentUser}
     />
   );
 }

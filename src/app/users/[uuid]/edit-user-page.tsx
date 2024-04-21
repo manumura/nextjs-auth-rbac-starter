@@ -25,11 +25,11 @@ export function SaveButton({ isValid }): React.ReactElement {
 
 export default function EditUserPage({ user }): React.ReactElement {
   const router = useRouter();
-  const updateUserActionWithUuid = updateUserAction.bind(null, user.uuid);
   const initialState = {
     message: '',
     error: false,
   };
+  const updateUserActionWithUuid = updateUserAction.bind(null, user.uuid);
   const [state, formAction] = useFormState(
     updateUserActionWithUuid,
     initialState,
@@ -51,6 +51,7 @@ export default function EditUserPage({ user }): React.ReactElement {
   } = methods;
 
   useEffect(() => {
+    console.log('state', state);
     if (state?.message) {
       toast(state.message, {
         type: state.error ? 'error' : 'success',

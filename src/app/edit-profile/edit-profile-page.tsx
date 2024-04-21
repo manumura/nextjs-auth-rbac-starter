@@ -8,6 +8,10 @@ import DropBox from '../../components/DropBox';
 import FormInput from '../../components/FormInput';
 import { updatePassword, updateProfile, updateProfileImage } from '../../lib/api';
 
+// Disable SWR caching on this page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function EditProfilePage({ user }) {
   const router = useRouter();
   const [images, setImages] = useState([] as any[]);
@@ -98,7 +102,7 @@ export default function EditProfilePage({ user }) {
           type: 'success',
           position: 'top-center',
         });
-        router.back();
+        router.push('/profile');
         router.refresh();
       } else {
         toast('Profile update failed!', {
