@@ -1,68 +1,83 @@
 'use client';
 
 import FormInput from '@/components/FormInput';
-import { clearStorage, saveIdToken } from '@/lib/storage';
+import { clearAuthentication, saveIdToken } from '@/lib/storage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { loginAction } from '../../lib/actions';
+import { LoginState, loginAction } from '../../lib/actions';
+import { LoginResponse } from '../../types/LoginResponse';
 
 export function LoginButton({ isValid }): React.ReactElement {
   const { pending } = useFormStatus();
-  const btn = <button className='w-full btn btn-primary'>Login</button>;
-  const btnDisabled = <button className='w-full btn btn-disabled btn-primary'>Login</button>;
+  const btn = <button className='btn btn-primary w-full'>Login</button>;
+  const btnDisabled = (
+    <button className='btn btn-disabled btn-primary w-full'>Login</button>
+  );
   const btnLoading = (
-    <button className='w-full btn btn-disabled btn-primary'>
+    <button className='btn btn-disabled btn-primary w-full'>
       <span className='loading loading-spinner'></span>
       Login
     </button>
   );
 
-  return !isValid ? btnDisabled : (pending ? btnLoading : btn);
+  return !isValid ? btnDisabled : pending ? btnLoading : btn;
 }
+
+const initialState: LoginState = {
+  message: '',
+  error: false,
+  user: undefined,
+  idToken: undefined,
+};
 
 export default function LoginPage({ error }): React.ReactElement {
   const router = useRouter();
-  const initialState = {
-    message: '',
-    error: false,
-    user: null,
-    idToken: null,
-  };
-  const [state, formAction] = useFormState(
-    loginAction,
-    initialState,
-  );
+  // const userStore = useUserStore();
+  const [state, formAction] = useFormState(loginAction, initialState);
   const methods = useForm({
     mode: 'all',
   });
   const {
     formState: { isValid },
   } = methods;
-  // const userStore = useUserStore();
 
-  useEffect(() => {
-    if (state?.message) {
-      toast(state.message, {
-        type: state.error ? 'error' : 'success',
-        position: 'top-center',
-      });
+  if (state?.message) {
+    toast(state.message, {
+      type: state.error ? 'error' : 'success',
+      position: 'top-center',
+    });
 
-      if (!state?.error) {
-        // userStore.setUser(state?.user);
-        saveIdToken(state?.idToken);
-        router.replace('/');
-      }
+    if (state?.user) {
+      // userStore.setUser(state?.user);
+      saveIdToken(state?.idToken);
+      router.replace('/');
     }
-  }, [state, router]);
+  }
+
+  // useEffect(() => {
+  //   console.log('login state', state);
+  //   if (state?.message) {
+  //     toast(state.message, {
+  //       type: state.error ? 'error' : 'success',
+  //       position: 'top-center',
+  //     });
+
+  //     if (state?.user) {
+  //       // userStore.setUser(state?.user);
+  //       saveIdToken(state?.idToken);
+  //       router.replace('/');
+  //     }
+  //   }
+  // }, [state, router]);
 
   useEffect(() => {
     // Handle access token expired
     if (error === '401') {
-      clearStorage();
+      clearAuthentication();
       // userStore.setUser(undefined);
       toast('Session expired, please login again.', {
         type: 'error',

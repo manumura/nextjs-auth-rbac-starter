@@ -4,7 +4,6 @@ import appConfig from '../../config/config';
 import { IUser } from '../../lib/user-store';
 import EditProfilePage from './edit-profile-page';
 
-// TODO disable SWR caching on this page
 // Disable SWR caching on this page
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;

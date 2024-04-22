@@ -3,9 +3,8 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { clearStorage } from '../lib/storage';
 import { logout } from '../lib/api';
-import { userChangeEventAbortController } from '../lib/sse';
+import { clearAuthentication } from '../lib/storage';
 
 const LogoutButton = ({ id }) => {
   const router = useRouter();
@@ -22,7 +21,7 @@ const LogoutButton = ({ id }) => {
       setLoading(true);
       // await sleep(1000);
       // TODO server action
-      userChangeEventAbortController.abort();
+      // userChangeEventAbortController.abort();
       await logout();
 
       toast('Logout successfull', {
@@ -36,7 +35,7 @@ const LogoutButton = ({ id }) => {
       });
     } finally {
       setLoading(false);
-      clearStorage();
+      clearAuthentication();
       // userStore.setUser(undefined);
 
       if (pathname !== '/') {

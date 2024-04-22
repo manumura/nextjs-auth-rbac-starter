@@ -43,4 +43,10 @@ export const getRefreshToken = (): string | null => {
   return refreshToken;
 };
 
+export const clearAuthentication = (): void => {
+  window.localStorage.removeItem(KEY.ACCESS_TOKEN);
+  window.localStorage.removeItem(KEY.REFRESH_TOKEN);
+  window.localStorage.removeItem(KEY.ID_TOKEN);
+}
+
 export const clearStorage = (): void => window.localStorage.clear();

@@ -4,4 +4,5 @@ export const appConstant = {
     REFRESH_TOKEN: 'refreshToken',
     ACCESS_TOKEN_EXPIRES_AT: 'accessTokenExpiresAt',
     ID_TOKEN: 'idToken',
+    MAX_USER_EVENTS_TO_STORE: 1000,
 };

@@ -3,12 +3,19 @@
 import { UUID } from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import appConfig from '../config/config';
 import { validateCaptcha } from './captcha.utils';
 import { setAuthCookies } from './cookies.utils.';
 import { getUserFromIdToken } from './jwt.utils';
-import { redirect } from 'next/navigation';
-import { userChangeEventAbortController } from './sse';
+import { IUser } from './user-store';
+
+export type LoginState = {
+  message: string,
+  error: boolean,
+  user: IUser | undefined,
+  idToken: string | undefined,
+};
 
 export async function registerAction(
   prevState: any,
@@ -87,12 +94,9 @@ export async function registerAction(
 export async function loginAction(
   prevState: any,
   formData: FormData,
-): Promise<any> {
+): Promise<LoginState> {
   try {
     console.log('Login server action');
-
-    // TODO remove test
-    console.log('test abort controller', userChangeEventAbortController);
 
     const BASE_URL = appConfig.baseUrl;
     const cookieStore = cookies();
@@ -125,6 +129,8 @@ export async function loginAction(
       return {
         message: `Login failed! ${response.message}`,
         error: true,
+        user: undefined,
+        idToken: undefined,
       };
     }
 
@@ -136,7 +142,7 @@ export async function loginAction(
     const user = await getUserFromIdToken(idToken);
     const message = `Welcome ${user?.name}!`;
 
-    const response = {
+    const response: LoginState = {
       message,
       error: false,
       user,
@@ -153,11 +159,13 @@ export async function loginAction(
     return {
       message,
       error: true,
+      user: undefined,
+      idToken: undefined,
     };
     // throw new Error(message);
   }
 
-  // TODO workaround for form state not updating
+  // TODO workaround for form state not updating: https://github.com/vercel/next.js/blob/canary/examples/next-forms/app/add-form.tsx
   revalidatePath('/');
   redirect('/');
 }
@@ -344,7 +352,7 @@ export async function forgotPasswordAction(
 
     const user = await res.json();
     console.log('Forgot password response: ', user);
-    const message = `Success! Please check the email sent at ${email}`;
+    const message = `Success! Please check the email sent at ${email}.`;
 
     // revalidatePath('/');
     return {
@@ -353,7 +361,7 @@ export async function forgotPasswordAction(
     };
   } catch (error) {
     console.error('Forgot password server action error: ', error);
-    const message = error?.response?.data?.message ? `An error occured, please try again:  ${error?.response?.data?.message}` : 'An error occured, please try again';
+    const message = error?.response?.data?.message ? `An error occured, please try again:  ${error?.response?.data?.message}.` : 'An error occured, please try again.';
     return {
       message,
       error: true,
@@ -393,7 +401,7 @@ export async function resetPasswordAction(
     if (!res.ok) {
       const response = await res.json();
       console.error('Reset password server action error: ', response);
-      const message = response ? `Password update failed: ${response}` : 'Password update failed';
+      const message = response ? `Password update failed: ${response}.` : 'Password update failed.';
       return {
         message,
         error: true,
@@ -411,7 +419,7 @@ export async function resetPasswordAction(
     };
   } catch (error) {
     console.error('Reset password server action error: ', error);
-    const message = error?.response?.data?.message ? `Password update failed: ${error?.response?.data?.message}` : 'Password update failed';
+    const message = error?.response?.data?.message ? `Password update failed: ${error?.response?.data?.message}.` : 'Password update failed.';
     return {
       message,
       error: true,
