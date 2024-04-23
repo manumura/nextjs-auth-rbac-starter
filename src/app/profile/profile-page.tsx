@@ -30,8 +30,8 @@ export default function ProfilePage({ user }) {
 
   return (
     <section className='h-section bg-slate-200'>
-      <div className='flex flex-col items-center py-20'>
-        <div className='card m-5 w-3/4 max-w-screen-lg bg-slate-50 shadow-xl'>
+      <div className='flex flex-col items-center pt-10'>
+        <div className='card w-3/4 max-w-screen-lg bg-slate-50 shadow-xl'>
           <div className='card-body'>
             <div className='card-title'>
               <h1>My Profile</h1>
