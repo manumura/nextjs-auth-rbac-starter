@@ -56,7 +56,7 @@ export default function RegisterPage(): React.ReactElement {
     if (state?.message) {
       toast(state.message, {
         type: state.error ? 'error' : 'success',
-        position: 'top-center',
+        position: 'top-right',
       });
     }
 

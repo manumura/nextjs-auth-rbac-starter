@@ -142,7 +142,7 @@ export default function UsersPage({
       console.log(msg);
       toast(msg, {
         type: 'info',
-        position: 'top-center',
+        position: 'top-right',
         autoClose: false,
       });
     }
@@ -152,7 +152,7 @@ export default function UsersPage({
       console.log(msg);
       toast(msg, {
         type: 'info',
-        position: 'top-center',
+        position: 'top-right',
         autoClose: false,
       });
 
@@ -175,7 +175,7 @@ export default function UsersPage({
       console.log(msg);
       toast(msg, {
         type: 'warning',
-        position: 'top-center',
+        position: 'top-right',
         autoClose: false,
       });
     }

@@ -23,14 +23,14 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
 
       toast(`User successfully deleted: ${response.name}`, {
         type: 'success',
-        position: 'top-center',
+        position: 'top-right',
       });
       onClose(true);
     } catch (error) {
       setLoading(false);
       toast(`Delete user failed!  ${error?.response?.data?.message}`, {
         type: 'error',
-        position: 'top-center',
+        position: 'top-right',
       });
     }
   };

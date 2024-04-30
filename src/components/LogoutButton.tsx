@@ -26,12 +26,12 @@ const LogoutButton = ({ id }) => {
 
       toast('Logout successfull', {
         type: 'success',
-        position: 'top-center',
+        position: 'top-right',
       });
     } catch (error) {
       toast(`Logout failed! ${error?.response?.data?.message}`, {
         type: 'error',
-        position: 'top-center',
+        position: 'top-right',
       });
     } finally {
       setLoading(false);

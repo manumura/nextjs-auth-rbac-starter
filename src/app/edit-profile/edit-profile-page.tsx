@@ -100,20 +100,20 @@ export default function EditProfilePage({ user }) {
       if (success) {
         toast('Profile successfully updated!', {
           type: 'success',
-          position: 'top-center',
+          position: 'top-right',
         });
         router.push('/profile');
         router.refresh();
       } else {
         toast('Profile update failed!', {
           type: 'error',
-          position: 'top-center',
+          position: 'top-right',
         });
       }
     } catch (error) {
       toast(`Profile update failed!  ${error?.response?.data?.message}`, {
         type: 'error',
-        position: 'top-center',
+        position: 'top-right',
       });
     } finally {
       setLoading(false);
@@ -155,14 +155,14 @@ export default function EditProfilePage({ user }) {
 
       toast(`${response.name} successfully changed password!`, {
         type: 'success',
-        position: 'top-center',
+        position: 'top-right',
       });
       router.back();
       router.refresh();
     } catch (error) {
       toast(`Change password failed!  ${error?.response?.data?.message}`, {
         type: 'error',
-        position: 'top-center',
+        position: 'top-right',
       });
     } finally {
       setLoading(false);

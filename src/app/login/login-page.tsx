@@ -45,34 +45,21 @@ export default function LoginPage({ error }): React.ReactElement {
     formState: { isValid },
   } = methods;
 
-  if (state?.message) {
-    toast(state.message, {
-      type: state.error ? 'error' : 'success',
-      position: 'top-center',
-    });
+  useEffect(() => {
+    // console.log('login state', state);
+    if (state?.message) {
+      toast(state.message, {
+        type: state.error ? 'error' : 'success',
+        position: 'top-right',
+      });
 
-    if (state?.user) {
-      // userStore.setUser(state?.user);
-      saveIdToken(state?.idToken);
-      router.replace('/');
+      if (state?.user) {
+        // userStore.setUser(state?.user);
+        saveIdToken(state?.idToken);
+        router.replace('/');
+      }
     }
-  }
-
-  // useEffect(() => {
-  //   console.log('login state', state);
-  //   if (state?.message) {
-  //     toast(state.message, {
-  //       type: state.error ? 'error' : 'success',
-  //       position: 'top-center',
-  //     });
-
-  //     if (state?.user) {
-  //       // userStore.setUser(state?.user);
-  //       saveIdToken(state?.idToken);
-  //       router.replace('/');
-  //     }
-  //   }
-  // }, [state, router]);
+  }, [state, router]);
 
   useEffect(() => {
     // Handle access token expired
@@ -81,7 +68,7 @@ export default function LoginPage({ error }): React.ReactElement {
       // userStore.setUser(undefined);
       toast('Session expired, please login again.', {
         type: 'error',
-        position: 'top-center',
+        position: 'top-right',
         toastId: '401',
       });
     }
@@ -89,7 +76,7 @@ export default function LoginPage({ error }): React.ReactElement {
     if (error === '404') {
       toast('Not Found!', {
         type: 'error',
-        position: 'top-center',
+        position: 'top-right',
         toastId: '404',
       });
     }
