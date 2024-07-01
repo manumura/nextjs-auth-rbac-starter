@@ -2,17 +2,16 @@
 
 import FormInput from '@/components/FormInput';
 import { clearAuthentication, saveIdToken } from '@/lib/storage';
+import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { LoginState, loginAction } from '../../lib/actions';
-import { LoginResponse } from '../../types/LoginResponse';
+import { login } from '../../lib/api';
+import { getUserFromIdToken } from '../../lib/jwt.utils';
 
-export function LoginButton({ isValid }): React.ReactElement {
-  const { pending } = useFormStatus();
+export function LoginButton({ isValid, isPending }): React.ReactElement {
   const btn = <button className='btn btn-primary w-full'>Login</button>;
   const btnDisabled = (
     <button className='btn btn-disabled btn-primary w-full'>Login</button>
@@ -24,42 +23,48 @@ export function LoginButton({ isValid }): React.ReactElement {
     </button>
   );
 
-  return !isValid ? btnDisabled : pending ? btnLoading : btn;
+  return !isValid ? btnDisabled : isPending ? btnLoading : btn;
 }
-
-const initialState: LoginState = {
-  message: '',
-  error: false,
-  user: undefined,
-  idToken: undefined,
-};
 
 export default function LoginPage({ error }): React.ReactElement {
   const router = useRouter();
   // const userStore = useUserStore();
-  const [state, formAction] = useFormState(loginAction, initialState);
+
   const methods = useForm({
     mode: 'all',
   });
   const {
-    formState: { isValid },
+    reset,
+    handleSubmit,
+    formState: { isSubmitSuccessful, isValid },
   } = methods;
 
-  useEffect(() => {
-    // console.log('login state', state);
-    if (state?.message) {
-      toast(state.message, {
-        type: state.error ? 'error' : 'success',
+  const mutation = useMutation({
+    mutationFn: ({ email, password }: { email: string; password: string }) =>
+      login(email, password),
+    async onSuccess(response, variables, context) {
+      const idToken = response.data.idToken;
+      const user = await getUserFromIdToken(idToken);
+
+      toast(`Welcome ${user?.name}!`, {
+        type: 'success',
         position: 'top-right',
       });
 
-      if (state?.user) {
-        // userStore.setUser(state?.user);
-        saveIdToken(state?.idToken);
-        router.replace('/');
-      }
-    }
-  }, [state, router]);
+      saveIdToken(idToken);
+      router.replace('/');
+    },
+    onError(error, variables, context) {
+      toast(error?.message, {
+        type: 'error',
+        position: 'top-right',
+      });
+    },
+  });
+
+  const onSubmit = async (formData) => {
+    mutation.mutate(formData);
+  };
 
   useEffect(() => {
     // Handle access token expired
@@ -94,7 +99,7 @@ export default function LoginPage({ error }): React.ReactElement {
       <div className='w-full'>
         <FormProvider {...methods}>
           <form
-            action={formAction}
+            onSubmit={handleSubmit(onSubmit)}
             className='mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg'
           >
             <h1 className='mb-4 text-center text-4xl font-[600]'>
@@ -118,7 +123,8 @@ export default function LoginPage({ error }): React.ReactElement {
                 Forgot Password?
               </Link>
             </div>
-            <LoginButton isValid={isValid} />
+
+            <LoginButton isValid={isValid} isPending={mutation.isPending} />
             <span className='block'>
               Need an account?{' '}
               <Link href='/register' className='text-secondary'>

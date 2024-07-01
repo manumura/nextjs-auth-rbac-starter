@@ -1,5 +1,7 @@
+'use client';
+
 import LoginPage from './login-page';
 
-export default async function Login({searchParams}) {
+export default function Login({searchParams}) {
   return <LoginPage error={searchParams.error} />;
 }

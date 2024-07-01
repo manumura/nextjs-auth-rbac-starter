@@ -1,45 +1,45 @@
-import { headers } from 'next/headers';
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import LoadingOverlay from '../components/LoadingOverlay';
+import { info, welcome } from '../lib/api';
 import HomePage from './home-page';
-import { getClientBaseUrl } from '../lib/utils';
+import Error from './error';
 
-async function getAppInfos() {
-  let message = 'Welcome to MyApp!';
-  let information = {};
+export default function Home() {
+  const {
+    isPending,
+    error,
+    data: information,
+  } = useQuery({
+    queryKey: ['info'],
+    queryFn: () => info().then((res) => res.data),
+  });
 
-  try {
-    const baseUrl = getClientBaseUrl(headers());
-    const welcomeRes = await fetch(`${baseUrl}/api/welcome`, {
-      method: 'GET',
-    });
+  const {
+    isPending: isPendingWelcome,
+    error: errorWelcome,
+    data: msg,
+  } = useQuery({
+    queryKey: ['welcome'],
+    queryFn: () => welcome().then((res) => res.data),
+  });
 
-    if (welcomeRes.ok) {
-      const welcomeAsJson = await welcomeRes.json();
-      message = welcomeAsJson.message;
-    }
-
-    const infoRes = await fetch(`${baseUrl}/api/info`, {
-      method: 'GET',
-    });
-
-    if (infoRes.ok) {
-      information = await infoRes.json();
-    }
-  } catch (error) {
-    console.error(error);
+  if (isPending || isPendingWelcome) {
+    // return <LoadingSpinner label='Loading' />;
+    return <LoadingOverlay label='Loading' />;
   }
 
-  return {
-    message,
-    information,
-  };
-}
+  if (error) {
+    return <Error error={error} />;
+  }
 
-export default async function Home() {
-  // Fetch data directly in a Server Component
-  const appInfos = await getAppInfos();
+  if (errorWelcome) {
+    return <Error error={errorWelcome} />;
+  }
 
   // Forward fetched data to your Client Component
   return (
-    <HomePage message={appInfos?.message} information={appInfos?.information} />
+    <HomePage message={msg.message} information={information} />
   );
 }

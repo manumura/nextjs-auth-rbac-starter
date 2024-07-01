@@ -74,9 +74,24 @@ axiosInstance.interceptors.response.use(
 
 ////////////////////////////////////////////////////////////////
 // Public APIs
-// export const login = async (email, password): Promise<AxiosResponse> => {
-//   return axiosPublicInstance.post('/v1/login', { email, password });
-// };
+export const info = async (): Promise<AxiosResponse> => {
+  return axiosPublicInstance.get('/v1/info');
+};
+
+export const welcome = async (): Promise<AxiosResponse> => {
+  return axiosPublicInstance.get('/v1/index');
+};
+
+type LoginResponse = {
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiresAt: number;
+  idToken: string;
+};
+
+export const login = async (email: string, password: string): Promise<AxiosResponse<LoginResponse>> => {
+  return axiosPublicInstance.post('/v1/login', { email, password });
+};
 
 // export const register = async (email, password, name): Promise<AxiosResponse> => {
 //   return axiosPublicInstance.post('/v1/register', { email, password, name });

@@ -1,3 +1,6 @@
+// TODO client-side
+// 'use client';
+
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import LoginButton from '../components/LoginButton';
