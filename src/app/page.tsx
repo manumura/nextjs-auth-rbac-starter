@@ -26,7 +26,6 @@ export default function Home() {
   });
 
   if (isPending || isPendingWelcome) {
-    // return <LoadingSpinner label='Loading' />;
     return <LoadingOverlay label='Loading' />;
   }
 

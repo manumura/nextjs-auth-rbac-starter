@@ -1,19 +1,19 @@
-import { cookies } from 'next/headers';
+'use client';
+
 import { redirect } from 'next/navigation';
+import { useEffect } from 'react';
+import useUserStore from '../../lib/user-store';
 import ForgotPasswordPage from './forgot-password-page';
 
-async function isAuthenticated(): Promise<boolean> {
-  // Redirect if user is authenticated
-  const accessToken = cookies().get('accessToken')?.value;
-  return !!accessToken;
-}
+export default function ForgotPassword() {
+  const userStore = useUserStore();
+  const user = userStore.user;
 
-export default async function ForgotPassword() {
-  // Fetch data directly in a Server Component
-  const isAuth = await isAuthenticated();
-  if (isAuth) {
-    redirect('/');
-  }
+  useEffect(() => {
+    if (user) {
+      redirect('/');
+    }
+  }, [user]);
 
   // Forward fetched data to your Client Component
   return <ForgotPasswordPage />;

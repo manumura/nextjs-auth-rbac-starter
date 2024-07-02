@@ -1,6 +1,6 @@
 'use client';
 
-export default function HomePage({ message, information }) {
+export default function HomePage({ message, information }): React.ReactElement {
   return (
     <>
       <section className='h-section bg-slate-200 pt-20'>

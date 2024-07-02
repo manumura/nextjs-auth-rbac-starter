@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import appConfig from '../config/config';
+import { IUser } from './user-store';
 
 const BASE_URL = appConfig.baseUrl;
 const REFRESH_TOKEN_ENDPOINT = '/v1/refresh-token';
@@ -74,11 +75,21 @@ axiosInstance.interceptors.response.use(
 
 ////////////////////////////////////////////////////////////////
 // Public APIs
-export const info = async (): Promise<AxiosResponse> => {
+type InfoResponse = {
+  env: string;
+  userAgent: string;
+  ip: string;
+};
+
+type MessageResponse = {
+  message: string;
+};
+
+export const info = async (): Promise<AxiosResponse<InfoResponse>> => {
   return axiosPublicInstance.get('/v1/info');
 };
 
-export const welcome = async (): Promise<AxiosResponse> => {
+export const welcome = async (): Promise<AxiosResponse<MessageResponse>> => {
   return axiosPublicInstance.get('/v1/index');
 };
 
@@ -93,17 +104,21 @@ export const login = async (email: string, password: string): Promise<AxiosRespo
   return axiosPublicInstance.post('/v1/login', { email, password });
 };
 
-// export const register = async (email, password, name): Promise<AxiosResponse> => {
-//   return axiosPublicInstance.post('/v1/register', { email, password, name });
-// };
+export const register = async (email: string, password: string, name: string): Promise<AxiosResponse<IUser>> => {
+  return axiosPublicInstance.post('/v1/register', { email, password, name });
+};
 
-// export const forgotPassword = async (email): Promise<AxiosResponse> => {
-//   return axiosPublicInstance.post('/v1/forgot-password', { email });
-// };
+export const forgotPassword = async (email: string): Promise<AxiosResponse<MessageResponse>> => {
+  return axiosPublicInstance.post('/v1/forgot-password', { email });
+};
 
-// export const resetPassword = async (password, token): Promise<AxiosResponse> => {
-//   return axiosPublicInstance.post('/v1/new-password', { password, token });
-// };
+export const resetPassword = async (password: string, token: string): Promise<AxiosResponse<IUser>> => {
+  return axiosPublicInstance.post('/v1/new-password', { password, token });
+};
+
+export const getUserFromToken = async (token: string): Promise<AxiosResponse<IUser>> => {
+  return axiosPublicInstance.get(`/v1/token/${token}`);
+};
 
 ////////////////////////////////////////////////////////////////
 // Authenticated-only APIs

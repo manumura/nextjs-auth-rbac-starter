@@ -1,14 +1,14 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import appConfig from '../../config/config';
-import { IUser } from '../../lib/user-store';
-import ResetPasswordPage from './reset-password-page';
+'use client';
 
-async function isAuthenticated(): Promise<boolean> {
-  // Redirect if user is authenticated
-  const accessToken = cookies().get('accessToken')?.value;
-  return !!accessToken;
-}
+import { useQuery } from '@tanstack/react-query';
+import { redirect } from 'next/navigation';
+import { useEffect } from 'react';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import appConfig from '../../config/config';
+import { getUserFromToken } from '../../lib/api';
+import useUserStore, { IUser } from '../../lib/user-store';
+import Error from '../error';
+import ResetPasswordPage from './reset-password-page';
 
 async function getUserByToken(token): Promise<IUser | undefined> {
   const BASE_URL = appConfig.baseUrl;
@@ -25,18 +25,37 @@ async function getUserByToken(token): Promise<IUser | undefined> {
   return json;
 }
 
-export default async function ResetPassword({ searchParams }) {
-  // Fetch data directly in a Server Component
-  const isAuth = await isAuthenticated();
-  if (isAuth) {
-    redirect('/');
-  }
+export default function ResetPassword({ searchParams }) {
+  const userStore = useUserStore();
+  const userFromStore = userStore.user;
+
+  useEffect(() => {
+    if (userFromStore) {
+      redirect('/');
+    }
+  }, [userFromStore]);
 
   if (!searchParams?.token) {
     redirect('/login?error=404');
   }
 
-  const user = await getUserByToken(searchParams?.token);
+  const {
+    isPending,
+    error,
+    data: user,
+  } = useQuery({
+    queryKey: ['userByToken'],
+    queryFn: () => getUserFromToken(searchParams?.token).then((res) => res.data),
+  });
+
+  if (isPending) {
+    return <LoadingOverlay label='Loading' />;
+  }
+
+  if (error) {
+    return <Error error={error} />;
+  }
+
   if (!user) {
     redirect('/login?error=404');
   }

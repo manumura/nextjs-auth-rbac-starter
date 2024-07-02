@@ -8,8 +8,11 @@ import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { registerAction } from '../../lib/actions';
+import { useMutation } from '@tanstack/react-query';
+import { register } from '../../lib/api';
+import { validateCaptcha } from '../../lib/captcha.utils';
 
-export function RegisterButton({ isValid, loading }): React.ReactElement {
+export function RegisterButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='w-full btn btn-primary'>Register</button>;
   const btnDisabled = <button className='w-full btn btn-disabled btn-primary'>Register</button>;
   const btnLoading = (
@@ -19,7 +22,7 @@ export function RegisterButton({ isValid, loading }): React.ReactElement {
     </button>
   );
 
-  return !isValid ? btnDisabled : (loading ? btnLoading : btn);
+  return !isValid ? btnDisabled : (isLoading ? btnLoading : btn);
 }
 
 export default function RegisterPage(): React.ReactElement {
@@ -36,33 +39,42 @@ export default function RegisterPage(): React.ReactElement {
     watch,
   } = methods;
 
+  const mutation = useMutation({
+    mutationFn: ({ email, password, name }: { email: string; password: string, name: string }) =>
+      register(email, password, name),
+    async onSuccess(response, variables, context) {
+      const user = response.data;
+      toast(`Registration successful ${user?.name}!`, {
+        type: 'success',
+        position: 'top-right',
+      });
+
+      router.push('/login');
+    },
+    onError(error, variables, context) {
+      toast(error?.message, {
+        type: 'error',
+        position: 'top-right',
+      });
+    },
+  });
+
   const onSubmit = async (data): Promise<void> => {
     if (!data || loading || !executeRecaptcha) {
       return;
     }
 
-    const token = await executeRecaptcha('onSubmit');
-
-    const formData = new FormData();
-    formData.append('token', token);
-    formData.append('name', data.name);
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-
     setLoading(true);
-    const state = await registerAction(null, formData);
+    const token = await executeRecaptcha('onSubmit');
+    const isCaptchaValid = await validateCaptcha(token);
     setLoading(false);
-    
-    if (state?.message) {
-      toast(state.message, {
-        type: state.error ? 'error' : 'success',
-        position: 'top-right',
-      });
+
+    if (!isCaptchaValid) {
+      console.error('Captcha validation failed');
+      return;
     }
 
-    if (!state?.error) {
-      router.push('/login');
-    }
+    mutation.mutate({ email: data.email, password: data.password, name: data.name });
   };
 
   const nameConstraints = {
@@ -131,7 +143,7 @@ export default function RegisterPage(): React.ReactElement {
                 Login Here
               </Link>
             </span>
-            <RegisterButton isValid={isValid} loading={loading} />
+            <RegisterButton isValid={isValid} isLoading={loading || mutation.isPending} />
           </form>
         </FormProvider>
       </div>

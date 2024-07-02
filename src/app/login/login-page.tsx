@@ -10,8 +10,9 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { login } from '../../lib/api';
 import { getUserFromIdToken } from '../../lib/jwt.utils';
+import useUserStore from '../../lib/user-store';
 
-export function LoginButton({ isValid, isPending }): React.ReactElement {
+export function LoginButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary w-full'>Login</button>;
   const btnDisabled = (
     <button className='btn btn-disabled btn-primary w-full'>Login</button>
@@ -23,12 +24,12 @@ export function LoginButton({ isValid, isPending }): React.ReactElement {
     </button>
   );
 
-  return !isValid ? btnDisabled : isPending ? btnLoading : btn;
+  return !isValid ? btnDisabled : (isLoading ? btnLoading : btn);
 }
 
 export default function LoginPage({ error }): React.ReactElement {
   const router = useRouter();
-  // const userStore = useUserStore();
+  const userStore = useUserStore();
 
   const methods = useForm({
     mode: 'all',
@@ -45,6 +46,7 @@ export default function LoginPage({ error }): React.ReactElement {
     async onSuccess(response, variables, context) {
       const idToken = response.data.idToken;
       const user = await getUserFromIdToken(idToken);
+      userStore.setUser(user);
 
       toast(`Welcome ${user?.name}!`, {
         type: 'success',
@@ -63,6 +65,10 @@ export default function LoginPage({ error }): React.ReactElement {
   });
 
   const onSubmit = async (formData) => {
+    if (!formData) {
+      return;
+    }
+    
     mutation.mutate(formData);
   };
 
@@ -70,7 +76,7 @@ export default function LoginPage({ error }): React.ReactElement {
     // Handle access token expired
     if (error === '401') {
       clearAuthentication();
-      // userStore.setUser(undefined);
+      userStore.setUser(undefined);
       toast('Session expired, please login again.', {
         type: 'error',
         position: 'top-right',
@@ -124,7 +130,7 @@ export default function LoginPage({ error }): React.ReactElement {
               </Link>
             </div>
 
-            <LoginButton isValid={isValid} isPending={mutation.isPending} />
+            <LoginButton isValid={isValid} isLoading={mutation.isPending} />
             <span className='block'>
               Need an account?{' '}
               <Link href='/register' className='text-secondary'>

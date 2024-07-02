@@ -1,14 +1,14 @@
 'use client';
 
 import FormInput from '@/components/FormInput';
+import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { resetPasswordAction } from '../../lib/actions';
+import { resetPassword } from '../../lib/api';
 
-export function SubmitButton({ isValid, loading }): React.ReactElement {
+export function SubmitButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='w-full btn btn-primary'>Submit</button>;
   const btnDisabled = <button className='w-full btn btn-disabled btn-primary'>Submit</button>;
   const btnLoading = (
@@ -18,13 +18,12 @@ export function SubmitButton({ isValid, loading }): React.ReactElement {
     </button>
   );
 
-  return !isValid ? btnDisabled : (loading ? btnLoading : btn);
+  return !isValid ? btnDisabled : (isLoading ? btnLoading : btn);
 }
 
 export default function ResetPasswordPage({ token }): React.ReactElement {
   const router = useRouter();
   const methods = useForm();
-  const [loading, setLoading] = useState(false);
 
   const {
     watch,
@@ -32,29 +31,32 @@ export default function ResetPasswordPage({ token }): React.ReactElement {
     formState: { isValid },
   } = methods;
 
-  const onSubmit = async (data): Promise<void> => {
-    if (!data || loading) {
+  const mutation = useMutation({
+    mutationFn: ({ password, token }: { password: string; token: string; }) =>
+      resetPassword(password, token),
+    async onSuccess(response, variables, context) {
+      // const user = response.data;
+      toast('Password successfully updated!', {
+        type: 'success',
+        position: 'top-right',
+      });
+
+      router.push('/login');
+    },
+    onError(error, variables, context) {
+      toast(error?.message, {
+        type: 'error',
+        position: 'top-right',
+      });
+    },
+  });
+
+  const onSubmit = async (formData): Promise<void> => {
+    if (!formData) {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('token', token);
-    formData.append('password', data.password);
-
-    setLoading(true);
-    const state = await resetPasswordAction(null, formData);
-    setLoading(false);
-
-    if (state?.message) {
-      toast(state.message, {
-        type: state.error ? 'error' : 'success',
-        position: 'top-right',
-      });
-    }
-
-    if (!state?.error) {
-      router.push('/login');
-    }
+    mutation.mutate({ password: formData.password, token });
   };
 
   const passwordConstraints = {
@@ -97,7 +99,7 @@ export default function ResetPasswordPage({ token }): React.ReactElement {
               constraints={passwordConfirmConstraints}
             />
 
-            <SubmitButton isValid={isValid} loading={loading} />
+            <SubmitButton isValid={isValid} isLoading={mutation.isPending} />
             <div className='text-center'>
               <Link href='/' className='text-secondary'>
                 Cancel
