@@ -1,38 +1,30 @@
-import { cookies } from 'next/headers';
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
-import appConfig from '../../config/config';
-import { IUser } from '../../lib/user-store';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import { getProfile } from '../../lib/api';
+import Error from '../error';
 import EditProfilePage from './edit-profile-page';
 
-// Disable SWR caching on this page
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
-async function getUser(): Promise<IUser | undefined> {
-  const BASE_URL = appConfig.baseUrl;
-  const cookieStore = cookies();
-
-  const res = await fetch(`${BASE_URL}/api/v1/profile`, {
-    method: 'GET',
-    credentials: 'include',
-    headers: {
-      Cookie: cookieStore as any,
-    },
-    cache: 'no-store',
+export default function EditProfile() {
+  const {
+    isPending,
+    error,
+    data: user,
+  } = useQuery({
+    queryKey: ['profile'],
+    queryFn: () => getProfile().then((res) => res.data),
   });
 
-  if (!res.ok) {
-    console.error(`Edit Profile getServerSideProps error: ${res.statusText}`);
-    return undefined;
+  if (isPending) {
+    return <LoadingOverlay label='Loading' />;
   }
 
-  const json = await res.json();
-  return json;
-}
+  if (error) {
+    return <Error error={error} />;
+  }
 
-export default async function EditProfile() {
-  // Fetch data directly in a Server Component
-  const user = await getUser();
   if (!user) {
     redirect('/login?error=404');
   }

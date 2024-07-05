@@ -12,16 +12,18 @@ import { forgotPassword } from '../../lib/api';
 import { validateCaptcha } from '../../lib/captcha.utils';
 
 export function SubmitButton({ isValid, isLoading }): React.ReactElement {
-  const btn = <button className='w-full btn btn-primary'>Submit</button>;
-  const btnDisabled = <button className='w-full btn btn-disabled btn-primary'>Submit</button>;
+  const btn = <button className='btn btn-primary w-full'>Submit</button>;
+  const btnDisabled = (
+    <button className='btn btn-disabled btn-primary w-full'>Submit</button>
+  );
   const btnLoading = (
-    <button className='w-full btn btn-disabled btn-primary'>
-      <span className='loading loading-spinner'></span> 
+    <button className='btn btn-disabled btn-primary w-full'>
+      <span className='loading loading-spinner'></span>
       Submit
     </button>
   );
 
-  return !isValid ? btnDisabled : (isLoading ? btnLoading : btn);
+  return !isValid ? btnDisabled : isLoading ? btnLoading : btn;
 }
 
 export default function ForgotPasswordPage(): React.ReactElement {
@@ -36,10 +38,8 @@ export default function ForgotPasswordPage(): React.ReactElement {
   } = methods;
 
   const mutation = useMutation({
-    mutationFn: ({ email }: { email: string; }) =>
-      forgotPassword(email),
-    async onSuccess(response, variables, context) {
-      const data = response.data;
+    mutationFn: ({ email }: { email: string }) => onMutate(email),
+    async onSuccess(message, variables, context) {
       toast('Please follow the link sent by email', {
         type: 'success',
         position: 'top-right',
@@ -54,6 +54,19 @@ export default function ForgotPasswordPage(): React.ReactElement {
       });
     },
   });
+
+  const onMutate = async (email): Promise<string> => {
+    if (!executeRecaptcha) {
+      throw new Error('Recaptcha not loaded');
+    }
+    const token = await executeRecaptcha('onSubmit');
+    const isCaptchaValid = validateCaptcha(token);
+    if (!isCaptchaValid) {
+      throw new Error('Captcha validation failed');
+    }
+    const response = await forgotPassword(email);
+    return response.data.message;
+  };
 
   const onSubmit = async (data): Promise<void> => {
     if (!data || loading || !executeRecaptcha) {
@@ -95,7 +108,10 @@ export default function ForgotPasswordPage(): React.ReactElement {
               constraints={emailConstraints}
             />
 
-            <SubmitButton isValid={isValid} isLoading={loading || mutation.isPending} />
+            <SubmitButton
+              isValid={isValid}
+              isLoading={loading || mutation.isPending}
+            />
             <div className='text-center'>
               <Link href='/login' className='text-secondary'>
                 Cancel

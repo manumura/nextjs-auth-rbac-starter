@@ -6,11 +6,13 @@ import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { login } from '../../lib/api';
+import { validateCaptcha } from '../../lib/captcha.utils';
 import { getUserFromIdToken } from '../../lib/jwt.utils';
-import useUserStore from '../../lib/user-store';
+import useUserStore, { IUser } from '../../lib/user-store';
 
 export function LoginButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary w-full'>Login</button>;
@@ -24,12 +26,13 @@ export function LoginButton({ isValid, isLoading }): React.ReactElement {
     </button>
   );
 
-  return !isValid ? btnDisabled : (isLoading ? btnLoading : btn);
+  return !isValid ? btnDisabled : isLoading ? btnLoading : btn;
 }
 
 export default function LoginPage({ error }): React.ReactElement {
   const router = useRouter();
   const userStore = useUserStore();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const methods = useForm({
     mode: 'all',
@@ -41,11 +44,14 @@ export default function LoginPage({ error }): React.ReactElement {
   } = methods;
 
   const mutation = useMutation({
-    mutationFn: ({ email, password }: { email: string; password: string }) =>
-      login(email, password),
-    async onSuccess(response, variables, context) {
-      const idToken = response.data.idToken;
-      const user = await getUserFromIdToken(idToken);
+    mutationFn: async ({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }) => onMutate(email, password),
+    onSuccess(user, variables, context) {
       userStore.setUser(user);
 
       toast(`Welcome ${user?.name}!`, {
@@ -53,7 +59,6 @@ export default function LoginPage({ error }): React.ReactElement {
         position: 'top-right',
       });
 
-      saveIdToken(idToken);
       router.replace('/');
     },
     onError(error, variables, context) {
@@ -64,11 +69,36 @@ export default function LoginPage({ error }): React.ReactElement {
     },
   });
 
+  const onMutate = async (email, password): Promise<IUser> => {
+    if (!executeRecaptcha) {
+      throw new Error('Recaptcha not loaded');
+    }
+    const token = await executeRecaptcha('onSubmit');
+    const isCaptchaValid = await validateCaptcha(token);
+    if (!isCaptchaValid) {
+      throw new Error('Captcha validation failed');
+    }
+    const response = await login(email, password);
+    const idToken = response?.data?.idToken;
+    if (!idToken) {
+      throw new Error('Invalid response');
+    }
+
+    // TODO save access token
+    saveIdToken(idToken);
+    const user = await getUserFromIdToken(idToken);
+    if (!user) {
+      throw new Error('Invalid user');
+    }
+
+    return user;
+  };
+
   const onSubmit = async (formData) => {
     if (!formData) {
       return;
     }
-    
+
     mutation.mutate(formData);
   };
 

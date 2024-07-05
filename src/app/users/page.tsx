@@ -8,10 +8,6 @@ import { IUser } from '../../lib/user-store';
 import UsersPage from './users-page';
 import { getUserFromIdToken } from '../../lib/jwt.utils';
 
-// Disable SWR caching on this page
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 type IGetUsersResponse = {
   users: IUser[];
   totalElements: number;

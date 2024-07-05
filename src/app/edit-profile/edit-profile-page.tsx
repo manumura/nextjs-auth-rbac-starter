@@ -6,34 +6,42 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import DropBox from '../../components/DropBox';
 import FormInput from '../../components/FormInput';
-import { updatePassword, updateProfile, updateProfileImage } from '../../lib/api';
-
-// Disable SWR caching on this page
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+import {
+  updatePassword,
+  updateProfile,
+  updateProfileImage,
+} from '../../lib/api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { IUser } from '../../lib/user-store';
 
 export default function EditProfilePage({ user }) {
   const router = useRouter();
   const [images, setImages] = useState([] as any[]);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const onDrop = useCallback((acceptedFiles) => {
-    acceptedFiles.map((file, index) => {
-      const reader = new FileReader();
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
 
-      reader.onabort = (): void => console.log('file reading was aborted');
-      reader.onerror = (): void => console.error('file reading has failed');
-      // reader.onprogress = (e) => console.log('file reading in progress ', e);
-      reader.onload = (): void => {
-        // Do whatever you want with the file contents
-        // const binaryStr = reader.result;
-        // console.log(binaryStr);
-        setImages([...images, file]);
-      };
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      acceptedFiles.map((file, index) => {
+        const reader = new FileReader();
 
-      reader.readAsDataURL(file);
-      return file;
-    });
-  }, [images]);
+        reader.onabort = (): void => console.log('file reading was aborted');
+        reader.onerror = (): void => console.error('file reading has failed');
+        // reader.onprogress = (e) => console.log('file reading in progress ', e);
+        reader.onload = (): void => {
+          // Do whatever you want with the file contents
+          // const binaryStr = reader.result;
+          // console.log(binaryStr);
+          setImages([...images, file]);
+        };
+
+        reader.readAsDataURL(file);
+        return file;
+      });
+    },
+    [images],
+  );
   const onUploadProgress = (progressEvent): void => {
     const { loaded, total } = progressEvent;
     if (progressEvent.bytes) {
@@ -41,8 +49,6 @@ export default function EditProfilePage({ user }) {
       setUploadProgress(progress);
     }
   };
-
-  const [loading, setLoading] = useState(false);
 
   const handleCancel = (): void => {
     router.back();
@@ -62,66 +68,63 @@ export default function EditProfilePage({ user }) {
     setError: setEditProfileError,
   } = editProfileMethods;
 
-  const onProfileEdited = async (data): Promise<void> => {
-    if (loading) {
-      return;
+  const mutationProfile = useMutation({
+    mutationFn: ({ name }: { name: string }) => onMutateProfile(name),
+    async onSuccess(user, variables, context) {
+      toast('Profile successfully updated!', {
+        type: 'success',
+        position: 'top-right',
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      router.push('/profile');
+      // router.refresh();
+    },
+    onError(error, variables, context) {
+      toast(error?.message, {
+        type: 'error',
+        position: 'top-right',
+      });
+    },
+  });
+
+  const onMutateProfile = async (name): Promise<IUser> => {
+    const response = await updateProfile(name);
+    if (response.status !== 200) {
+      throw new Error('Profile update failed');
+    }
+    const user = response.data;
+
+    if (images.length <= 0) {
+      return user;
     }
 
-    if (!data?.name && images.length <= 0) {
+    // Upload profile image
+    console.log('Uploading image');
+    const formData = new FormData();
+    formData.append('image', images[0]);
+
+    const uploadResponse = await updateProfileImage(formData, onUploadProgress);
+    if (uploadResponse.status !== 200) {
+      throw new Error('Profile image upload failed');
+    }
+    return user;
+  };
+
+  const onProfileEdited = async (formData): Promise<void> => {
+    if (!formData?.name && images.length <= 0) {
       setEditProfileError('name', { message: 'Please edit at least 1 field' });
       // setError('password', { message: 'Please edit at least 1 field' });
       return;
     }
 
-    try {
-      setLoading(true);
-      let success = true;
-
-      const res = await updateProfile(data.name);
-      if (res.status !== 200) {
-        success = false;
-      } else {
-        // Upload profile image
-        if (images.length > 0) {
-          console.log('Uploading image');
-          const formData = new FormData();
-          formData.append('image', images[0]);
-
-          const uploadRes = await updateProfileImage(
-            formData,
-            onUploadProgress,
-          );
-          if (uploadRes.status !== 200) {
-            success = false;
-          }
-        }
-      }
-
-      if (success) {
-        toast('Profile successfully updated!', {
-          type: 'success',
-          position: 'top-right',
-        });
-        router.push('/profile');
-        router.refresh();
-      } else {
-        toast('Profile update failed!', {
-          type: 'error',
-          position: 'top-right',
-        });
-      }
-    } catch (error) {
-      toast(`Profile update failed!  ${error?.response?.data?.message}`, {
-        type: 'error',
-        position: 'top-right',
-      });
-    } finally {
-      setLoading(false);
-    }
+    mutationProfile.mutate({
+      name: formData.name,
+    });
   };
   // ------------------------------------------------
 
-   //----------------- Change Password -------------------
+  //----------------- Change Password -------------------
   const changePasswordMethods = useForm({
     defaultValues: {
       oldPassword: '',
@@ -137,36 +140,57 @@ export default function EditProfilePage({ user }) {
     setError: setChangePasswordError,
   } = changePasswordMethods;
 
-  const onPasswordChanged = async (data): Promise<void> => {
-    if (loading) {
-      return;
-    }
-
-    if (!data?.oldPassword || !data?.newPassword) {
-      setChangePasswordError('oldPassword', { message: 'Please enter current and new password' });
-      setChangePasswordError('newPassword', { message: 'Please enter current and new password' });
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const res = await updatePassword(data.oldPassword, data.newPassword);
-      const response = res?.data;
-
-      toast(`${response.name} successfully changed password!`, {
+  const mutationPassword = useMutation({
+    mutationFn: ({
+      oldPassword,
+      newPassword,
+    }: {
+      oldPassword: string;
+      newPassword: string;
+    }) => onMutatePassword(oldPassword, newPassword),
+    async onSuccess(user, variables, context) {
+      toast(`${user.name} successfully changed password!`, {
         type: 'success',
         position: 'top-right',
       });
-      router.back();
-      router.refresh();
-    } catch (error) {
-      toast(`Change password failed!  ${error?.response?.data?.message}`, {
+
+      // queryClient.invalidateQueries({ queryKey: ['profile'] });
+      router.push('/profile');
+      // router.refresh();
+    },
+    onError(error, variables, context) {
+      toast(error?.message, {
         type: 'error',
         position: 'top-right',
       });
-    } finally {
-      setLoading(false);
+    },
+  });
+
+  const onMutatePassword = async (oldPassword, newPassword): Promise<IUser> => {
+    const response = await updatePassword(oldPassword, newPassword);
+    if (response.status !== 200) {
+      throw new Error('Change password failed');
     }
+
+    const user = response?.data;
+    return user;
+  };
+
+  const onPasswordChanged = async (formData): Promise<void> => {
+    if (!formData?.oldPassword || !formData?.newPassword) {
+      setChangePasswordError('oldPassword', {
+        message: 'Please enter current and new password',
+      });
+      setChangePasswordError('newPassword', {
+        message: 'Please enter current and new password',
+      });
+      return;
+    }
+
+    mutationPassword.mutate({
+      oldPassword: formData.oldPassword,
+      newPassword: formData.newPassword,
+    });
   };
   // ------------------------------------------------
 
@@ -193,16 +217,27 @@ export default function EditProfilePage({ user }) {
     },
   };
 
+  const loading = mutationProfile.isPending || mutationPassword.isPending;
   const btn = <button className='btn btn-primary'>Save</button>;
-  const btnDisabled = <button className='btn btn-disabled btn-primary'>Save</button>;
+  const btnDisabled = (
+    <button className='btn btn-disabled btn-primary'>Save</button>
+  );
   const btnLoading = (
-    <button className='w-full btn btn-disabled'>
+    <button className='btn btn-disabled w-full'>
       <span className='loading loading-spinner'></span>
       Save
     </button>
   );
-  const editProfileButton = !isEditProfileValid ? btnDisabled : (loading ? btnLoading : btn);
-  const changePasswordButton = !isChangePasswordValid ? btnDisabled : (loading ? btnLoading : btn);
+  const editProfileButton = !isEditProfileValid
+    ? btnDisabled
+    : loading
+      ? btnLoading
+      : btn;
+  const changePasswordButton = !isChangePasswordValid
+    ? btnDisabled
+    : loading
+      ? btnLoading
+      : btn;
   const uploadProgressStyle = {
     '--size': '3.2rem',
     '--value': uploadProgress,
@@ -238,7 +273,7 @@ export default function EditProfilePage({ user }) {
                 <div>
                   <button
                     type='button'
-                    className={`btn-outline btn-accent btn ${
+                    className={`btn btn-outline btn-accent ${
                       loading ? 'btn-disabled' : ''
                     }`}
                     onClick={handleCancel}
@@ -285,7 +320,7 @@ export default function EditProfilePage({ user }) {
                 <div>
                   <button
                     type='button'
-                    className={`btn-outline btn-accent btn ${
+                    className={`btn btn-outline btn-accent ${
                       loading ? 'btn-disabled' : ''
                     }`}
                     onClick={handleCancel}

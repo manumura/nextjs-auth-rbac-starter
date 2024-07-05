@@ -11,27 +11,30 @@ import { registerAction } from '../../lib/actions';
 import { useMutation } from '@tanstack/react-query';
 import { register } from '../../lib/api';
 import { validateCaptcha } from '../../lib/captcha.utils';
+import { IUser } from '../../lib/user-store';
 
 export function RegisterButton({ isValid, isLoading }): React.ReactElement {
-  const btn = <button className='w-full btn btn-primary'>Register</button>;
-  const btnDisabled = <button className='w-full btn btn-disabled btn-primary'>Register</button>;
+  const btn = <button className='btn btn-primary w-full'>Register</button>;
+  const btnDisabled = (
+    <button className='btn btn-disabled btn-primary w-full'>Register</button>
+  );
   const btnLoading = (
-    <button className='w-full btn btn-disabled btn-primary'>
-      <span className='loading loading-spinner'></span> 
+    <button className='btn btn-disabled btn-primary w-full'>
+      <span className='loading loading-spinner'></span>
       Register
     </button>
   );
 
-  return !isValid ? btnDisabled : (isLoading ? btnLoading : btn);
+  return !isValid ? btnDisabled : isLoading ? btnLoading : btn;
 }
 
 export default function RegisterPage(): React.ReactElement {
   const router = useRouter();
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
   const methods = useForm({
     mode: 'all',
   });
-  const [loading, setLoading] = useState(false);
-  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const {
     handleSubmit,
@@ -40,10 +43,16 @@ export default function RegisterPage(): React.ReactElement {
   } = methods;
 
   const mutation = useMutation({
-    mutationFn: ({ email, password, name }: { email: string; password: string, name: string }) =>
-      register(email, password, name),
-    async onSuccess(response, variables, context) {
-      const user = response.data;
+    mutationFn: ({
+      email,
+      password,
+      name,
+    }: {
+      email: string;
+      password: string;
+      name: string;
+    }) => onMutate(email, password, name),
+    async onSuccess(user, variables, context) {
       toast(`Registration successful ${user?.name}!`, {
         type: 'success',
         position: 'top-right',
@@ -59,22 +68,29 @@ export default function RegisterPage(): React.ReactElement {
     },
   });
 
-  const onSubmit = async (data): Promise<void> => {
-    if (!data || loading || !executeRecaptcha) {
-      return;
+  const onMutate = async (email, password, name): Promise<IUser> => {
+    if (!executeRecaptcha) {
+      throw new Error('Recaptcha not loaded');
     }
-
-    setLoading(true);
     const token = await executeRecaptcha('onSubmit');
-    const isCaptchaValid = await validateCaptcha(token);
-    setLoading(false);
-
+    const isCaptchaValid = validateCaptcha(token);
     if (!isCaptchaValid) {
-      console.error('Captcha validation failed');
+      throw new Error('Captcha validation failed');
+    }
+    const response = await register(email, password, name);
+    return response.data;
+  };
+
+  const onSubmit = async (formData): Promise<void> => {
+    if (!formData) {
       return;
     }
 
-    mutation.mutate({ email: data.email, password: data.password, name: data.name });
+    mutation.mutate({
+      email: formData.email,
+      password: formData.password,
+      name: formData.name,
+    });
   };
 
   const nameConstraints = {
@@ -143,7 +159,7 @@ export default function RegisterPage(): React.ReactElement {
                 Login Here
               </Link>
             </span>
-            <RegisterButton isValid={isValid} isLoading={loading || mutation.isPending} />
+            <RegisterButton isValid={isValid} isLoading={mutation.isPending} />
           </form>
         </FormProvider>
       </div>

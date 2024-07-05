@@ -126,20 +126,24 @@ export const logout = async (): Promise<AxiosResponse> => {
   return axiosInstance.post('/v1/logout');
 };
 
-export const updateProfile = async (name): Promise<AxiosResponse> => {
+export const getProfile = async (): Promise<AxiosResponse<IUser>> => {
+  return axiosInstance.get('/v1/profile');
+};
+
+export const updateProfile = async (name): Promise<AxiosResponse<IUser>> => {
   return axiosInstance.put('/v1/profile', {
     name,
   });
 };
 
-export const updatePassword = async (oldPassword, newPassword): Promise<AxiosResponse> => {
+export const updatePassword = async (oldPassword, newPassword): Promise<AxiosResponse<IUser>> => {
   return axiosInstance.put('/v1/profile/password', {
     oldPassword,
     newPassword,
   });
 };
 
-export const updateProfileImage = async (image, onUploadProgress): Promise<AxiosResponse> => {
+export const updateProfileImage = async (image, onUploadProgress): Promise<AxiosResponse<IUser>> => {
   return axiosInstance.put('/v1/profile/image', image, {
     headers: {
       'Content-Type': 'multipart/form-data',

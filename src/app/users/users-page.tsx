@@ -13,10 +13,6 @@ import { getSavedUserEvents, saveUserEvents } from '../../lib/storage';
 import { appConstant } from '../../config/constant';
 import appConfig from '../../config/config';
 
-// Disable SWR caching on this page
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 export default function UsersPage({
   users,
   totalElements,
