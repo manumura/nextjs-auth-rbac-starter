@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import appConfig from '../config/config';
 import { IUser } from './user-store';
+import { UUID } from 'node:crypto';
 
 const BASE_URL = appConfig.baseUrl;
 const REFRESH_TOKEN_ENDPOINT = '/v1/refresh-token';
@@ -130,20 +131,20 @@ export const getProfile = async (): Promise<AxiosResponse<IUser>> => {
   return axiosInstance.get('/v1/profile');
 };
 
-export const updateProfile = async (name): Promise<AxiosResponse<IUser>> => {
+export const updateProfile = async (name: string): Promise<AxiosResponse<IUser>> => {
   return axiosInstance.put('/v1/profile', {
     name,
   });
 };
 
-export const updatePassword = async (oldPassword, newPassword): Promise<AxiosResponse<IUser>> => {
+export const updatePassword = async (oldPassword: string, newPassword: string): Promise<AxiosResponse<IUser>> => {
   return axiosInstance.put('/v1/profile/password', {
     oldPassword,
     newPassword,
   });
 };
 
-export const updateProfileImage = async (image, onUploadProgress): Promise<AxiosResponse<IUser>> => {
+export const updateProfileImage = async (image: FormData, onUploadProgress): Promise<AxiosResponse<IUser>> => {
   return axiosInstance.put('/v1/profile/image', image, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -152,19 +153,19 @@ export const updateProfileImage = async (image, onUploadProgress): Promise<Axios
   });
 };
 
-// export const createUser = async (email, name, role): Promise<AxiosResponse> => {
-//   return axiosInstance.post('/v1/users', { email, name, role });
-// };
+export const createUser = async (email: string, name: string, role: string): Promise<AxiosResponse<IUser>> => {
+  return axiosInstance.post('/v1/users', { email, name, role });
+};
 
-// export const updateUser = async (uuid, name, email, role, password?): Promise<AxiosResponse> => {
-//   return axiosInstance.put(`/v1/users/${uuid}`, {
-//     name,
-//     email,
-//     role,
-//     ...(password ? { password } : {}),
-//   });
-// };
+export const updateUser = async (uuid: UUID, name: string, email: string, role: string, password?: string): Promise<AxiosResponse<IUser>> => {
+  return axiosInstance.put(`/v1/users/${uuid}`, {
+    name,
+    email,
+    role,
+    ...(password ? { password } : {}),
+  });
+};
 
-export const deleteUser = async (userUuid): Promise<AxiosResponse> => {
+export const deleteUser = async (userUuid: UUID): Promise<AxiosResponse<IUser>> => {
   return axiosInstance.delete(`/v1/users/${userUuid}`);
 };

@@ -1,18 +1,19 @@
 'use client';
 
 import FormInput from '@/components/FormInput';
+import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import FormSelect from '../../components/FormSelect';
-import { createUserAction } from '../../lib/actions';
+import { createUser } from '../../lib/api';
+import { IUser } from '../../lib/user-store';
 
-export function SaveButton({ isValid }): React.ReactElement {
-  const { pending } = useFormStatus();
+export function SaveButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary mx-1'>Save</button>;
-  const btnDisabled = <button className='btn btn-disabled btn-primary mx-1'>Save</button>;
+  const btnDisabled = (
+    <button className='btn btn-disabled btn-primary mx-1'>Save</button>
+  );
   const btnLoading = (
     <button className='btn btn-disabled btn-primary mx-1'>
       <span className='loading loading-spinner'></span>
@@ -20,39 +21,67 @@ export function SaveButton({ isValid }): React.ReactElement {
     </button>
   );
 
-  return !isValid ? btnDisabled : (pending ? btnLoading : btn);
+  return !isValid ? btnDisabled : isLoading ? btnLoading : btn;
 }
 
 export default function CreateUserPage(): React.ReactElement {
   const router = useRouter();
-  const initialState = {
-    message: '',
-    error: false,
-  };
-  const [state, formAction] = useFormState(
-    createUserAction,
-    initialState,
-  );
   const methods = useForm({
     mode: 'all',
   });
 
   const {
+    handleSubmit,
     formState: { isValid },
   } = methods;
 
-  useEffect(() => {
-    if (state?.message) {
-      toast(state.message, {
-        type: state.error ? 'error' : 'success',
+  const mutation = useMutation({
+    mutationFn: ({
+      email,
+      name,
+      role,
+    }: {
+      email: string;
+      name: string;
+      role: string;
+    }) => onMutate(email, name, role),
+    async onSuccess(user, variables, context) {
+      console.log('User created successfully', user);
+      toast(`User created successfully ${user?.name}!`, {
+        type: 'success',
         position: 'top-right',
       });
 
-      if (!state.error) {
-        router.replace('/users');
-      }
+      router.replace('/users');
+    },
+    onError(error, variables, context) {
+      toast(error?.message, {
+        type: 'error',
+        position: 'top-right',
+      });
+    },
+  });
+
+  const onMutate = async (email, name, role): Promise<IUser> => {
+    const response = await createUser(email, name, role);
+    if (response.status !== 201) {
+      throw new Error('User creation failed');
     }
-  }, [state, router]);
+    const user = response.data;
+    return user;
+  };
+
+  const onSubmit = async (formData): Promise<void> => {
+    if (!formData) {
+      return;
+    }
+
+    mutation.mutate({
+      email: formData.email,
+      name: formData.name,
+      role: formData.role,
+    });
+  };
 
   const onCancel = (): void => {
     router.back();
@@ -83,7 +112,7 @@ export default function CreateUserPage(): React.ReactElement {
       <div className='w-full'>
         <FormProvider {...methods}>
           <form
-            action={formAction}
+            onSubmit={handleSubmit(onSubmit)}
             className='mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg'
           >
             <h2 className='mb-4 text-center text-2xl font-[600]'>
@@ -107,11 +136,12 @@ export default function CreateUserPage(): React.ReactElement {
               constraints={roleConstraints}
             />
             <div className='flex justify-center space-x-5'>
-              <SaveButton isValid={isValid} />
+              <SaveButton isValid={isValid} isLoading={mutation.isPending} />
               <button
                 type='button'
-                id='btn-cancel'
-                className='btn-outline btn mx-1'
+                className={`btn btn-outline mx-1 ${
+                  mutation.isPending ? 'btn-disabled' : ''
+                }`}
                 onClick={onCancel}
               >
                 Cancel
