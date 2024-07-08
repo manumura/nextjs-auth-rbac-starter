@@ -1,11 +1,11 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UUID } from 'crypto';
 import { toast } from 'react-toastify';
 import { deleteUser } from '../lib/api';
-import { IUser } from '../lib/user-store';
 import Modal from './Modal';
+import { IUser } from '../types/custom-types';
 
 const DeleteUserModal = ({
   user,

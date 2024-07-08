@@ -12,7 +12,8 @@ import { toast } from 'react-toastify';
 import { login } from '../../lib/api';
 import { validateCaptcha } from '../../lib/captcha.utils';
 import { getUserFromIdToken } from '../../lib/jwt.utils';
-import useUserStore, { IUser } from '../../lib/user-store';
+import useUserStore from '../../lib/user-store';
+import { IUser } from '../../types/custom-types';
 
 export function LoginButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary w-full'>Login</button>;

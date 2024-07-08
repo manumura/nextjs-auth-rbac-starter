@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
-import appConfig from '../config/config';
-import { IUser } from './user-store';
 import { UUID } from 'node:crypto';
+import appConfig from '../config/config';
+import { IGetUsersResponse, InfoResponse, IUser, LoginResponse, MessageResponse } from '../types/custom-types';
 
 const BASE_URL = appConfig.baseUrl;
 const REFRESH_TOKEN_ENDPOINT = '/v1/refresh-token';
@@ -76,28 +76,6 @@ axiosInstance.interceptors.response.use(
 
 ////////////////////////////////////////////////////////////////
 // Public APIs
-type LoginResponse = {
-  accessToken: string;
-  refreshToken: string;
-  accessTokenExpiresAt: number;
-  idToken: string;
-};
-
-type InfoResponse = {
-  env: string;
-  userAgent: string;
-  ip: string;
-};
-
-type MessageResponse = {
-  message: string;
-};
-
-type IGetUsersResponse = {
-  elements: IUser[];
-  totalElements: number;
-};
-
 export const info = async (): Promise<AxiosResponse<InfoResponse>> => {
   return axiosPublicInstance.get('/v1/info');
 };

@@ -12,16 +12,20 @@ import { subscribe } from '../../lib/sse';
 import { getSavedUserEvents, saveUserEvents } from '../../lib/storage';
 import { appConstant } from '../../config/constant';
 import appConfig from '../../config/config';
-import { IUser } from '../../lib/user-store';
+import { IUser } from '../../types/custom-types';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function UsersPage({
   users,
   totalElements,
   page,
   pageSize,
+  role,
   currentUser,
 }) {
   const router = useRouter();
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [usersToDisplay, setUsersToDisplay] = useState(users);
@@ -57,7 +61,8 @@ export default function UsersPage({
     setIsDeleteModalOpen(false);
     if (isSuccess) {
       // Refresh page
-      router.refresh();
+      // router.refresh();
+      queryClient.invalidateQueries({ queryKey: ['users', page, pageSize] });
     }
   };
 
@@ -156,6 +161,7 @@ export default function UsersPage({
       if (userIndex !== -1) {
         usersToDisplay[userIndex] = userFromEvent;
         setUsersToDisplay([...usersToDisplay]);
+
         hightlightRow(userFromEvent.uuid);
       }
     }

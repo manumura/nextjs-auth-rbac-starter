@@ -3,7 +3,7 @@ import {
   EventStreamContentType,
   fetchEventSource,
 } from '@microsoft/fetch-event-source';
-import { FatalError, RetriableError } from '../types/Errors';
+import { FatalError, RetriableError } from '../types/custom-errors';
 
 export async function subscribe(
   url: string,

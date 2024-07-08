@@ -12,6 +12,7 @@ const LogoutButton = ({ id }) => {
   // const userStore = useUserStore();
   const [loading, setLoading] = useState(false);
 
+  // TODO react query
   const handleLogout = async (): Promise<void> => {
     if (loading) {
       return;
@@ -20,7 +21,6 @@ const LogoutButton = ({ id }) => {
     try {
       setLoading(true);
       // await sleep(1000);
-      // TODO server action
       // userChangeEventAbortController.abort();
       await logout();
 

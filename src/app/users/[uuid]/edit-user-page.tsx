@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import FormInput from '../../../components/FormInput';
 import FormSelect from '../../../components/FormSelect';
 import { updateUser } from '../../../lib/api';
-import { IUser } from '../../../lib/user-store';
+import { IUser } from '../../../types/custom-types';
 
 export function SaveButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary mx-1'>Save</button>;

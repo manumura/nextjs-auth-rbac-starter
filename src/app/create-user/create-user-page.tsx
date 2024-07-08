@@ -7,7 +7,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import FormSelect from '../../components/FormSelect';
 import { createUser } from '../../lib/api';
-import { IUser } from '../../lib/user-store';
+import { IUser } from '../../types/custom-types';
 
 export function SaveButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary mx-1'>Save</button>;

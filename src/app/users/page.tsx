@@ -49,6 +49,7 @@ function Users({ searchParams }) {
       totalElements={totalElements}
       page={page}
       pageSize={pageSize}
+      role={role}
       currentUser={currentUser}
     />
   );

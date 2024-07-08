@@ -1,17 +1,16 @@
 'use client';
 
 import FormInput from '@/components/FormInput';
+import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { registerAction } from '../../lib/actions';
-import { useMutation } from '@tanstack/react-query';
 import { register } from '../../lib/api';
 import { validateCaptcha } from '../../lib/captcha.utils';
-import { IUser } from '../../lib/user-store';
+import { IUser } from '../../types/custom-types';
 
 export function RegisterButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary w-full'>Register</button>;

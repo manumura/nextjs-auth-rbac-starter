@@ -12,7 +12,7 @@ import {
   updateProfileImage,
 } from '../../lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { IUser } from '../../lib/user-store';
+import { IUser } from '../../types/custom-types';
 
 export default function EditProfilePage({ user }) {
   const router = useRouter();

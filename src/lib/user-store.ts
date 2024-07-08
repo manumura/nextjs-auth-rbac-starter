@@ -1,13 +1,5 @@
-import { UUID } from 'crypto';
 import { create } from 'zustand';
-
-export type IUser = {
-  uuid: UUID;
-  name: string;
-  email: string;
-  role: string;
-  isActive: boolean;
-};
+import { IUser } from '../types/custom-types';
 
 type UserState = {
   user: IUser | null;

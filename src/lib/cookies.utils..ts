@@ -5,7 +5,7 @@ import { RequestCookies, ResponseCookies } from 'next/dist/compiled/@edge-runtim
 import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 import { appConstant } from '../config/constant';
 import { COOKIE_OPTIONS } from '../config/cookie.config';
-import { LoginResponse } from '../types/LoginResponse';
+import { LoginResponse } from '../types/custom-types';
 
 const COOKIE_NAMES = [
   appConstant.ACCESS_TOKEN, 
