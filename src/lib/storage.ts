@@ -43,6 +43,12 @@ export const getRefreshToken = (): string | null => {
   return refreshToken;
 };
 
+export const saveAuthentication = (accessToken: string, refreshToken: string, idToken: string): void => {
+  saveAccessToken(accessToken);
+  saveRefreshToken(refreshToken);
+  saveIdToken(idToken);
+};
+
 export const clearAuthentication = (): void => {
   window.localStorage.removeItem(KEY.ACCESS_TOKEN);
   window.localStorage.removeItem(KEY.REFRESH_TOKEN);

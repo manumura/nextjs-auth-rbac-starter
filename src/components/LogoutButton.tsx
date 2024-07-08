@@ -1,48 +1,50 @@
 'use client';
 
+import { useMutation } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { logout } from '../lib/api';
 import { clearAuthentication } from '../lib/storage';
+import useUserStore from '../lib/user-store';
 
 const LogoutButton = ({ id }) => {
   const router = useRouter();
   const pathname = usePathname();
-  // const userStore = useUserStore();
-  const [loading, setLoading] = useState(false);
+  const userStore = useUserStore();
 
-  // TODO react query
-  const handleLogout = async (): Promise<void> => {
-    if (loading) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      // await sleep(1000);
-      // userChangeEventAbortController.abort();
-      await logout();
+  const mutation = useMutation({
+    mutationFn: async () => onMutate(),
+    onSuccess(data, variables, context) {
+      userStore.setUser(undefined);
+      clearAuthentication();
 
       toast('Logout successfull', {
         type: 'success',
         position: 'top-right',
       });
-    } catch (error) {
-      toast(`Logout failed! ${error?.response?.data?.message}`, {
-        type: 'error',
-        position: 'top-right',
-      });
-    } finally {
-      setLoading(false);
-      clearAuthentication();
-      // userStore.setUser(undefined);
 
       if (pathname !== '/') {
         router.push('/');
       }
       router.refresh();
+    },
+    onError(error, variables, context) {
+      toast(error?.message, {
+        type: 'error',
+        position: 'top-right',
+      });
+    },
+  });
+
+  const onMutate = async (): Promise<void> => {
+    const response = await logout();
+    if (response.status !== 204) {
+      throw new Error('Logout failed');
     }
+  };
+
+  const handleLogout = async (): Promise<void> => {
+    mutation.mutate();
   };
 
   const btn = (
@@ -57,7 +59,7 @@ const LogoutButton = ({ id }) => {
     </button>
   );
 
-  return loading ? btnLoading : btn;
+  return mutation.isPending ? btnLoading : btn;
 };
 
 export default LogoutButton;

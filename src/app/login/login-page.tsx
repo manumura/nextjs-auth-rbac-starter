@@ -1,7 +1,7 @@
 'use client';
 
 import FormInput from '@/components/FormInput';
-import { clearAuthentication, saveIdToken } from '@/lib/storage';
+import { clearAuthentication, saveAuthentication, saveIdToken } from '@/lib/storage';
 import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -80,13 +80,12 @@ export default function LoginPage({ error }): React.ReactElement {
       throw new Error('Captcha validation failed');
     }
     const response = await login(email, password);
-    const idToken = response?.data?.idToken;
-    if (!idToken) {
+    const { accessToken, refreshToken, idToken } = response?.data;
+    if (!idToken || !accessToken || !refreshToken) {
       throw new Error('Invalid response');
     }
 
-    // TODO save access token
-    saveIdToken(idToken);
+    saveAuthentication(accessToken, refreshToken, idToken);
     const user = await getUserFromIdToken(idToken);
     if (!user) {
       throw new Error('Invalid user');

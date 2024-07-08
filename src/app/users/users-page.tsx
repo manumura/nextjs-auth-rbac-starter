@@ -62,7 +62,11 @@ export default function UsersPage({
     if (isSuccess) {
       // Refresh page
       // router.refresh();
-      queryClient.invalidateQueries({ queryKey: ['users', page, pageSize] });
+      const index = usersToDisplay.findIndex((u) => u.uuid === selectedUser?.uuid);
+      if (index !== -1) {
+        usersToDisplay.splice(index, 1);
+        setUsersToDisplay([...usersToDisplay]);
+      }
     }
   };
 
