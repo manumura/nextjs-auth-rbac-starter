@@ -12,6 +12,7 @@ import { subscribe } from '../../lib/sse';
 import { getSavedUserEvents, saveUserEvents } from '../../lib/storage';
 import { appConstant } from '../../config/constant';
 import appConfig from '../../config/config';
+import { IUser } from '../../lib/user-store';
 
 export default function UsersPage({
   users,
@@ -21,7 +22,7 @@ export default function UsersPage({
   currentUser,
 }) {
   const router = useRouter();
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [usersToDisplay, setUsersToDisplay] = useState(users);
 
@@ -269,11 +270,13 @@ export default function UsersPage({
   return (
     <section className='h-section bg-slate-200'>
       {usersTable}
-      <DeleteUserModal
-        user={selectedUser}
-        isOpen={isDeleteModalOpen}
-        onClose={onCloseDeleteModal}
-      />
+      {selectedUser && (
+        <DeleteUserModal
+          user={selectedUser}
+          isOpen={isDeleteModalOpen}
+          onClose={onCloseDeleteModal}
+        />
+      )}
     </section>
   );
 }

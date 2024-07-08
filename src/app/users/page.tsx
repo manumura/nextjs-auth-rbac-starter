@@ -1,68 +1,48 @@
-import { unstable_noStore } from 'next/cache';
-import { cookies } from 'next/headers';
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
-import { URLSearchParams } from 'url';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import appConfig from '../../config/config';
-import { IUser } from '../../lib/user-store';
-import UsersPage from './users-page';
+import { getUsers } from '../../lib/api';
 import { getUserFromIdToken } from '../../lib/jwt.utils';
+import { getSavedIdToken } from '../../lib/storage';
+import Error from '../error';
+import UsersPage from './users-page';
 
-type IGetUsersResponse = {
-  users: IUser[];
-  totalElements: number;
-  currentUser: IUser | undefined;
-};
-
-async function getUsers(page, pageSize, role): Promise<IGetUsersResponse> {
-  unstable_noStore(); // Disable SWR caching
-
-  const BASE_URL = appConfig.baseUrl;
-  const cookieStore = cookies();
-  const params = new URLSearchParams({
-    ...(page ? { page } : {}),
-    ...(pageSize ? { pageSize } : {}),
-    ...(role ? { role } : {}),
-  });
-
-  const res = await fetch(`${BASE_URL}/api/v1/users?` + params, {
-    method: 'GET',
-    credentials: 'include',
-    headers: {
-      Cookie: cookieStore as any,
-    },
-    cache: 'no-store',
-    // next: { revalidate: 0 },
-  });
-
-  if (!res.ok) {
-    console.error(`Get Users getServerSideProps error: ${res.statusText}`);
-    return { users: [], totalElements: 0, currentUser: undefined};
-  }
-
-  const json = await res.json();
-  const users = json.elements;
-  const totalElements = json.totalElements;
-
-  let currentUser;
-  const idTokenCookie = cookieStore.get('idToken');
-  if (idTokenCookie?.value) {
-    currentUser = await getUserFromIdToken(idTokenCookie.value);
-  }
-  
-  return { users, totalElements, currentUser };
-}
-
-async function Users({ searchParams }) {
-  // Fetch data directly in a Server Component
+function Users({ searchParams }) {
   const page = searchParams?.page || 1;
   const pageSize = appConfig.defaultRowsPerPage;
   // TODO filter by role
   const role = undefined;
 
-  const { users, totalElements, currentUser } = await getUsers(page, pageSize, role);
+  const queryFunction = async () => {
+    const data = await getUsers(page, pageSize, role).then((res) => res.data);
+    const users = data.elements;
+    const totalElements = data.totalElements;
 
-  // Forward fetched data to your Client Component
+    const idToken = getSavedIdToken();
+    const currentUser = idToken ? await getUserFromIdToken(idToken) : null;
+    return { users, totalElements, currentUser };
+  };
+
+  const {
+    isPending,
+    error,
+    data: { users, totalElements, currentUser } = { users: [], totalElements: 0, currentUser: null},
+  } = useQuery({
+    queryKey: ['users', page, pageSize, role],
+    queryFn: queryFunction,
+  });  
+
+  if (isPending) {
+    return <LoadingOverlay label='Loading' />;
+  }
+
+  if (error) {
+    return <Error error={error} />;
+  }
+
   return (
     <UsersPage
       users={users}
@@ -74,9 +54,9 @@ async function Users({ searchParams }) {
   );
 }
 
-export default async function Page({ searchParams }) {
+export default function Page({ searchParams }) {
   return (
-    <Suspense fallback={<LoadingOverlay label='Loading...' />}>
+    <Suspense fallback={<LoadingOverlay label='Fetching users...' />}>
       <Users searchParams={searchParams} />
     </Suspense>
   );

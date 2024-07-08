@@ -29,7 +29,6 @@ export default function EditUser({ params }): JSX.Element {
     return <Error error={error} />;
   }
 
-  console.log('user', user);
   if (!user) {
     redirect('/users');
   }
