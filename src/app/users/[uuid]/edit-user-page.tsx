@@ -1,18 +1,20 @@
 'use client';
 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { UUID } from 'crypto';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import FormInput from '../../../components/FormInput';
 import FormSelect from '../../../components/FormSelect';
-import { updateUserAction } from '../../../lib/actions';
+import { updateUser } from '../../../lib/api';
+import { IUser } from '../../../lib/user-store';
 
-export function SaveButton({ isValid }): React.ReactElement {
-  const { pending } = useFormStatus();
+export function SaveButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary mx-1'>Save</button>;
-  const btnDisabled = <button className='btn btn-disabled btn-primary mx-1'>Save</button>;
+  const btnDisabled = (
+    <button className='btn btn-disabled btn-primary mx-1'>Save</button>
+  );
   const btnLoading = (
     <button className='btn btn-disabled btn-primary mx-1'>
       <span className='loading loading-spinner'></span>
@@ -20,20 +22,13 @@ export function SaveButton({ isValid }): React.ReactElement {
     </button>
   );
 
-  return !isValid ? btnDisabled : (pending ? btnLoading : btn);
+  return !isValid ? btnDisabled : isLoading ? btnLoading : btn;
 }
 
 export default function EditUserPage({ user }): React.ReactElement {
   const router = useRouter();
-  const initialState = {
-    message: '',
-    error: false,
-  };
-  const updateUserActionWithUuid = updateUserAction.bind(null, user.uuid);
-  const [state, formAction] = useFormState(
-    updateUserActionWithUuid,
-    initialState,
-  );
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
   const methods = useForm({
     defaultValues: {
       name: user.name,
@@ -46,22 +41,70 @@ export default function EditUserPage({ user }): React.ReactElement {
   });
   const {
     watch,
+    handleSubmit,
     formState: { isValid, errors },
     setError,
   } = methods;
 
-  useEffect(() => {
-    if (state?.message) {
-      toast(state.message, {
-        type: state.error ? 'error' : 'success',
+  const mutation = useMutation({
+    mutationFn: ({
+      uuid,
+      name,
+      email,
+      role,
+      password,
+    }: {
+      uuid: UUID;
+      name: string;
+      email: string;
+      role: string;
+      password: string;
+    }) => onMutate(uuid, name, email, role, password),
+    async onSuccess(userUpdated, variables, context) {
+      toast(`User updated successfully ${userUpdated?.name}!`, {
+        type: 'success',
         position: 'top-right',
       });
 
-      if (!state.error) {
-        router.replace('/users');
-      }
+      queryClient.invalidateQueries({ queryKey: ['userByUuid', user.uuid] });
+      router.replace('/users');
+    },
+    onError(error, variables, context) {
+      toast(error?.message, {
+        type: 'error',
+        position: 'top-right',
+      });
+    },
+  });
+
+  const onMutate = async (
+    uuid,
+    name,
+    email,
+    role,
+    password,
+  ): Promise<IUser> => {
+    const response = await updateUser(uuid, name, email, role, password);
+    if (response.status !== 200) {
+      throw new Error('User update failed');
     }
-  }, [state, router]);
+    const user = response.data;
+    return user;
+  };
+
+  const onSubmit = async (formData): Promise<void> => {
+    if (!formData || !user) {
+      return;
+    }
+
+    mutation.mutate({
+      uuid: user.uuid,
+      email: formData.email,
+      name: formData.name,
+      role: formData.role,
+      password: formData.password,
+    });
+  };
 
   const onCancel = (): void => {
     router.back();
@@ -110,7 +153,7 @@ export default function EditUserPage({ user }): React.ReactElement {
     <div className='w-full py-10'>
       <FormProvider {...methods}>
         <form
-          action={formAction}
+          onSubmit={handleSubmit(onSubmit)}
           className='mx-auto w-full max-w-md space-y-5 overflow-hidden rounded-2xl bg-slate-50 p-8 shadow-lg'
         >
           <h2 className='mb-4 text-center text-2xl font-[600]'>Edit user</h2>
@@ -144,11 +187,13 @@ export default function EditUserPage({ user }): React.ReactElement {
             constraints={roleConstraints}
           />
           <div className='flex justify-center space-x-5'>
-            <SaveButton isValid={isValid} />
+            <SaveButton isValid={isValid} isLoading={mutation.isPending} />
             <button
               type='button'
               id='btn-cancel'
-              className='btn btn-outline mx-1'
+              className={`btn btn-outline mx-1 ${
+                mutation.isPending ? 'btn-disabled' : ''
+              }`}
               onClick={onCancel}
             >
               Cancel

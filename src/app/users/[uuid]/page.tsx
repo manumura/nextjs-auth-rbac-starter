@@ -1,39 +1,38 @@
-import { UUID } from 'crypto';
-import { cookies } from 'next/headers';
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
-import appConfig from '../../../config/config';
-import { IUser } from '../../../lib/user-store';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import Error from '../../error';
 import EditUserPage from './edit-user-page';
+import { getUserByUuid } from '../../../lib/api';
 
-async function getUserByUuid(uuid: UUID): Promise<IUser | undefined> {
-  const BASE_URL = appConfig.baseUrl;
-  const cookieStore = cookies();
-
-  const res = await fetch(`${BASE_URL}/api/v1/users/${uuid}`, {
-    method: 'GET',
-    credentials: 'include',
-    headers: {
-      Cookie: cookieStore as any,
-    },
-    cache: 'no-cache',
-  });
-
-  if (!res.ok) {
-    console.error(`Edit User getServerSideProps error: ${res.statusText}`);
-    return undefined;
+export default function EditUser({ params }): JSX.Element {
+  if (!params?.uuid) {
+    redirect('/users');
   }
 
-  const json = await res.json();
-  return json;
-}
+  const {
+    isPending,
+    error,
+    data: user,
+  } = useQuery({
+    queryKey: ['userByUuid', params.uuid],
+    queryFn: () => getUserByUuid(params.uuid).then((res) => res.data),
+  });
 
-export default async function EditUser({ params }): Promise<JSX.Element> {
-  // Fetch data directly in a Server Component
-  const user = await getUserByUuid(params?.uuid);
+  if (isPending) {
+    return <LoadingOverlay label='Loading' />;
+  }
+
+  if (error) {
+    return <Error error={error} />;
+  }
+
+  console.log('user', user);
   if (!user) {
     redirect('/users');
   }
 
-  // Forward fetched data to your Client Component
   return <EditUserPage user={user} />;
 }

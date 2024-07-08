@@ -153,6 +153,10 @@ export const updateProfileImage = async (image: FormData, onUploadProgress): Pro
   });
 };
 
+export const getUserByUuid = async (uuid: UUID): Promise<AxiosResponse<IUser>> => {
+  return axiosInstance.get(`/v1/users/${uuid}`);
+};
+
 export const createUser = async (email: string, name: string, role: string): Promise<AxiosResponse<IUser>> => {
   return axiosInstance.post('/v1/users', { email, name, role });
 };

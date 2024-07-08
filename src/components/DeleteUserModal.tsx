@@ -1,40 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { UUID } from 'crypto';
 import { toast } from 'react-toastify';
 import { deleteUser } from '../lib/api';
+import { IUser } from '../lib/user-store';
 import Modal from './Modal';
 
-const DeleteUserModal = ({ user, isOpen, onClose }) => {
-  const [loading, setLoading] = useState(false);
-
+const DeleteUserModal = ({
+  user,
+  isOpen,
+  onClose,
+}: {
+  user: IUser;
+  isOpen: boolean;
+  onClose: any;
+}) => {
   const onCancel = (): void => {
     onClose(false);
   };
 
-  const onDelete = async (): Promise<void> => {
-    if (loading) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const res = await deleteUser(user?.uuid);
-      setLoading(false);
-      const response = res?.data;
-
-      toast(`User successfully deleted: ${response.name}`, {
+  const mutation = useMutation({
+    mutationFn: ({ userUuid }: { userUuid: UUID }) => onMutate(userUuid),
+    async onSuccess(user, variables, context) {
+      toast(`User deleted successfully ${user?.name}!`, {
         type: 'success',
         position: 'top-right',
       });
+
       onClose(true);
-    } catch (error) {
-      setLoading(false);
-      toast(`Delete user failed!  ${error?.response?.data?.message}`, {
+    },
+    onError(error, variables, context) {
+      toast(error?.message, {
         type: 'error',
         position: 'top-right',
       });
+    },
+  });
+
+  const onMutate = async (userUuid): Promise<IUser> => {
+    const response = await deleteUser(userUuid);
+    if (response.status !== 200) {
+      throw new Error('User deletion failed');
     }
+    const user = response.data;
+    return user;
+  };
+
+  const onDelete = async (): Promise<void> => {
+    if (!user?.uuid) {
+      return;
+    }
+
+    mutation.mutate({
+      userUuid: user.uuid,
+    });
   };
 
   const btn = (
@@ -44,7 +64,7 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
   );
   const btnLoading = (
     <button
-      className='btn btn-accent mx-1 btn-disabled'
+      className='btn btn-disabled btn-accent mx-1'
       id='btn-delete-loading'
     >
       <span className='loading loading-spinner'></span>
@@ -66,10 +86,13 @@ const DeleteUserModal = ({ user, isOpen, onClose }) => {
 
   const footer = (
     <div className='flex'>
-      {loading ? btnLoading : btn}
+      {mutation.isPending ? btnLoading : btn}
       <button
         id='btn-cancel'
-        className='btn-outline btn mx-1'
+        type='button'
+        className={`btn btn-outline mx-1 ${
+          mutation.isPending ? 'btn-disabled' : ''
+        }`}
         onClick={onCancel}
       >
         Cancel

@@ -21,7 +21,7 @@ export function SaveButton({ isValid, isLoading }): React.ReactElement {
     </button>
   );
 
-  return !isValid ? btnDisabled : isLoading ? btnLoading : btn;
+  return !isValid ? btnDisabled : (isLoading ? btnLoading : btn);
 }
 
 export default function CreateUserPage(): React.ReactElement {
@@ -46,7 +46,6 @@ export default function CreateUserPage(): React.ReactElement {
       role: string;
     }) => onMutate(email, name, role),
     async onSuccess(user, variables, context) {
-      console.log('User created successfully', user);
       toast(`User created successfully ${user?.name}!`, {
         type: 'success',
         position: 'top-right',
@@ -139,6 +138,7 @@ export default function CreateUserPage(): React.ReactElement {
               <SaveButton isValid={isValid} isLoading={mutation.isPending} />
               <button
                 type='button'
+                id='btn-cancel'
                 className={`btn btn-outline mx-1 ${
                   mutation.isPending ? 'btn-disabled' : ''
                 }`}
