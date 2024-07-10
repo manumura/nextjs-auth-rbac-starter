@@ -5,6 +5,7 @@ import LoadingOverlay from '../components/LoadingOverlay';
 import { info, welcome } from '../lib/api';
 import HomePage from './home-page';
 import Error from './error';
+import { InfoResponse } from '../types/custom-types';
 
 export default function Home() {
   const {
@@ -14,6 +15,7 @@ export default function Home() {
   } = useQuery({
     queryKey: ['info'],
     queryFn: () => info().then((res) => res.data),
+    initialData: {} as InfoResponse,
   });
 
   const {
@@ -23,11 +25,12 @@ export default function Home() {
   } = useQuery({
     queryKey: ['welcome'],
     queryFn: () => welcome().then((res) => res.data),
+    initialData: { message: 'Loading...' },
   });
 
-  if (isPending || isPendingWelcome) {
-    return <LoadingOverlay label='Loading' />;
-  }
+  // if (isPending || isPendingWelcome) {
+  //   return <LoadingOverlay label='Loading' />;
+  // }
 
   if (error) {
     return <Error error={error} />;

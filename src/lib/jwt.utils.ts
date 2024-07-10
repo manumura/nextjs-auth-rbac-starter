@@ -5,10 +5,10 @@ import { IUser } from '../types/custom-types';
 const idTokenPublicKeyAsBase64 = process.env.NEXT_PUBLIC_ID_TOKEN_PUBLIC_KEY_AS_BASE64 as string;
 const idTokenPublicKey = Buffer.from(idTokenPublicKeyAsBase64, 'base64').toString('utf8');
 
-export const getUserFromIdToken = async (idToken: string): Promise<IUser | undefined> => {
+export const getUserFromIdToken = async (idToken: string): Promise<IUser | null> => {
   if (!idToken) {
     console.error('No idToken found');
-    return undefined;
+    return null;
   }
 
   const publicKey = await jose.importSPKI(

@@ -27,7 +27,7 @@ export function LoginButton({ isValid, isLoading }): React.ReactElement {
     </button>
   );
 
-  return !isValid ? btnDisabled : isLoading ? btnLoading : btn;
+  return !isValid ? btnDisabled : (isLoading ? btnLoading : btn);
 }
 
 export default function LoginPage({ error }): React.ReactElement {
@@ -106,7 +106,7 @@ export default function LoginPage({ error }): React.ReactElement {
     // Handle access token expired
     if (error === '401') {
       clearAuthentication();
-      userStore.setUser(undefined);
+      userStore.setUser(null);
       toast('Session expired, please login again.', {
         type: 'error',
         position: 'top-right',

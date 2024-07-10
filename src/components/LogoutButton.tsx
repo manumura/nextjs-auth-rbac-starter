@@ -15,7 +15,7 @@ const LogoutButton = ({ id }) => {
   const mutation = useMutation({
     mutationFn: async () => onMutate(),
     onSuccess(data, variables, context) {
-      userStore.setUser(undefined);
+      userStore.setUser(null);
       clearAuthentication();
 
       toast('Logout successfull', {

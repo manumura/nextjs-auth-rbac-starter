@@ -2,21 +2,77 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from '../../public/next.svg';
+import useUserStore from '../lib/user-store';
+import { isAdmin } from '../lib/utils';
+import { IUser } from '../types/custom-types';
+import LoginButton from './LoginButton';
+import LogoutButton from './LogoutButton';
 
-export default function Navbar({ navItems, children }) {
-  const [ open, setOpen ] = useState(false);
+function getNavItems(user: IUser | null | undefined): React.JSX.Element[] {
+  const navItems: React.JSX.Element[] = [];
+
+  if (!user) {
+    const registerLink = (
+      <Link href='/register' id='register-link' className='text-neutral'>
+        Register
+      </Link>
+    );
+    const loginLink = <LoginButton id='login-link' />;
+    navItems.push(registerLink);
+    navItems.push(loginLink);
+    return navItems;
+  }
+
+  if (isAdmin(user)) {
+    const usersLink = (
+      <Link href='/users' id='users-link' className='text-neutral'>
+        Users
+      </Link>
+    );
+    navItems.push(usersLink);
+  }
+  const profileLink = (
+    <Link href='/profile' id='profile-link' className='text-neutral'>
+      Profile
+    </Link>
+  );
+  const logoutLink = <LogoutButton id='logout-link' />;
+  navItems.push(profileLink);
+  navItems.push(logoutLink);
+  return navItems;
+}
+
+export default function Navbar({ children }) {
+  const userStore = useUserStore();
+  const [open, setOpen] = useState(false);
+  const [navItems, setNavItems] = useState<React.JSX.Element[]>([]);
   const toggleDrawer = (): void => setOpen(!open);
+
+  useEffect(() => {
+    // Initialize navItems on load
+    setNavItems(getNavItems(userStore.user));
+    
+    // Re-render navItems when user changes
+    const unsubscribe = useUserStore.subscribe((userState) => {
+      console.log('Navbar user updated', userState.user);
+      setNavItems(getNavItems(userState.user));
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const navItemsList = navItems.map((item: React.JSX.Element) => {
     return <li key={item.props.id}>{item}</li>;
   });
 
   const navbar = (
-    <div className='w-full navbar'>
+    <div className='navbar w-full'>
       <div
-        className='flex-none btn btn-square btn-ghost lg:hidden'
+        className='btn btn-square btn-ghost flex-none lg:hidden'
         onClick={toggleDrawer}
       >
         {/* <label htmlFor='my-drawer' className='btn btn-square btn-ghost'> */}
@@ -24,7 +80,7 @@ export default function Navbar({ navItems, children }) {
           xmlns='http://www.w3.org/2000/svg'
           fill='none'
           viewBox='0 0 24 24'
-          className='inline-block w-6 h-6 stroke-current'
+          className='inline-block h-6 w-6 stroke-current'
         >
           <path
             strokeLinecap='round'
@@ -64,14 +120,14 @@ export default function Navbar({ navItems, children }) {
         checked={open}
         onChange={toggleDrawer}
       />
-      <div className='flex flex-col drawer-content'>
+      <div className='drawer-content flex flex-col'>
         {navbar}
         {children}
       </div>
       <div className='drawer-side'>
         <label htmlFor='my-drawer' className='drawer-overlay'></label>
         <ul
-          className='menu w-80 min-h-full bg-slate-100 p-4'
+          className='menu min-h-full w-80 bg-slate-100 p-4'
           onClick={toggleDrawer}
         >
           {navItemsList}
