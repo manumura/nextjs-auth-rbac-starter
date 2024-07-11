@@ -9,6 +9,7 @@ import { getCurrentUserFromStorage, isAdmin } from '../lib/utils';
 import { IUser } from '../types/custom-types';
 import LoginButton from './LoginButton';
 import LogoutButton from './LogoutButton';
+import LoadingOverlay from './LoadingOverlay';
 
 function getNavItems(user: IUser | null | undefined): React.JSX.Element[] {
   const navItems: React.JSX.Element[] = [];
@@ -70,6 +71,10 @@ export default function Navbar({ children }) {
       unsubscribe();
     };
   }, []);
+
+  if (loading) {
+    return <div><LoadingOverlay label='Loading...' /></div>;
+  }
 
   const navItemsList = navItems.map((item: React.JSX.Element) => {
     return <li key={item.props.id}>{item}</li>;
