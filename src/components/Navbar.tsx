@@ -5,7 +5,7 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import logo from '../../public/next.svg';
 import useUserStore from '../lib/user-store';
-import { isAdmin } from '../lib/utils';
+import { getCurrentUserFromStorage, isAdmin } from '../lib/utils';
 import { IUser } from '../types/custom-types';
 import LoginButton from './LoginButton';
 import LogoutButton from './LogoutButton';
@@ -46,14 +46,19 @@ function getNavItems(user: IUser | null | undefined): React.JSX.Element[] {
 
 export default function Navbar({ children }) {
   const userStore = useUserStore();
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [navItems, setNavItems] = useState<React.JSX.Element[]>([]);
   const toggleDrawer = (): void => setOpen(!open);
 
   useEffect(() => {
     // Initialize navItems on load
-    console.log('Navbar user', userStore.user);
-    setNavItems(getNavItems(userStore.user));
+    getCurrentUserFromStorage().then((currentUser) => {
+      console.log('Navbar current user', currentUser);
+      userStore.setUser(currentUser);
+      setNavItems(getNavItems(currentUser));
+      setLoading(false);
+    });
     
     // Re-render navItems when user changes
     const unsubscribe = useUserStore.subscribe((userState) => {
