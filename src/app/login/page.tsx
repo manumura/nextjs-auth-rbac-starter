@@ -11,7 +11,6 @@ export default function Login({ searchParams }) {
   const userStore = useUserStore();
   const currentUser = userStore.user;
   useEffect(() => {
-    console.log('Login page', currentUser);
     if (currentUser) {
       redirect('/');
     }
