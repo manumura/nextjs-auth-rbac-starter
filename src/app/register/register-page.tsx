@@ -8,8 +8,7 @@ import React from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { register } from '../../lib/api';
-import { validateCaptcha } from '../../lib/captcha.utils';
+import { register, validateRecaptcha } from '../../lib/api';
 import { IUser } from '../../types/custom-types';
 
 export function RegisterButton({ isValid, isLoading }): React.ReactElement {
@@ -72,7 +71,7 @@ export default function RegisterPage(): React.ReactElement {
       throw new Error('Recaptcha not loaded');
     }
     const token = await executeRecaptcha('onSubmit');
-    const isCaptchaValid = validateCaptcha(token);
+    const isCaptchaValid = await validateRecaptcha(token);
     if (!isCaptchaValid) {
       throw new Error('Captcha validation failed');
     }

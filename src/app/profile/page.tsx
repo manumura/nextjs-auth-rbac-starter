@@ -6,8 +6,20 @@ import LoadingOverlay from '../../components/LoadingOverlay';
 import { getProfile } from '../../lib/api';
 import Error from '../error';
 import ProfilePage from './profile-page';
+import useUserStore from '../../lib/user-store';
+import { useEffect, useState } from 'react';
 
 export default function Profile() {
+  const [loading, setLoading] = useState(true);
+  const userStore = useUserStore();
+  const currentUser = userStore.user;
+  useEffect(() => {
+    if (!currentUser) {
+      redirect('/login');
+    }
+    setLoading(false);
+  }, []);
+
   const {
     isPending,
     error,
@@ -15,9 +27,10 @@ export default function Profile() {
   } = useQuery({
     queryKey: ['profile'],
     queryFn: () => getProfile().then((res) => res.data),
+    retry: false,
   });
 
-  if (isPending) {
+  if (isPending || loading) {
     return <LoadingOverlay label='Loading' />;
   }
 

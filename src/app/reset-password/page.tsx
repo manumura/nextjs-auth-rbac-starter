@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import { getUserFromToken } from '../../lib/api';
 import useUserStore from '../../lib/user-store';
@@ -10,17 +10,18 @@ import Error from '../error';
 import ResetPasswordPage from './reset-password-page';
 
 export default function ResetPassword({ searchParams }) {
+  const [loading, setLoading] = useState(true);
   const userStore = useUserStore();
-  const userFromStore = userStore.user;
-
+  const currentUser = userStore.user;
   useEffect(() => {
-    if (userFromStore) {
+    if (currentUser) {
       redirect('/');
     }
-  }, [userFromStore]);
+    setLoading(false);
+  }, []);
 
   if (!searchParams?.token) {
-    redirect('/login?error=404');
+    redirect('/');
   }
 
   const {
@@ -32,7 +33,7 @@ export default function ResetPassword({ searchParams }) {
     queryFn: () => getUserFromToken(searchParams?.token).then((res) => res.data),
   });
 
-  if (isPending) {
+  if (isPending || loading) {
     return <LoadingOverlay label='Loading' />;
   }
 

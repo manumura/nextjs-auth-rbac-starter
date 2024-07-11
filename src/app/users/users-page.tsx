@@ -24,8 +24,6 @@ export default function UsersPage({
   currentUser,
 }) {
   const router = useRouter();
-  // Get QueryClient from the context
-  const queryClient = useQueryClient();
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [usersToDisplay, setUsersToDisplay] = useState(users);

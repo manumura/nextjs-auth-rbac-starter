@@ -29,12 +29,12 @@ axiosInstance.interceptors.response.use(
     const config = error.config;
 
     if (error.response.status !== 401) {
-      return Promise.reject(error);
+      return Promise.reject(new Error(error));
     }
 
     // Avoid infinite loop
     if (config.url.includes(`${REFRESH_TOKEN_ENDPOINT}`)) {
-      return Promise.reject(error);
+      return Promise.reject(new Error(error));
     }
 
     try {
@@ -63,9 +63,9 @@ axiosInstance.interceptors.response.use(
 
       // retun config;
       return axiosInstance(config);
-    } catch (err) {
-      console.error('Axios interceptor error: ', err?.response?.data);
-      return Promise.reject(err);
+    } catch (error) {
+      console.error('Axios interceptor error: ', error?.response?.data);
+      return Promise.reject(new Error(error));
     }
   },
 );
@@ -116,6 +116,12 @@ export const getUserFromToken = async (
   token: string,
 ): Promise<AxiosResponse<IUser>> => {
   return axiosPublicInstance.get(`/v1/token/${token}`);
+};
+
+export const validateRecaptcha = async (
+  token: string,
+): Promise<AxiosResponse<boolean>> => {
+  return axiosPublicInstance.post('/v1/recaptcha', { token });
 };
 
 ////////////////////////////////////////////////////////////////

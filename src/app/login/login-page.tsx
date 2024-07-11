@@ -9,8 +9,7 @@ import { useEffect } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { login } from '../../lib/api';
-import { validateCaptcha } from '../../lib/captcha.utils';
+import { login, validateRecaptcha } from '../../lib/api';
 import { getUserFromIdToken } from '../../lib/jwt.utils';
 import useUserStore from '../../lib/user-store';
 import { IUser } from '../../types/custom-types';
@@ -75,12 +74,16 @@ export default function LoginPage({ error }): React.ReactElement {
       throw new Error('Recaptcha not loaded');
     }
     const token = await executeRecaptcha('onSubmit');
-    const isCaptchaValid = await validateCaptcha(token);
+    const isCaptchaValid = await validateRecaptcha(token);
     if (!isCaptchaValid) {
       throw new Error('Captcha validation failed');
     }
     const response = await login(email, password);
-    const { accessToken, refreshToken, idToken } = response?.data;
+    if (!response || response.status !== 200) {
+      throw new Error('Invalid response');
+    }
+
+    const { accessToken, refreshToken, idToken } = response.data;
     if (!idToken || !accessToken || !refreshToken) {
       throw new Error('Invalid response');
     }

@@ -4,12 +4,10 @@ import FormInput from '@/components/FormInput';
 import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { forgotPassword } from '../../lib/api';
-import { validateCaptcha } from '../../lib/captcha.utils';
+import { forgotPassword, validateRecaptcha } from '../../lib/api';
 
 export function SubmitButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary w-full'>Submit</button>;
@@ -23,13 +21,12 @@ export function SubmitButton({ isValid, isLoading }): React.ReactElement {
     </button>
   );
 
-  return !isValid ? btnDisabled : isLoading ? btnLoading : btn;
+  return !isValid ? btnDisabled : (isLoading ? btnLoading : btn);
 }
 
 export default function ForgotPasswordPage(): React.ReactElement {
   const router = useRouter();
   const methods = useForm();
-  const [loading, setLoading] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
 
   const {
@@ -60,7 +57,7 @@ export default function ForgotPasswordPage(): React.ReactElement {
       throw new Error('Recaptcha not loaded');
     }
     const token = await executeRecaptcha('onSubmit');
-    const isCaptchaValid = validateCaptcha(token);
+    const isCaptchaValid = await validateRecaptcha(token);
     if (!isCaptchaValid) {
       throw new Error('Captcha validation failed');
     }
@@ -68,22 +65,12 @@ export default function ForgotPasswordPage(): React.ReactElement {
     return response.data.message;
   };
 
-  const onSubmit = async (data): Promise<void> => {
-    if (!data || loading || !executeRecaptcha) {
+  const onSubmit = async (formData): Promise<void> => {
+    if (!formData) {
       return;
     }
 
-    setLoading(true);
-    const token = await executeRecaptcha('onSubmit');
-    const isCaptchaValid = await validateCaptcha(token);
-    setLoading(false);
-
-    if (!isCaptchaValid) {
-      console.error('Captcha validation failed');
-      return;
-    }
-
-    mutation.mutate({ email: data.email });
+    mutation.mutate({ email: formData.email });
   };
 
   const emailConstraints = {
@@ -110,7 +97,7 @@ export default function ForgotPasswordPage(): React.ReactElement {
 
             <SubmitButton
               isValid={isValid}
-              isLoading={loading || mutation.isPending}
+              isLoading={mutation.isPending}
             />
             <div className='text-center'>
               <Link href='/login' className='text-secondary'>
