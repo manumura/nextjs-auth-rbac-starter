@@ -2,18 +2,18 @@
 
 import { Pagination } from '@/components/Pagination';
 import { EventSourceMessage } from '@microsoft/fetch-event-source';
+import { useQueryClient } from '@tanstack/react-query';
 import { UUID } from 'crypto';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FiDelete, FiEdit, FiPlusCircle } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import DeleteUserModal from '../../components/DeleteUserModal';
+import appConfig from '../../config/config';
+import { appConstant } from '../../config/constant';
 import { subscribe } from '../../lib/sse';
 import { getSavedUserEvents, saveUserEvents } from '../../lib/storage';
-import { appConstant } from '../../config/constant';
-import appConfig from '../../config/config';
 import { IUser } from '../../types/custom-types';
-import { useQueryClient } from '@tanstack/react-query';
 
 export default function UsersPage({
   users,
@@ -24,6 +24,8 @@ export default function UsersPage({
   currentUser,
 }) {
   const router = useRouter();
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [usersToDisplay, setUsersToDisplay] = useState(users);
@@ -60,11 +62,7 @@ export default function UsersPage({
     if (isSuccess) {
       // Refresh page
       // router.refresh();
-      const index = usersToDisplay.findIndex((u) => u.uuid === selectedUser?.uuid);
-      if (index !== -1) {
-        usersToDisplay.splice(index, 1);
-        setUsersToDisplay([...usersToDisplay]);
-      }
+      queryClient.invalidateQueries({ queryKey: ['users', page, pageSize, role] });
     }
   };
 

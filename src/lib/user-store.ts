@@ -13,7 +13,7 @@ const useUserStore = create<UserState>((set) => ({
 }));
 
 getCurrentUserFromStorage().then((currentUser) => {
-  console.log('currentUser', currentUser);
+  console.log('init currentUser', currentUser);
   useUserStore.getInitialState().user = currentUser;
 });
 

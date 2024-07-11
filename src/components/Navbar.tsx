@@ -52,6 +52,7 @@ export default function Navbar({ children }) {
 
   useEffect(() => {
     // Initialize navItems on load
+    console.log('Navbar user', userStore.user);
     setNavItems(getNavItems(userStore.user));
     
     // Re-render navItems when user changes
