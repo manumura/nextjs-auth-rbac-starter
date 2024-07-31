@@ -48,8 +48,6 @@ function Users({ queryParams }) {
     return <Error error={error} />;
   }
 
-  console.log('Users', users, page, pageSize, totalElements);
-
   return (
     <UsersPage
       users={users}
@@ -66,7 +64,6 @@ function Users({ queryParams }) {
 export default function Page() {
   // const page = searchParams?.page ?? 1;
   const searchParams = useSearchParams();
-  console.log('Users searchParams', searchParams);
   const pageAsString = searchParams.get('page') ?? '1';
   const page = parseInt(pageAsString, 10);
   const pageSize = appConfig.defaultRowsPerPage;

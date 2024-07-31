@@ -60,7 +60,7 @@ export default function UsersPage({
   const onCloseDeleteModal = (isSuccess): void => {
     setIsDeleteModalOpen(false);
     if (isSuccess) {
-      // Refresh page
+      // TODO Refresh page ?
       // router.refresh();
       queryClient.invalidateQueries({ queryKey: ['users', page, pageSize, role] });
     }
