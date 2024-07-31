@@ -8,9 +8,9 @@ import { getUsers } from '../../lib/api';
 import useUserStore from '../../lib/user-store';
 import Error from '../error';
 import UsersPage from './users-page';
-import { redirect } from 'next/navigation';
+import { redirect, useSearchParams } from 'next/navigation';
 
-function Users({ searchParams }) {
+function Users({ queryParams }) {
   const [loading, setLoading] = useState(true);
   const userStore = useUserStore();
   const currentUser = userStore.user;
@@ -21,10 +21,7 @@ function Users({ searchParams }) {
     setLoading(false);
   }, []);
 
-  const page = searchParams?.page || 1;
-  const pageSize = appConfig.defaultRowsPerPage;
-  // TODO filter by role
-  const role = undefined;
+  const { page, pageSize, role } = queryParams;
 
   const queryFunction = async () => {
     const data = await getUsers(page, pageSize, role).then((res) => res.data);
@@ -41,7 +38,7 @@ function Users({ searchParams }) {
     queryKey: ['users', page, pageSize, role],
     queryFn: queryFunction,
     retry: false,
-  });  
+  });
 
   if (isPending || loading) {
     return <LoadingOverlay label='Loading' />;
@@ -50,6 +47,8 @@ function Users({ searchParams }) {
   if (error) {
     return <Error error={error} />;
   }
+
+  console.log('Users', users, page, pageSize, totalElements);
 
   return (
     <UsersPage
@@ -63,10 +62,21 @@ function Users({ searchParams }) {
   );
 }
 
-export default function Page({ searchParams }) {
+// export default function Page({ searchParams }) {
+export default function Page() {
+  // const page = searchParams?.page ?? 1;
+  const searchParams = useSearchParams();
+  console.log('Users searchParams', searchParams);
+  const pageAsString = searchParams.get('page') ?? '1';
+  const page = parseInt(pageAsString, 10);
+  const pageSize = appConfig.defaultRowsPerPage;
+  // TODO filter by role
+  const role = undefined;
+  const queryParams = { page, pageSize, role };
+
   return (
     <Suspense fallback={<LoadingOverlay label='Fetching users...' />}>
-      <Users searchParams={searchParams} />
+      <Users queryParams={queryParams} />
     </Suspense>
   );
 }
