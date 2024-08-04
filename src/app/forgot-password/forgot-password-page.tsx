@@ -39,7 +39,7 @@ export default function ForgotPasswordPage(): React.ReactElement {
     async onSuccess(message, variables, context) {
       toast('Please follow the link sent by email', {
         type: 'success',
-        position: 'top-right',
+        position: 'bottom-right',
       });
 
       router.push('/');
@@ -47,7 +47,7 @@ export default function ForgotPasswordPage(): React.ReactElement {
     onError(error, variables, context) {
       toast(error?.message, {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
       });
     },
   });

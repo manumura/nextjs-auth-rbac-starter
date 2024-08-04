@@ -20,7 +20,7 @@ const LogoutButton = ({ id }) => {
 
       toast('Logout successfull', {
         type: 'success',
-        position: 'top-right',
+        position: 'bottom-right',
       });
 
       if (pathname !== '/') {
@@ -31,7 +31,7 @@ const LogoutButton = ({ id }) => {
     onError(error, variables, context) {
       toast(error?.message, {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
       });
     },
   });

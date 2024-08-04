@@ -25,7 +25,7 @@ const DeleteUserModal = ({
     async onSuccess(user, variables, context) {
       toast(`User deleted successfully ${user?.name}`, {
         type: 'success',
-        position: 'top-right',
+        position: 'bottom-right',
       });
 
       onClose(true);
@@ -33,7 +33,7 @@ const DeleteUserModal = ({
     onError(error, variables, context) {
       toast(error?.message, {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
       });
     },
   });

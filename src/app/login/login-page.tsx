@@ -56,7 +56,7 @@ export default function LoginPage({ error }): React.ReactElement {
 
       toast(`Welcome ${user?.name}!`, {
         type: 'success',
-        position: 'top-right',
+        position: 'bottom-right',
       });
 
       router.replace('/');
@@ -64,7 +64,7 @@ export default function LoginPage({ error }): React.ReactElement {
     onError(error, variables, context) {
       toast(error?.message, {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
       });
     },
   });
@@ -112,7 +112,7 @@ export default function LoginPage({ error }): React.ReactElement {
       userStore.setUser(null);
       toast('Session expired, please login again.', {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
         toastId: '401',
       });
     }
@@ -120,7 +120,7 @@ export default function LoginPage({ error }): React.ReactElement {
     if (error === '404') {
       toast('Not Found!', {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
         toastId: '404',
       });
     }

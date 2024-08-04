@@ -63,7 +63,7 @@ export default function EditUserPage({ user }): React.ReactElement {
     async onSuccess(userUpdated, variables, context) {
       toast(`User updated successfully ${userUpdated?.name}!`, {
         type: 'success',
-        position: 'top-right',
+        position: 'bottom-right',
       });
 
       await queryClient.invalidateQueries({ queryKey: ['userByUuid', user.uuid] });
@@ -72,7 +72,7 @@ export default function EditUserPage({ user }): React.ReactElement {
     onError(error, variables, context) {
       toast(error?.message, {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
       });
     },
   });

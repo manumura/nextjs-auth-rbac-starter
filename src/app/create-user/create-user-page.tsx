@@ -48,7 +48,7 @@ export default function CreateUserPage(): React.ReactElement {
     async onSuccess(user, variables, context) {
       toast(`User created successfully ${user?.name}`, {
         type: 'success',
-        position: 'top-right',
+        position: 'bottom-right'
       });
 
       router.replace('/users');
@@ -56,7 +56,7 @@ export default function CreateUserPage(): React.ReactElement {
     onError(error, variables, context) {
       toast(error?.message, {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
       });
     },
   });

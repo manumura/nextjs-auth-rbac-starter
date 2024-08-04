@@ -38,7 +38,7 @@ export default function ResetPasswordPage({ token }): React.ReactElement {
       // const user = response.data;
       toast('Password successfully updated!', {
         type: 'success',
-        position: 'top-right',
+        position: 'bottom-right',
       });
 
       router.push('/login');
@@ -46,7 +46,7 @@ export default function ResetPasswordPage({ token }): React.ReactElement {
     onError(error, variables, context) {
       toast(error?.message, {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
       });
     },
   });

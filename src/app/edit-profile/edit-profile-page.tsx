@@ -73,7 +73,7 @@ export default function EditProfilePage({ user }) {
     async onSuccess(user, variables, context) {
       toast('Profile successfully updated!', {
         type: 'success',
-        position: 'top-right',
+        position: 'bottom-right',
       });
 
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
@@ -82,7 +82,7 @@ export default function EditProfilePage({ user }) {
     onError(error, variables, context) {
       toast(error?.message, {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
       });
     },
   });
@@ -150,7 +150,7 @@ export default function EditProfilePage({ user }) {
     async onSuccess(user, variables, context) {
       toast(`${user.name} successfully changed password!`, {
         type: 'success',
-        position: 'top-right',
+        position: 'bottom-right',
       });
 
       router.push('/profile');
@@ -158,7 +158,7 @@ export default function EditProfilePage({ user }) {
     onError(error, variables, context) {
       toast(error?.message, {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
       });
     },
   });

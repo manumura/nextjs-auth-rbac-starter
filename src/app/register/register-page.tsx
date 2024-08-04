@@ -53,7 +53,7 @@ export default function RegisterPage(): React.ReactElement {
     async onSuccess(user, variables, context) {
       toast(`Registration successful ${user?.name}!`, {
         type: 'success',
-        position: 'top-right',
+        position: 'bottom-right',
       });
 
       router.push('/login');
@@ -61,7 +61,7 @@ export default function RegisterPage(): React.ReactElement {
     onError(error, variables, context) {
       toast(error?.message, {
         type: 'error',
-        position: 'top-right',
+        position: 'bottom-right',
       });
     },
   });
