@@ -4,7 +4,7 @@ import useClickAway from 'react-use/lib/useClickAway';
 
 const Modal = ({ title, body, footer, isOpen, onClose }) => {
   const ref = useRef(null);
-  useClickAway(ref, () => {
+  useClickAway(ref, async () => {
     if (isOpen) {
       onClose();
     }

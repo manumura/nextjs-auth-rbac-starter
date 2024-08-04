@@ -24,6 +24,7 @@ export default function UsersPage({
   currentUser,
 }) {
   const router = useRouter();
+  // const pathname = usePathname();
   // Get QueryClient from the context
   const queryClient = useQueryClient();
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
@@ -57,12 +58,16 @@ export default function UsersPage({
     setIsDeleteModalOpen(true);
   };
 
-  const onCloseDeleteModal = (isSuccess): void => {
+  const onCloseDeleteModal = async (success: boolean): Promise<void> => {
     setIsDeleteModalOpen(false);
-    if (isSuccess) {
-      // TODO Refresh page ?
-      // router.refresh();
-      queryClient.invalidateQueries({ queryKey: ['users', page, pageSize, role] });
+    if (success) {
+      queryClient.refetchQueries({ queryKey: ['users', page, pageSize, role] }).then(() => {
+        console.log(`users refetched for page, pageSize, role: ${page}, ${pageSize}, ${role}`);
+        // const t = new Date().getTime();
+        // router.replace(`users?page=${page}&t=${t}`);
+        // router.refresh(); // NOT WORKING
+        window.location.reload();
+      });
     }
   };
 

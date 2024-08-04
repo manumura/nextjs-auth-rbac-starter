@@ -14,16 +14,16 @@ const DeleteUserModal = ({
 }: {
   user: IUser;
   isOpen: boolean;
-  onClose: any;
+  onClose: (success: boolean) => Promise<void>;
 }) => {
-  const onCancel = (): void => {
+  const onCancel = async (): Promise<void> => {
     onClose(false);
   };
 
   const mutation = useMutation({
     mutationFn: ({ userUuid }: { userUuid: UUID }) => onMutate(userUuid),
     async onSuccess(user, variables, context) {
-      toast(`User deleted successfully ${user?.name}!`, {
+      toast(`User deleted successfully ${user?.name}`, {
         type: 'success',
         position: 'top-right',
       });
@@ -106,7 +106,7 @@ const DeleteUserModal = ({
       body={body}
       footer={footer}
       isOpen={isOpen}
-      onClose={(): void => onClose(false)}
+      onClose={(): Promise<void> => onClose(false)}
     />
   );
 };

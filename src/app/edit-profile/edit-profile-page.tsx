@@ -76,9 +76,8 @@ export default function EditProfilePage({ user }) {
         position: 'top-right',
       });
 
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
       router.push('/profile');
-      // router.refresh();
     },
     onError(error, variables, context) {
       toast(error?.message, {

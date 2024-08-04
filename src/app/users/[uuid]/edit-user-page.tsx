@@ -66,8 +66,8 @@ export default function EditUserPage({ user }): React.ReactElement {
         position: 'top-right',
       });
 
-      queryClient.invalidateQueries({ queryKey: ['userByUuid', user.uuid] });
-      router.replace('/users');
+      await queryClient.invalidateQueries({ queryKey: ['userByUuid', user.uuid] });
+      router.back();
     },
     onError(error, variables, context) {
       toast(error?.message, {

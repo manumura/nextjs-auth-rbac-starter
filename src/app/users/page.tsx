@@ -36,6 +36,7 @@ function Users({ queryParams }) {
     data: { users, totalElements } = { users: [], totalElements: 0 },
   } = useQuery({
     queryKey: ['users', page, pageSize, role],
+    // queryKey: ['users', page, pageSize],
     queryFn: queryFunction,
     retry: false,
   });
@@ -61,11 +62,10 @@ function Users({ queryParams }) {
 }
 
 // export default function Page({ searchParams }) {
+// const page = searchParams?.page || 1;
 export default function Page() {
-  // const page = searchParams?.page ?? 1;
   const searchParams = useSearchParams();
-  const pageAsString = searchParams.get('page') ?? '1';
-  const page = parseInt(pageAsString, 10);
+  const page = Number(searchParams?.get('page')) || 1;
   const pageSize = appConfig.defaultRowsPerPage;
   // TODO filter by role
   const role = undefined;
