@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import FormSelect from '../../components/FormSelect';
 import { createUser } from '../../lib/api';
 import { IUser } from '../../types/custom-types';
+import { AxiosResponse } from 'axios';
 
 export function SaveButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary mx-1'>Save</button>;
@@ -62,7 +63,16 @@ export default function CreateUserPage(): React.ReactElement {
   });
 
   const onMutate = async (email, name, role): Promise<IUser> => {
-    const response = await createUser(email, name, role);
+    let response: AxiosResponse<IUser>;
+    try {
+      response = await createUser(email, name, role);
+    } catch (error) {
+      if (error?.response) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(error.message);
+    }
+
     if (response.status !== 201) {
       throw new Error('User creation failed');
     }

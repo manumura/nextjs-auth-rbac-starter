@@ -13,6 +13,7 @@ import {
 } from '../../lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { IUser } from '../../types/custom-types';
+import { AxiosResponse } from 'axios';
 
 export default function EditProfilePage({ user }) {
   const router = useRouter();
@@ -88,7 +89,16 @@ export default function EditProfilePage({ user }) {
   });
 
   const onMutateProfile = async (name): Promise<IUser> => {
-    const response = await updateProfile(name);
+    let response: AxiosResponse<IUser>;
+    try {
+      response = await updateProfile(name);
+    } catch (error) {
+      if (error?.response) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(error.message);
+    }
+
     if (response.status !== 200) {
       throw new Error('Profile update failed');
     }
@@ -164,7 +174,16 @@ export default function EditProfilePage({ user }) {
   });
 
   const onMutatePassword = async (oldPassword, newPassword): Promise<IUser> => {
-    const response = await updatePassword(oldPassword, newPassword);
+    let response: AxiosResponse<IUser>;
+    try {
+      response = await updatePassword(oldPassword, newPassword);
+    } catch (error) {
+      if (error?.response) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(error.message);
+    }
+
     if (response.status !== 200) {
       throw new Error('Change password failed');
     }

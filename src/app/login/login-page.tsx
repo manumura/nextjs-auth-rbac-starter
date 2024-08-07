@@ -12,7 +12,8 @@ import { toast } from 'react-toastify';
 import { login, validateRecaptcha } from '../../lib/api';
 import { getUserFromIdToken } from '../../lib/jwt.utils';
 import useUserStore from '../../lib/user-store';
-import { IUser } from '../../types/custom-types';
+import { IUser, LoginResponse } from '../../types/custom-types';
+import { Axios, AxiosResponse } from 'axios';
 
 export function LoginButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary w-full'>Login</button>;
@@ -78,7 +79,17 @@ export default function LoginPage({ error }): React.ReactElement {
     if (!isCaptchaValid) {
       throw new Error('Captcha validation failed');
     }
-    const response = await login(email, password);
+
+    let response: AxiosResponse<LoginResponse>;
+    try {
+      response = await login(email, password);
+    } catch (error) {
+      if (error?.response) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(error.message);
+    }
+    
     if (!response || response.status !== 200) {
       throw new Error('Invalid response');
     }

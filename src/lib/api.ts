@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { UUID } from 'node:crypto';
 import appConfig from '../config/config';
 import { IGetUsersResponse, InfoResponse, IUser, LoginResponse, MessageResponse } from '../types/custom-types';
@@ -28,16 +28,20 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const config = error.config;
-
-    if (error.response.status !== 401) {
-      return Promise.reject(new Error(error));
+  async (error: AxiosError) => {
+    if (!error?.config) {
+      return Promise.reject(new Error('Unknown error'));
     }
 
+    if (error.response?.status !== 401) {
+      console.error('Axios interceptor error: ', error?.response?.data);
+      return Promise.reject(error);
+    }
+
+    const config = error.config;
     // Avoid infinite loop
-    if (config.url.includes(`${REFRESH_TOKEN_ENDPOINT}`)) {
-      return Promise.reject(new Error(error));
+    if (config.url?.includes(`${REFRESH_TOKEN_ENDPOINT}`)) {
+      return Promise.reject(error);
     }
 
     try {
@@ -57,11 +61,14 @@ axiosInstance.interceptors.response.use(
       // Update cookies
       if (response?.status === 200 && response?.data) {
         // const data: LoginResponse = response.data;
-        config.headers = {
-          ...config.headers,
-          //   Cookie: getCookiesAsString(data),
-          'set-cookie': response.headers['set-cookie'],
-        };
+        // config.headers = {
+        //   ...config.headers,
+        //   //   Cookie: getCookiesAsString(data),
+        //   'set-cookie': response.headers['set-cookie'],
+        // };
+
+        // TODO TEST
+        config.headers.set('set-cookie', response.headers['set-cookie']);
       }
 
       // retun config;
@@ -72,10 +79,6 @@ axiosInstance.interceptors.response.use(
     }
   },
 );
-
-// const getCookiesAsString = (data: LoginResponse) => {
-//   return `accessToken=${data.accessToken}; refreshToken=${data.refreshToken}; accessTokenExpiresAt=${data.accessTokenExpiresAt}; idToken=${data.idToken}`;
-// };
 
 ////////////////////////////////////////////////////////////////
 // Public APIs
