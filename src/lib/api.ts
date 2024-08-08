@@ -27,7 +27,7 @@ export const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response: AxiosResponse) => response,
   async (error: AxiosError) => {
     if (!error?.config) {
       return Promise.reject(new Error('Unknown error'));
@@ -60,15 +60,8 @@ axiosInstance.interceptors.response.use(
 
       // Update cookies
       if (response?.status === 200 && response?.data) {
-        // const data: LoginResponse = response.data;
-        // config.headers = {
-        //   ...config.headers,
-        //   //   Cookie: getCookiesAsString(data),
-        //   'set-cookie': response.headers['set-cookie'],
-        // };
-
-        // TODO TEST
         config.headers.set('set-cookie', response.headers['set-cookie']);
+        console.log('Token refreshed succesfully');
       }
 
       // retun config;
