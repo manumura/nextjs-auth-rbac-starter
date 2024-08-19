@@ -1,3 +1,4 @@
+import appConfig from "../config/config";
 import { IUser } from "../types/custom-types";
 import { getUserFromIdToken } from "./jwt.utils";
 import { getSavedIdToken } from "./storage";
@@ -16,12 +17,10 @@ export const getCurrentUserFromStorage = async (): Promise<IUser | null> => {
   return currentUser;
 };
 
-const defaultProto = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-
 export const getClientBaseUrl = (headers): string => {
   // const activePath = headersList.get('x-invoke-path');
   // const url = headersList.get('referer');
   const host = headers.get('host');
-  const protocol = headers.get('x-forwarded-proto') ?? defaultProto;
+  const protocol = headers.get('x-forwarded-proto') ?? appConfig.defaultProto;
   return `${protocol}://${host}`;
 };
