@@ -9,7 +9,7 @@ import FormInput from '../../../components/FormInput';
 import FormSelect from '../../../components/FormSelect';
 import { updateUser } from '../../../lib/api';
 import { IUser } from '../../../types/custom-types';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 
 export function SaveButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary mx-1'>Save</button>;
@@ -85,21 +85,19 @@ export default function EditUserPage({ user }): React.ReactElement {
     role,
     password,
   ): Promise<IUser> => {
-    let response: AxiosResponse<IUser>;
     try {
-      response = await updateUser(uuid, name, email, role, password);
+      const response = await updateUser(uuid, name, email, role, password);
+      const user = response.data;
+      return user;
     } catch (error) {
-      if (error?.response) {
+      if (error instanceof AxiosError && error.response?.data.message) {
         throw new Error(error.response.data.message);
       }
-      throw new Error(error.message);
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error('Edit user failed');
     }
-
-    if (response.status !== 200) {
-      throw new Error('User update failed');
-    }
-    const user = response.data;
-    return user;
   };
 
   const onSubmit = async (formData): Promise<void> => {

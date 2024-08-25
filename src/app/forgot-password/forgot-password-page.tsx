@@ -8,7 +8,7 @@ import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { forgotPassword, validateRecaptcha } from '../../lib/api';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { MessageResponse } from '../../types/custom-types';
 
 export function SubmitButton({ isValid, isLoading }): React.ReactElement {
@@ -28,8 +28,10 @@ export function SubmitButton({ isValid, isLoading }): React.ReactElement {
 
 export default function ForgotPasswordPage(): React.ReactElement {
   const router = useRouter();
-  const methods = useForm();
   const { executeRecaptcha } = useGoogleReCaptcha();
+  const methods = useForm({
+    mode: 'all',
+  });
 
   const {
     handleSubmit,
@@ -63,17 +65,19 @@ export default function ForgotPasswordPage(): React.ReactElement {
     if (!isCaptchaValid) {
       throw new Error('Captcha validation failed');
     }
-
-    let response: AxiosResponse<MessageResponse>;
+    
     try {
-      response = await forgotPassword(email);
+      const response = await forgotPassword(email);
+      return response.data.message;
     } catch (error) {
-      if (error?.response) {
+      if (error instanceof AxiosError && error.response?.data.message) {
         throw new Error(error.response.data.message);
       }
-      throw new Error(error.message);
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error('Forgot password failed');
     }
-    return response.data.message;
   };
 
   const onSubmit = async (formData): Promise<void> => {

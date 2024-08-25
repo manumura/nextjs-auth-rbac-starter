@@ -2,13 +2,13 @@
 
 import FormInput from '@/components/FormInput';
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/navigation';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import FormSelect from '../../components/FormSelect';
 import { createUser } from '../../lib/api';
 import { IUser } from '../../types/custom-types';
-import { AxiosResponse } from 'axios';
 
 export function SaveButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary mx-1'>Save</button>;
@@ -63,21 +63,19 @@ export default function CreateUserPage(): React.ReactElement {
   });
 
   const onMutate = async (email, name, role): Promise<IUser> => {
-    let response: AxiosResponse<IUser>;
     try {
-      response = await createUser(email, name, role);
+      const response = await createUser(email, name, role);
+      const user = response.data;
+      return user;
     } catch (error) {
-      if (error?.response) {
+      if (error instanceof AxiosError && error.response?.data.message) {
         throw new Error(error.response.data.message);
       }
-      throw new Error(error.message);
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error('Create user failed');
     }
-
-    if (response.status !== 201) {
-      throw new Error('User creation failed');
-    }
-    const user = response.data;
-    return user;
   };
 
   const onSubmit = async (formData): Promise<void> => {

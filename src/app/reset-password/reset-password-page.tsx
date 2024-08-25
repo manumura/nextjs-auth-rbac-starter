@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { resetPassword } from '../../lib/api';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { IUser } from '../../types/custom-types';
 
 export function SubmitButton({ isValid, isLoading }): React.ReactElement {
@@ -25,7 +25,9 @@ export function SubmitButton({ isValid, isLoading }): React.ReactElement {
 
 export default function ResetPasswordPage({ token }): React.ReactElement {
   const router = useRouter();
-  const methods = useForm();
+  const methods = useForm({
+    mode: 'all',
+  });
 
   const {
     watch,
@@ -53,21 +55,19 @@ export default function ResetPasswordPage({ token }): React.ReactElement {
   });
 
   const onMutate = async (password, token): Promise<IUser> => {
-    let response: AxiosResponse<IUser>;
     try {
-      response = await resetPassword(password, token);
+      const response = await resetPassword(password, token);
+      const user = response.data;
+      return user;
     } catch (error) {
-      if (error?.response) {
+      if (error instanceof AxiosError && error.response?.data.message) {
         throw new Error(error.response.data.message);
       }
-      throw new Error(error.message);
-    }
-
-    if (response.status !== 200) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
       throw new Error('Reset password failed');
     }
-    const user = response.data;
-    return user;
   };
 
   const onSubmit = async (formData): Promise<void> => {

@@ -13,7 +13,7 @@ import { login, validateRecaptcha } from '../../lib/api';
 import { getUserFromIdToken } from '../../lib/jwt.utils';
 import useUserStore from '../../lib/user-store';
 import { IUser, LoginResponse } from '../../types/custom-types';
-import { Axios, AxiosResponse } from 'axios';
+import { Axios, AxiosError, AxiosResponse } from 'axios';
 
 export function LoginButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary w-full'>Login</button>;
@@ -80,32 +80,29 @@ export default function LoginPage({ error }): React.ReactElement {
       throw new Error('Captcha validation failed');
     }
 
-    let response: AxiosResponse<LoginResponse>;
     try {
-      response = await login(email, password);
+      const response = await login(email, password);
+      const { accessToken, refreshToken, idToken } = response.data;
+      if (!idToken || !accessToken || !refreshToken) {
+        throw new Error('Invalid response');
+      }
+  
+      saveAuthentication(accessToken, refreshToken, idToken);
+      const user = await getUserFromIdToken(idToken);
+      if (!user) {
+        throw new Error('Invalid user');
+      }
+  
+      return user;
     } catch (error) {
-      if (error?.response) {
+      if (error instanceof AxiosError && error.response?.data.message) {
         throw new Error(error.response.data.message);
       }
-      throw new Error(error.message);
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error('Login failed');
     }
-    
-    if (!response || response.status !== 200) {
-      throw new Error('Invalid response');
-    }
-
-    const { accessToken, refreshToken, idToken } = response.data;
-    if (!idToken || !accessToken || !refreshToken) {
-      throw new Error('Invalid response');
-    }
-
-    saveAuthentication(accessToken, refreshToken, idToken);
-    const user = await getUserFromIdToken(idToken);
-    if (!user) {
-      throw new Error('Invalid user');
-    }
-
-    return user;
   };
 
   const onSubmit = async (formData) => {

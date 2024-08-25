@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { deleteUser } from '../lib/api';
 import Modal from './Modal';
 import { IUser } from '../types/custom-types';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 
 const DeleteUserModal = ({
   user,
@@ -40,21 +40,19 @@ const DeleteUserModal = ({
   });
 
   const onMutate = async (userUuid): Promise<IUser> => {
-    let response: AxiosResponse<IUser>;
     try {
-      response = await deleteUser(userUuid);
+      const response = await deleteUser(userUuid);
+      const user = response.data;
+      return user;
     } catch (error) {
-      if (error?.response) {
+      if (error instanceof AxiosError && error.response?.data.message) {
         throw new Error(error.response.data.message);
       }
-      throw new Error(error.message);
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error('Delete user failed');
     }
-    
-    if (response.status !== 200) {
-      throw new Error('User deletion failed');
-    }
-    const user = response.data;
-    return user;
   };
 
   const onDelete = async (): Promise<void> => {

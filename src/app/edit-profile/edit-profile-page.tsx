@@ -13,7 +13,7 @@ import {
 } from '../../lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { IUser } from '../../types/custom-types';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 
 export default function EditProfilePage({ user }) {
   const router = useRouter();
@@ -89,35 +89,33 @@ export default function EditProfilePage({ user }) {
   });
 
   const onMutateProfile = async (name): Promise<IUser> => {
-    let response: AxiosResponse<IUser>;
     try {
-      response = await updateProfile(name);
+      const response = await updateProfile(name);
+      const user = response.data;
+  
+      if (images.length <= 0) {
+        return user;
+      }
+  
+      // Upload profile image
+      console.log('Uploading image');
+      const formData = new FormData();
+      formData.append('image', images[0]);
+  
+      const uploadResponse = await updateProfileImage(formData, onUploadProgress);
+      if (uploadResponse.status !== 200) {
+        throw new Error('Profile image upload failed');
+      }
+      return user;
     } catch (error) {
-      if (error?.response) {
+      if (error instanceof AxiosError && error.response?.data.message) {
         throw new Error(error.response.data.message);
       }
-      throw new Error(error.message);
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error('Edit user failed');
     }
-
-    if (response.status !== 200) {
-      throw new Error('Profile update failed');
-    }
-    const user = response.data;
-
-    if (images.length <= 0) {
-      return user;
-    }
-
-    // Upload profile image
-    console.log('Uploading image');
-    const formData = new FormData();
-    formData.append('image', images[0]);
-
-    const uploadResponse = await updateProfileImage(formData, onUploadProgress);
-    if (uploadResponse.status !== 200) {
-      throw new Error('Profile image upload failed');
-    }
-    return user;
   };
 
   const onProfileEdited = async (formData): Promise<void> => {
@@ -174,22 +172,19 @@ export default function EditProfilePage({ user }) {
   });
 
   const onMutatePassword = async (oldPassword, newPassword): Promise<IUser> => {
-    let response: AxiosResponse<IUser>;
     try {
-      response = await updatePassword(oldPassword, newPassword);
+      const response = await updatePassword(oldPassword, newPassword);
+      const user = response?.data;
+      return user;
     } catch (error) {
-      if (error?.response) {
+      if (error instanceof AxiosError && error.response?.data.message) {
         throw new Error(error.response.data.message);
       }
-      throw new Error(error.message);
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error('Edit password failed');
     }
-
-    if (response.status !== 200) {
-      throw new Error('Change password failed');
-    }
-
-    const user = response?.data;
-    return user;
   };
 
   const onPasswordChanged = async (formData): Promise<void> => {

@@ -68,7 +68,7 @@ axiosInstance.interceptors.response.use(
       return axiosInstance(config);
     } catch (error) {
       console.error('Axios interceptor error: ', error?.response?.data);
-      return Promise.reject(new Error(error));
+      return Promise.reject(error);
     }
   },
 );
