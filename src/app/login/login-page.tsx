@@ -87,12 +87,12 @@ export default function LoginPage({ error }): React.ReactElement {
         throw new Error('Invalid response');
       }
   
-      saveAuthentication(accessToken, refreshToken, idToken);
       const user = await getUserFromIdToken(idToken);
       if (!user) {
         throw new Error('Invalid user');
       }
   
+      saveAuthentication(accessToken, refreshToken, idToken);
       return user;
     } catch (error) {
       if (error instanceof AxiosError && error.response?.data.message) {
