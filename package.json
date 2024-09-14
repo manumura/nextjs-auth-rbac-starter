@@ -12,7 +12,7 @@
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",
     "@tanstack/react-query": "^5.51.16",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "clsx": "^2.1.1",
     "cookie": "^0.6.0",
     "jose": "^5.6.3",
