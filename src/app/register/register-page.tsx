@@ -10,7 +10,8 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { register, validateRecaptcha } from '../../lib/api';
 import { IUser } from '../../types/custom-types';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
+import { validatePassword } from '../../lib/utils';
 
 export function RegisterButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary w-full'>Register</button>;
@@ -52,7 +53,7 @@ export default function RegisterPage(): React.ReactElement {
       name: string;
     }) => onMutate(email, password, name),
     async onSuccess(user, variables, context) {
-      toast(`Registration successful ${user?.name}!`, {
+      toast('Registration successful! Please follow the link sent to your email to verify your account.', {
         type: 'success',
         position: 'bottom-right',
       });
@@ -76,7 +77,14 @@ export default function RegisterPage(): React.ReactElement {
     if (!isCaptchaValid) {
       throw new Error('Captcha validation failed');
     }
-    
+
+    const { isValid: isPasswordValid, message } = validatePassword(password);
+    if (!isPasswordValid) {
+      throw new Error(
+        'Password must be at least 8 characters long, and contain at least 1 number, 1 uppercase letter, 1 lowercase letter, and 1 special character',
+      );
+    }
+
     try {
       const response = await register(email, password, name);
       return response.data;
@@ -118,6 +126,12 @@ export default function RegisterPage(): React.ReactElement {
     minLength: {
       value: 8,
       message: 'Password is min 8 characters',
+    },
+    validate: (value: string): string | undefined => {
+      const { isValid, message } = validatePassword(value);
+      if (message) {
+        return message;
+      }
     },
   };
   const passwordConfirmConstraints = {

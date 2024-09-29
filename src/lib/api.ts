@@ -1,7 +1,15 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { UUID } from 'node:crypto';
 import appConfig from '../config/config';
-import { IGetUsersResponse, InfoResponse, IUser, LoginResponse, MessageResponse } from '../types/custom-types';
+import {
+  IGetUsersResponse,
+  InfoResponse,
+  IUser,
+  LoginResponse,
+  MessageResponse,
+} from '../types/custom-types';
+import { clearAuthentication } from './storage';
+import useUserStore from './user-store';
 
 const BASE_URL = appConfig.baseUrl;
 const REFRESH_TOKEN_ENDPOINT = '/v1/refresh-token';
@@ -20,8 +28,8 @@ export const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Cache-Control': 'no-cache',
-    'Pragma': 'no-cache',
-    'Expires': '0',
+    Pragma: 'no-cache',
+    Expires: '0',
   },
   withCredentials: true, // for cookies
 });
@@ -55,7 +63,7 @@ axiosInstance.interceptors.response.use(
             Cookie: config.headers.Cookie,
           },
           withCredentials: true, // for cookies
-        },
+        }
       );
 
       // Update cookies
@@ -67,10 +75,18 @@ axiosInstance.interceptors.response.use(
       // retun config;
       return axiosInstance(config);
     } catch (error) {
-      console.error('Axios interceptor error: ', error?.response?.data);
-      return Promise.reject(error);
+      const err = error as AxiosError;
+      console.error(
+        'Axios interceptor unexpected error: ',
+        err?.response?.data
+      );
+      if (err?.status === 401) {
+        useUserStore.getState().setUser(null);
+        clearAuthentication();
+      }
+      return Promise.reject(err);
     }
-  },
+  }
 );
 
 ////////////////////////////////////////////////////////////////
@@ -109,6 +125,12 @@ export const resetPassword = async (
   token: string,
 ): Promise<AxiosResponse<IUser>> => {
   return axiosPublicInstance.post('/v1/new-password', { password, token });
+};
+
+export const verifyEmail = async (token: string): Promise<IUser> => {
+  return axiosPublicInstance
+    .post('/v1/verify-email', { token })
+    .then((response) => response.data);
 };
 
 export const getUserFromToken = async (

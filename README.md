@@ -50,3 +50,9 @@ docker run -it --rm -p 3001:3001 --name nextjs-auth-rbac-starter manumura/nextjs
 ```
 
 Open <http://localhost:3000> with your browser to see the result. Use incognito mode if loaading forever.
+
+## Update dependencies
+
+`
+ncu -u -x eslint -x typescript-eslint
+`

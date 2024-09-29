@@ -95,8 +95,10 @@ export default function LoginPage({ error }): React.ReactElement {
       saveAuthentication(accessToken, refreshToken, idToken);
       return user;
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.data.message) {
-        throw new Error(error.response.data.message);
+      if (error instanceof AxiosError && error.response?.data) {
+        const err = error.response.data.error;
+        const message = err === 'email_not_verified' ? 'Please verify your email before logging in.' : error.response.data.message;
+        throw new Error(message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);

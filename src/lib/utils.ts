@@ -24,3 +24,44 @@ export const getClientBaseUrl = (headers): string => {
   const protocol = headers.get('x-forwarded-proto') ?? appConfig.defaultProto;
   return `${protocol}://${host}`;
 };
+
+export const passwordRules = {
+  isMinLength: {
+    regex: /.{8,}/,
+    message: 'Password must be at least 8 characters long.',
+  },
+  hasNumber: {
+    regex: /\d/,
+    message: 'Password must contain at least 1 number.',
+  },
+  hasLowercaseCharacter: {
+    regex: /[a-z]/,
+    message: 'Password must contain 1 lowercase letter.',
+  },
+  hasUppercaseCharacter: {
+    regex: /[A-Z]/,
+    message: 'Password must contain 1 uppercase letter.',
+  },
+  hasSpecialCharacter: {
+    regex: /[^A-Za-z0-9]/,
+    message: 'Password must contain 1 special character.',
+  },
+};
+
+export function validatePassword(password: string): {
+  isValid: boolean;
+  message: string;
+} {
+  let message: string = '';
+  let isValid: boolean = true;
+  for (const [name, rule] of Object.entries(passwordRules)) {
+    const valid = rule.regex.test(password);
+    if (!valid) {
+      isValid = false;
+      message += rule.message + ' ';
+    }
+  }
+  message = message.trim();
+
+  return { message, isValid };
+}
