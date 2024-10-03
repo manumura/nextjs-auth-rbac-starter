@@ -129,8 +129,8 @@ export default function RegisterPage(): React.ReactElement {
     },
     validate: (value: string): string | undefined => {
       const { isValid, message } = validatePassword(value);
-      if (message) {
-        return message;
+      if (!isValid) {
+        return message || 'Password is invalid';
       }
     },
   };
