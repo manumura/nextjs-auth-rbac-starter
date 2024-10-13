@@ -14,7 +14,7 @@
     "@tanstack/react-query": "^5.56.2",
     "axios": "^1.7.7",
     "clsx": "^2.1.1",
-    "cookie": "^0.6.0",
+    "cookie": "^0.7.0",
     "jose": "^5.9.3",
     "moment": "^2.30.1",
     "next": "^14.2.13",
