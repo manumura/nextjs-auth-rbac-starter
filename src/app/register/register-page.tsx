@@ -37,6 +37,7 @@ export default function RegisterPage(): React.ReactElement {
   });
 
   const {
+    clearErrors,
     handleSubmit,
     formState: { isValid },
     watch,
@@ -127,11 +128,19 @@ export default function RegisterPage(): React.ReactElement {
       value: 8,
       message: 'Password is min 8 characters',
     },
+    maxLength: {
+      value: 70,
+      message: 'Password is max 70 characters',
+    },
     validate: (value: string): string | undefined => {
       const { isValid, message } = validatePassword(value);
       if (!isValid) {
         return message || 'Password is invalid';
       }
+      if (watch('passwordConfirm') && watch('passwordConfirm') !== value) {
+        return 'Passwords do no match';
+      }
+      clearErrors("passwordConfirm");
     },
   };
   const passwordConfirmConstraints = {
@@ -140,6 +149,7 @@ export default function RegisterPage(): React.ReactElement {
       if (watch('password') !== value) {
         return 'Passwords do no match';
       }
+      clearErrors("password");
     },
   };
 

@@ -1,14 +1,14 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, use, useEffect, useState } from 'react';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import appConfig from '../../config/config';
 import { getUsers } from '../../lib/api';
 import useUserStore from '../../lib/user-store';
 import Error from '../error';
 import UsersPage from './users-page';
-import { redirect, useSearchParams } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 function Users({ queryParams }) {
   const [loading, setLoading] = useState(true);
@@ -61,15 +61,13 @@ function Users({ queryParams }) {
   );
 }
 
-// export default function Page({ searchParams }) {
-// const page = searchParams?.page || 1;
-export default function Page() {
-  const searchParams = useSearchParams();
-  const page = Number(searchParams?.get('page')) || 1;
+export default function Page({ searchParams }: { readonly searchParams: Promise<{ page: string }> }) {
+  const { page } = use(searchParams);
+  const p = Number(page) || 1;
   const pageSize = appConfig.defaultRowsPerPage;
   // TODO filter by role
   const role = undefined;
-  const queryParams = { page, pageSize, role };
+  const queryParams = { p, pageSize, role };
 
   return (
     <Suspense fallback={<LoadingOverlay label='Fetching users...' />}>

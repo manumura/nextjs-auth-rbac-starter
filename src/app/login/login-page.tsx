@@ -62,8 +62,8 @@ export default function LoginPage({ error }): React.ReactElement {
 
       router.replace('/');
     },
-    onError(error, variables, context) {
-      toast(error?.message, {
+    onError(err, variables, context) {
+      toast(err?.message, {
         type: 'error',
         position: 'bottom-right',
       });

@@ -2,14 +2,15 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import { getUserFromToken } from '../../lib/api';
 import useUserStore from '../../lib/user-store';
 import Error from '../error';
 import ResetPasswordPage from './reset-password-page';
 
-export default function ResetPassword({ searchParams }) {
+export default function ResetPassword({ searchParams }: { readonly searchParams: Promise<{ token: string }> }) {
+  const { token } = use(searchParams);
   const [loading, setLoading] = useState(true);
   const userStore = useUserStore();
   const currentUser = userStore.user;
@@ -20,7 +21,7 @@ export default function ResetPassword({ searchParams }) {
     setLoading(false);
   }, []);
 
-  if (!searchParams?.token) {
+  if (!token) {
     redirect('/');
   }
 
@@ -30,7 +31,7 @@ export default function ResetPassword({ searchParams }) {
     data: user,
   } = useQuery({
     queryKey: ['userByToken'],
-    queryFn: () => getUserFromToken(searchParams?.token).then((res) => res.data),
+    queryFn: () => getUserFromToken(token).then((res) => res.data),
   });
 
   if (isPending || loading) {
@@ -46,5 +47,5 @@ export default function ResetPassword({ searchParams }) {
   }
 
   // Forward fetched data to your Client Component
-  return <ResetPasswordPage token={searchParams?.token} />;
+  return <ResetPasswordPage token={token} />;
 }

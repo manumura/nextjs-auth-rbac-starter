@@ -26,9 +26,9 @@ export const getClientBaseUrl = (headers): string => {
 };
 
 export const passwordRules = {
-  isMinLength: {
-    regex: /.{8,}/,
-    message: 'Password must be at least 8 characters long.',
+  isLengthValid: {
+    regex: /^.{8,70}$/,
+    message: 'Password must be minimum 8 and maximum 70 characters long.',
   },
   hasNumber: {
     regex: /\d/,

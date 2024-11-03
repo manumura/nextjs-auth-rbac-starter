@@ -2,13 +2,14 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import { verifyEmail } from '../../lib/api';
 import useUserStore from '../../lib/user-store';
 import VerifyEmailPage from './verify-email-page';
 
-export default function VerifyEmail({ searchParams }) {
+export default function VerifyEmail({ searchParams }: { readonly searchParams: Promise<{ token: string }> }) {
+  const { token } = use(searchParams);
   const [loading, setLoading] = useState(true);
   const userStore = useUserStore();
   const currentUser = userStore.user;
@@ -19,7 +20,7 @@ export default function VerifyEmail({ searchParams }) {
     setLoading(false);
   }, []);
 
-  if (!searchParams?.token) {
+  if (!token) {
     console.error('No token found in query params');
     redirect('/');
   }
@@ -29,8 +30,9 @@ export default function VerifyEmail({ searchParams }) {
     error,
     data: result,
   } = useQuery({
-    queryKey: ['verify-email', searchParams?.token],
-    queryFn: () => verifyEmail(searchParams?.token).then((user) => (user ? 'success' : 'failed')),
+    queryKey: ['verify-email', token],
+    queryFn: () =>
+      verifyEmail(token).then((user) => (user ? 'success' : 'failed')),
     retry: false,
   });
 

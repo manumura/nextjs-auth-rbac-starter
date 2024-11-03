@@ -8,14 +8,19 @@ import Error from '../../error';
 import EditUserPage from './edit-user-page';
 import { UUID } from 'node:crypto';
 import useUserStore from '../../../lib/user-store';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use, type JSX } from 'react';
 
 // export const dynamicParams = true;
 // export async function generateStaticParams() {
 //   return [{uuid: ''}];
 // }
 
-export default function EditUser({ params }: {params : {uuid: UUID}}): JSX.Element {
+export default function EditUser({
+  params,
+}: {
+  readonly params: Promise<{ uuid: UUID }>;
+}): JSX.Element {
+  const { uuid } = use(params);
   const [loading, setLoading] = useState(true);
   const userStore = useUserStore();
   const currentUser = userStore.user;
@@ -26,11 +31,10 @@ export default function EditUser({ params }: {params : {uuid: UUID}}): JSX.Eleme
     setLoading(false);
   }, []);
 
-  if (!params?.uuid) {
+  if (!uuid) {
     redirect('/users');
   }
 
-  const uuid = params.uuid;
   const {
     isPending,
     error,
