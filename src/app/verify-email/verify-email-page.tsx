@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import Link from 'next/link';
 import React from 'react';
 
 export default function VerifyEmailPage({ result }): React.ReactElement {
@@ -19,9 +20,9 @@ export default function VerifyEmailPage({ result }): React.ReactElement {
         <p className={messageClasses}>{message}</p>
         <div className='mt-4 text-xl'>
           {success ? (
-            <a href='/login'>Click here to login</a>
+            <Link href='/login'>Click here to login</Link>
           ) : (
-            <a href='/'>Click here to return to Home</a>
+            <Link href='/'>Click here to return to Home</Link>
           )}
         </div>
       </div>
