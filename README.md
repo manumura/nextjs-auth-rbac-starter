@@ -54,5 +54,5 @@ Open <http://localhost:3000> with your browser to see the result. Use incognito 
 ## Update dependencies
 
 `
-ncu -u -x eslint -x typescript-eslint -x @types/react -x @types/react-dom
+ncu -u -x eslint -x typescript-eslint
 `

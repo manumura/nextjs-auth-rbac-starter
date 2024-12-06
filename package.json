@@ -38,8 +38,8 @@
     "@types/cookie": "^1.0.0",
     "@types/dropzone": "^5.7.9",
     "@types/node": "22.10.1",
-    "@types/react": "npm:types-react@19.0.0-rc.1",
-    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@types/set-cookie-parser": "^2.4.10",
     "daisyui": "^4.12.14",
     "eslint": "^8.57.0",
@@ -51,9 +51,5 @@
     "tailwindcss": "^3.4.16",
     "typescript": "^5.7.2",
     "typescript-eslint": "^7.18.0"
-  },
-  "overrides": {
-    "@types/react": "npm:types-react@19.0.0-rc.1",
-    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1"
   }
 }
