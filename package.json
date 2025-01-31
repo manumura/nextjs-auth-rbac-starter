@@ -28,7 +28,6 @@
     "react-use": "^17.6.0",
     "set-cookie-parser": "^2.7.1",
     "sharp": "^0.33.5",
-    "tailwind-merge": "^2.6.0",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
