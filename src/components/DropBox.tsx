@@ -53,13 +53,13 @@ function DropBox({ onDrop, imgSrc = null }) {
   const avatarImgSrc = files[0]?.preview || imgSrc;
   const avatar = avatarImgSrc ? (
     <div className='avatar'>
-      <div className='w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden relative'>
+      <div className='w-24 rounded-full ring-3 ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden relative'>
         <Image alt='my avatar image' fill={true} src={avatarImgSrc} className='rounded-full' />
       </div>
     </div>
   ) : (
     <div className='avatar placeholder'>
-      <div className='w-24 rounded-full bg-base-200 text-neutral-content ring ring-primary ring-offset-base-100 ring-offset-24'>
+      <div className='w-24 rounded-full bg-base-200 text-neutral-content ring-3 ring-primary ring-offset-base-100 ring-offset-2'>
         <span className='text-3xl' />
       </div>
     </div>
