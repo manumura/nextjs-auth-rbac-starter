@@ -31,19 +31,23 @@ export default function UsersPage({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [usersToDisplay, setUsersToDisplay] = useState(users);
 
-  const userChangeEventAbortController = new AbortController();
-
   useEffect(() => {
     setUsersToDisplay(users);
   }, [users]);
 
   useEffect(() => {
-    subscribeUserChangeEvents();
+    const userChangeEventAbortController = new AbortController();
+    console.log('===== Subscribing to user change events =====');
+    subscribe(
+      `${appConfig.baseUrl}/api/v1/events/users`,
+      userChangeEventAbortController,
+      onMessage,
+    );
+
     return () => {
-      userChangeEventAbortController.abort();
+      userChangeEventAbortController.abort('User change event subscription aborted');
       console.log(
-        'Unsubscribed to user change events - signal aborted:',
-        userChangeEventAbortController.signal.aborted,
+        `===== Unsubscribed to user change events - signal aborted: ${userChangeEventAbortController.signal.aborted} =====`,
       );
     };
   }, []);
@@ -198,15 +202,6 @@ export default function UsersPage({
       };
     }
   };
-
-  async function subscribeUserChangeEvents() {
-    console.log('Subscribing to user change events');
-    subscribe(
-      `${appConfig.baseUrl}/api/v1/events/users`,
-      userChangeEventAbortController,
-      onMessage,
-    );
-  }
 
   const isUserListEmpty = !usersToDisplay || usersToDisplay.length <= 0;
   const noUserRow = (
