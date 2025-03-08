@@ -18,7 +18,7 @@ const FormSelect = ({
         {label}
       </label>
       <select
-        className='block w-full appearance-none rounded-2xl py-2 px-4 focus:outline-hidden'
+        className='select w-full appearance-none rounded-2xl py-2 px-4 focus:outline-hidden'
         // value={value} onChange={onChange}
         {...register(name, constraints)}
       >

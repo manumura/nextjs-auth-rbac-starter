@@ -21,7 +21,7 @@ const FormInput = ({
       <input
         type={type}
         placeholder={placeholder}
-        className='block w-full rounded-2xl appearance-none focus:outline-hidden py-2 px-4'
+        className='input w-full rounded-2xl appearance-none focus:outline-hidden py-2 px-4'
         {...register(name, constraints)}
       />
       {errors[name] && (
