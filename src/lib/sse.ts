@@ -50,6 +50,7 @@ export async function subscribe(
         onMessage(message);
       },
       onclose() {
+        console.error('Connection closed unexpectedly');
         // if the server closes the connection unexpectedly, retry:
         throw new RetriableError();
       },
@@ -59,13 +60,13 @@ export async function subscribe(
           // rethrow to stop the operation
           throw error;
         } else {
+          console.error('retry count: ', retryCount);
           // do nothing to automatically retry. You can also return a specific retry interval here.
           if (retryCount >= maxRetries) {
             console.error('Max retries reached: closing stream');
             throw error;
           }
           retryCount++;
-          console.error('retry count: ', retryCount);
         }
       },
     });
