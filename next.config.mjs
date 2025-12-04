@@ -8,6 +8,11 @@ const nextConfig = {
         hostname: 'res.cloudinary.com',
         pathname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: 'd1mhmhu13a04xr.cloudfront.net',
+        pathname: '**',
+      },
     ],
   },
   // output: "standalone",
