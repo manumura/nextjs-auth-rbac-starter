@@ -2,18 +2,14 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
+import { UUID } from 'node:crypto';
+import { use, useEffect, useState, type JSX } from 'react';
 import LoadingOverlay from '../../../components/LoadingOverlay';
 import { getUserByUuid } from '../../../lib/api';
+import useUserStore from '../../../lib/user-store';
+import { getCurrentUserFromStorage } from '../../../lib/utils';
 import Error from '../../error';
 import EditUserPage from './edit-user-page';
-import { UUID } from 'node:crypto';
-import useUserStore from '../../../lib/user-store';
-import { useEffect, useState, use, type JSX } from 'react';
-
-// export const dynamicParams = true;
-// export async function generateStaticParams() {
-//   return [{uuid: ''}];
-// }
 
 export default function EditUser({
   params,
@@ -21,19 +17,23 @@ export default function EditUser({
   readonly params: Promise<{ uuid: UUID }>;
 }): JSX.Element {
   const { uuid } = use(params);
-  const [loading, setLoading] = useState(true);
-  const userStore = useUserStore();
-  const currentUser = userStore.user;
-  useEffect(() => {
-    if (!currentUser) {
-      redirect('/login');
-    }
-    setLoading(false);
-  }, []);
-
   if (!uuid) {
     redirect('/users');
   }
+  
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const currentUser = useUserStore((state) => state.user);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (!currentUser) {
+        redirect('/login');
+      }
+      setIsAuthChecked(true);
+    };
+
+    checkAuth();
+  }, [currentUser]);
 
   const {
     isPending,
@@ -43,9 +43,10 @@ export default function EditUser({
     queryKey: ['userByUuid', uuid],
     queryFn: () => getUserByUuid(uuid).then((res) => res.data),
     retry: false,
+    enabled: isAuthChecked, // Only fetch when auth is confirmed
   });
 
-  if (isPending || loading) {
+  if (!isAuthChecked || isPending) {
     return <LoadingOverlay label='Loading' />;
   }
 

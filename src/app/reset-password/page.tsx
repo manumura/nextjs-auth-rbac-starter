@@ -2,28 +2,38 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
-import { useEffect, useState, use } from 'react';
+import { use, useEffect, useState } from 'react';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import { getUserFromToken } from '../../lib/api';
 import useUserStore from '../../lib/user-store';
 import Error from '../error';
 import ResetPasswordPage from './reset-password-page';
 
-export default function ResetPassword({ searchParams }: { readonly searchParams: Promise<{ token: string }> }) {
+export default function ResetPassword({
+  searchParams,
+}: {
+  readonly searchParams: Promise<{ token: string }>;
+}) {
   const { token } = use(searchParams);
-  const [loading, setLoading] = useState(true);
-  const userStore = useUserStore();
-  const currentUser = userStore.user;
-  useEffect(() => {
-    if (currentUser) {
-      redirect('/');
-    }
-    setLoading(false);
-  }, []);
-
   if (!token) {
+    console.error('No token found in query params');
     redirect('/');
   }
+
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const currentUser = useUserStore((state) => state.user);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      console.log('Current User in Login Page:', currentUser);
+      if (currentUser) {
+        redirect('/');
+      }
+      setIsAuthChecked(true);
+    };
+
+    checkAuth();
+  }, [currentUser]);
 
   const {
     isPending,
@@ -32,9 +42,11 @@ export default function ResetPassword({ searchParams }: { readonly searchParams:
   } = useQuery({
     queryKey: ['userByToken'],
     queryFn: () => getUserFromToken(token).then((res) => res.data),
+    retry: false,
+    enabled: isAuthChecked, // Only fetch when auth is confirmed
   });
 
-  if (isPending || loading) {
+  if (!isAuthChecked || isPending) {
     return <LoadingOverlay label='Loading' />;
   }
 

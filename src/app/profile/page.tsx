@@ -2,23 +2,27 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import { getProfile } from '../../lib/api';
+import useUserStore from '../../lib/user-store';
 import Error from '../error';
 import ProfilePage from './profile-page';
-import useUserStore from '../../lib/user-store';
-import { useEffect, useState } from 'react';
 
 export default function Profile() {
-  const [loading, setLoading] = useState(true);
-  const userStore = useUserStore();
-  const currentUser = userStore.user;
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const currentUser = useUserStore((state) => state.user);
+
   useEffect(() => {
-    if (!currentUser) {
-      redirect('/login');
-    }
-    setLoading(false);
-  }, []);
+    const checkAuth = async () => {
+      if (!currentUser) {
+        redirect('/login');
+      }
+      setIsAuthChecked(true);
+    };
+
+    checkAuth();
+  }, [currentUser]);
 
   const {
     isPending,
@@ -28,9 +32,10 @@ export default function Profile() {
     queryKey: ['profile'],
     queryFn: () => getProfile().then((res) => res.data),
     retry: false,
+    enabled: isAuthChecked, // Only fetch when auth is confirmed
   });
 
-  if (isPending || loading) {
+  if (!isAuthChecked || isPending) {
     return <LoadingOverlay label='Loading' />;
   }
 
@@ -43,7 +48,5 @@ export default function Profile() {
   }
 
   // Forward fetched data to your Client Component
-  return (
-    <ProfilePage user={user} />
-  );
+  return <ProfilePage user={user} />;
 }

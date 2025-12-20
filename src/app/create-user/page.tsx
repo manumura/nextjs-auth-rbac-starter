@@ -1,24 +1,27 @@
 'use client';
 
+import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import LoadingOverlay from '../../components/LoadingOverlay';
 import useUserStore from '../../lib/user-store';
 import CreateUserPage from './create-user-page';
-import { redirect } from 'next/navigation';
-import { set } from 'react-hook-form';
-import LoadingOverlay from '../../components/LoadingOverlay';
 
 export default function CreateUser() {
-  const [loading, setLoading] = useState(true);
-  const userStore = useUserStore();
-  const currentUser = userStore.user;
-  useEffect(() => {
-    if (!currentUser) {
-      redirect('/login');
-    }
-    setLoading(false);
-  }, []);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const currentUser = useUserStore((state) => state.user);
 
-  if (loading) {
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (!currentUser) {
+        redirect('/login');
+      }
+      setIsAuthChecked(true);
+    };
+
+    checkAuth();
+  }, [currentUser]);
+
+  if (!isAuthChecked) {
     return <LoadingOverlay label='Loading' />;
   }
 

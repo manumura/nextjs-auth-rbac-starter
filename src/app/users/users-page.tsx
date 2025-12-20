@@ -23,66 +23,6 @@ export default function UsersPage({
   role,
   currentUser,
 }) {
-  const router = useRouter();
-  // const pathname = usePathname();
-  // Get QueryClient from the context
-  const queryClient = useQueryClient();
-  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [usersToDisplay, setUsersToDisplay] = useState(users);
-
-  useEffect(() => {
-    setUsersToDisplay(users);
-  }, [users]);
-
-  useEffect(() => {
-    const userChangeEventAbortController = new AbortController();
-    console.log('===== Subscribing to user change events =====');
-    subscribe(
-      `${appConfig.baseUrl}/api/v1/events/users`,
-      userChangeEventAbortController,
-      onMessage,
-    );
-
-    return () => {
-      userChangeEventAbortController.abort('User change event subscription aborted');
-      console.log(
-        `===== Unsubscribed to user change events - signal aborted: ${userChangeEventAbortController.signal.aborted} =====`,
-      );
-    };
-  }, []);
-
-  const onPageSelect = (pageSelected): void => {
-    router.replace(`users?page=${pageSelected}`);
-    // router.refresh();
-  };
-
-  const openDeleteModal = (user): void => {
-    setSelectedUser(user);
-    setIsDeleteModalOpen(true);
-  };
-
-  const onCloseDeleteModal = async (success: boolean): Promise<void> => {
-    setIsDeleteModalOpen(false);
-    if (success) {
-      queryClient.refetchQueries({ queryKey: ['users', page, pageSize, role] }).then(() => {
-        console.log(`users refetched for page, pageSize, role: ${page}, ${pageSize}, ${role}`);
-        // const t = new Date().getTime();
-        // router.replace(`users?page=${page}&t=${t}`);
-        // router.refresh(); // NOT WORKING
-        window.location.reload();
-      });
-    }
-  };
-
-  const onEditUser = (userUuid): void => {
-    router.push(`users/${userUuid}`);
-  };
-
-  const onCreateUser = (): void => {
-    router.push('create-user');
-  };
-
   const onMessage = (message: EventSourceMessage) => {
     const shouldProcess = shouldProcessMessage(message);
     if (!shouldProcess) {
@@ -201,6 +141,66 @@ export default function UsersPage({
         row.classList.remove('highlight-row');
       };
     }
+  };
+
+  const router = useRouter();
+  // const pathname = usePathname();
+  // Get QueryClient from the context
+  const queryClient = useQueryClient();
+  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [usersToDisplay, setUsersToDisplay] = useState(users);
+
+  useEffect(() => {
+    setUsersToDisplay(users);
+  }, [users]);
+
+  useEffect(() => {
+    const userChangeEventAbortController = new AbortController();
+    console.log('===== Subscribing to user change events =====');
+    subscribe(
+      `${appConfig.baseUrl}/api/v1/events/users`,
+      userChangeEventAbortController,
+      onMessage,
+    );
+
+    return () => {
+      userChangeEventAbortController.abort('User change event subscription aborted');
+      console.log(
+        `===== Unsubscribed to user change events - signal aborted: ${userChangeEventAbortController.signal.aborted} =====`,
+      );
+    };
+  }, []);
+
+  const onPageSelect = (pageSelected): void => {
+    router.replace(`users?page=${pageSelected}`);
+    // router.refresh();
+  };
+
+  const openDeleteModal = (user): void => {
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
+  };
+
+  const onCloseDeleteModal = async (success: boolean): Promise<void> => {
+    setIsDeleteModalOpen(false);
+    if (success) {
+      queryClient.refetchQueries({ queryKey: ['users', page, pageSize, role] }).then(() => {
+        console.log(`users refetched for page, pageSize, role: ${page}, ${pageSize}, ${role}`);
+        // const t = new Date().getTime();
+        // router.replace(`users?page=${page}&t=${t}`);
+        // router.refresh(); // NOT WORKING
+        window.location.reload();
+      });
+    }
+  };
+
+  const onEditUser = (userUuid): void => {
+    router.push(`users/${userUuid}`);
+  };
+
+  const onCreateUser = (): void => {
+    router.push('create-user');
   };
 
   const isUserListEmpty = !usersToDisplay || usersToDisplay.length <= 0;

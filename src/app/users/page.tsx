@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { redirect } from 'next/navigation';
 import { Suspense, use, useEffect, useState } from 'react';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import appConfig from '../../config/config';
@@ -8,21 +9,25 @@ import { getUsers } from '../../lib/api';
 import useUserStore from '../../lib/user-store';
 import Error from '../error';
 import UsersPage from './users-page';
-import { redirect } from 'next/navigation';
 
 function Users({ queryParams }) {
-  const [loading, setLoading] = useState(true);
-  const userStore = useUserStore();
-  const currentUser = userStore.user;
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const currentUser = useUserStore((state) => state.user);
+  const setUser = useUserStore((state) => state.setUser);
+
   useEffect(() => {
-    if (!currentUser) {
-      redirect('/login');
-    }
-    setLoading(false);
-  }, []);
+    const checkAuth = async () => {
+      console.log('Current User in Users Page:', currentUser);
+      if (!currentUser) {
+        redirect('/login');
+      }
+      setIsAuthChecked(true);
+    };
+
+    checkAuth();
+  }, [currentUser, setUser]);
 
   const { page, pageSize, role } = queryParams;
-
   const queryFunction = async () => {
     const data = await getUsers(page, pageSize, role).then((res) => res.data);
     const users = data.elements;
@@ -39,9 +44,10 @@ function Users({ queryParams }) {
     // queryKey: ['users', page, pageSize],
     queryFn: queryFunction,
     retry: false,
+    enabled: isAuthChecked, // Only fetch when auth is confirmed
   });
 
-  if (isPending || loading) {
+  if (!isAuthChecked || isPending) {
     return <LoadingOverlay label='Loading' />;
   }
 
@@ -61,7 +67,11 @@ function Users({ queryParams }) {
   );
 }
 
-export default function Page({ searchParams }: { readonly searchParams: Promise<{ page: string }> }) {
+export default function Page({
+  searchParams,
+}: {
+  readonly searchParams: Promise<{ page: string }>;
+}) {
   const { page } = use(searchParams);
   const p = Number(page) || 1;
   const pageSize = appConfig.defaultRowsPerPage;

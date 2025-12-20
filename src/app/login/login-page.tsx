@@ -1,8 +1,9 @@
 'use client';
 
 import FormInput from '@/components/FormInput';
-import { clearAuthentication, saveAuthentication, saveIdToken } from '@/lib/storage';
+import { clearAuthentication, saveAuthentication } from '@/lib/storage';
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -12,8 +13,7 @@ import { toast } from 'react-toastify';
 import { login, validateRecaptcha } from '../../lib/api';
 import { getUserFromIdToken } from '../../lib/jwt.utils';
 import useUserStore from '../../lib/user-store';
-import { IUser, LoginResponse } from '../../types/custom-types';
-import { Axios, AxiosError, AxiosResponse } from 'axios';
+import { IUser } from '../../types/custom-types';
 
 export function LoginButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary w-full'>Login</button>;
@@ -134,7 +134,7 @@ export default function LoginPage({ error }): React.ReactElement {
         toastId: '404',
       });
     }
-  }, [error]);
+  }, [error, userStore]);
 
   const emailConstraints = {
     required: { value: true, message: 'Email is required' },

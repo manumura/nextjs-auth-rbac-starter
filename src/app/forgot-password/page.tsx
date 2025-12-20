@@ -2,23 +2,27 @@
 
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import LoadingOverlay from '../../components/LoadingOverlay';
 import useUserStore from '../../lib/user-store';
 import ForgotPasswordPage from './forgot-password-page';
-import { set } from 'react-hook-form';
-import LoadingOverlay from '../../components/LoadingOverlay';
 
 export default function ForgotPassword() {
-  const [loading, setLoading] = useState(true);
-  const userStore = useUserStore();
-  const currentUser = userStore.user;
-  useEffect(() => {
-    if (currentUser) {
-      redirect('/');
-    }
-    setLoading(false);
-  }, []);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const currentUser = useUserStore((state) => state.user);
 
-  if (loading) {
+  useEffect(() => {
+    const checkAuth = async () => {
+      console.log('Current User in Login Page:', currentUser);
+      if (currentUser) {
+        redirect('/');
+      }
+      setIsAuthChecked(true);
+    };
+
+    checkAuth();
+  }, [currentUser]);
+
+  if (!isAuthChecked) {
     return <LoadingOverlay label='Loading' />;
   }
 

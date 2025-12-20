@@ -1,26 +1,36 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { redirect } from 'next/navigation';
+import { use, useEffect, useState } from 'react';
+import LoadingOverlay from '../../components/LoadingOverlay';
 import useUserStore from '../../lib/user-store';
 import LoginPage from './login-page';
-import { redirect } from 'next/navigation';
-import LoadingOverlay from '../../components/LoadingOverlay';
 
-export default function Login({searchParams}: { readonly searchParams: Promise<{ error: string }> }) {
-  const { error } = use(searchParams);
-  const [loading, setLoading] = useState(true);
-  const userStore = useUserStore();
-  const currentUser = userStore.user;
+export default function Login({
+  searchParams,
+}: {
+  readonly searchParams: Promise<{ error: string }>;
+}) {
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const currentUser = useUserStore((state) => state.user);
+
   useEffect(() => {
-    if (currentUser) {
-      redirect('/');
-    }
-    setLoading(false);
-  }, []);
+    const checkAuth = async () => {
+      console.log('Current User in Login Page:', currentUser);
+      if (currentUser) {
+        redirect('/');
+      }
+      setIsAuthChecked(true);
+    };
 
-  if (loading) {
+    checkAuth();
+  }, [currentUser]);
+
+  if (!isAuthChecked) {
     return <LoadingOverlay label='Loading' />;
   }
+
+  const { error } = use(searchParams);
 
   return <LoginPage error={error} />;
 }
