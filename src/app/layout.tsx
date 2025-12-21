@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Navbar from '../components/Navbar';
 import { Providers } from '../components/Providers';
+import { getProfile } from '../lib/api';
 import useUserStore from '../lib/user-store';
-import { getCurrentUserFromStorage } from '../lib/utils';
 import '../styles/globals.css';
 
 // Fix for Error: connect ECONNREFUSED ::1:9002 on localhost with node > 16
@@ -35,12 +35,25 @@ export default function RootLayout({
     const checkAuth = async () => {
       console.log('Current User in Root Layout:', currentUser);
       if (!currentUser) {
-        const currentUserFromLocalStorage = await getCurrentUserFromStorage();
-        console.log(
-          'Current User from Local Storage in Root Layout:',
-          currentUserFromLocalStorage,
-        );
-        setUser(currentUserFromLocalStorage);
+        // const currentUserFromLocalStorage = await getCurrentUserFromStorage();
+        // console.log(
+        //   'Current User from Local Storage in Root Layout:',
+        //   currentUserFromLocalStorage,
+        // );
+        // setUser(currentUserFromLocalStorage);
+        try {
+          const response = await getProfile();
+          if (response.status === 200 && response.data) {
+            const currentUserFromAPI = response.data;
+            console.log(
+              'Fetched Current User from API in Root Layout:',
+              currentUserFromAPI,
+            );
+            setUser(currentUserFromAPI);
+          }
+        } catch (error) {
+          console.error('Error fetching profile in Root Layout:', error);
+        }
       }
       setIsAuthChecked(true);
       console.log('RootLayout mounted');

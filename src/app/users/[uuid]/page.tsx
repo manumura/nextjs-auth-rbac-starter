@@ -7,7 +7,6 @@ import { use, useEffect, useState, type JSX } from 'react';
 import LoadingOverlay from '../../../components/LoadingOverlay';
 import { getUserByUuid } from '../../../lib/api';
 import useUserStore from '../../../lib/user-store';
-import { getCurrentUserFromStorage } from '../../../lib/utils';
 import Error from '../../error';
 import EditUserPage from './edit-user-page';
 
@@ -20,7 +19,7 @@ export default function EditUser({
   if (!uuid) {
     redirect('/users');
   }
-  
+
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const currentUser = useUserStore((state) => state.user);
 
