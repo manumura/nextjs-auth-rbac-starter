@@ -163,6 +163,10 @@ export const updateProfile = async (
   });
 };
 
+export const deleteProfile = async (): Promise<AxiosResponse<IUser>> => {
+  return axiosInstance.delete('/v1/profile');
+};
+
 export const updatePassword = async (
   oldPassword: string,
   newPassword: string,

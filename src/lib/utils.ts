@@ -50,18 +50,17 @@ export const passwordRules = {
 
 export function validatePassword(password: string): {
   isValid: boolean;
-  message: string;
+  errors: string[];
 } {
-  let message: string = '';
+  const errors: string[] = [];
   let isValid: boolean = true;
   for (const [name, rule] of Object.entries(passwordRules)) {
     const valid = rule.regex.test(password);
     if (!valid) {
       isValid = false;
-      message += rule.message + ' ';
+      errors.push(rule.message);
     }
   }
-  message = message.trim();
 
-  return { message, isValid };
+  return { errors, isValid };
 }

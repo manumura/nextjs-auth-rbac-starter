@@ -1,24 +1,28 @@
 'use client';
 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import DropBox from '../../components/DropBox';
-import FormInput from '../../components/FormInput';
+import ChangePasswordForm from '../../components/ChangePasswordForm';
+import DeleteProfileForm from '../../components/DeleteProfileForm';
+import EditProfileForm from '../../components/EditProfileForm';
 import {
+  deleteProfile,
+  logout,
   updatePassword,
   updateProfile,
   updateProfileImage,
 } from '../../lib/api';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { IUser } from '../../types/custom-types';
-import { AxiosError, AxiosResponse } from 'axios';
+import { clearAuthentication } from '../../lib/storage';
+import useUserStore from '../../lib/user-store';
 
 export default function EditProfilePage({ user }) {
   const router = useRouter();
   const [images, setImages] = useState([] as any[]);
-  const [uploadProgress, setUploadProgress] = useState(0);
   // Get QueryClient from the context
   const queryClient = useQueryClient();
 
@@ -47,7 +51,8 @@ export default function EditProfilePage({ user }) {
     const { loaded, total } = progressEvent;
     if (progressEvent.bytes) {
       const progress = Math.round((loaded / total) * 100);
-      setUploadProgress(progress);
+      // setUploadProgress(progress);
+      console.log('Upload progress:', progress);
     }
   };
 
@@ -60,14 +65,11 @@ export default function EditProfilePage({ user }) {
     defaultValues: {
       name: user.name,
     },
+    mode: 'all',
   });
 
-  const {
-    handleSubmit: handleEditProfile,
-    formState: { isValid: isEditProfileValid },
-    // watch,
-    setError: setEditProfileError,
-  } = editProfileMethods;
+  const { handleSubmit: handleEditProfile, setError: setEditProfileError } =
+    editProfileMethods;
 
   const mutationProfile = useMutation({
     mutationFn: ({ name }: { name: string }) => onMutateProfile(name),
@@ -92,17 +94,20 @@ export default function EditProfilePage({ user }) {
     try {
       const response = await updateProfile(name);
       const user = response.data;
-  
+
       if (images.length <= 0) {
         return user;
       }
-  
+
       // Upload profile image
       console.log('Uploading image');
       const formData = new FormData();
       formData.append('image', images[0]);
-  
-      const uploadResponse = await updateProfileImage(formData, onUploadProgress);
+
+      const uploadResponse = await updateProfileImage(
+        formData,
+        onUploadProgress,
+      );
       if (uploadResponse.status !== 200) {
         throw new Error('Profile image upload failed');
       }
@@ -138,12 +143,11 @@ export default function EditProfilePage({ user }) {
       newPassword: '',
       newPasswordConfirm: '',
     },
+    mode: 'all',
   });
 
   const {
     handleSubmit: handleChangePassword,
-    formState: { isValid: isChangePasswordValid, errors },
-    watch,
     setError: setChangePasswordError,
   } = changePasswordMethods;
 
@@ -205,145 +209,90 @@ export default function EditProfilePage({ user }) {
   };
   // ------------------------------------------------
 
-  const nameConstraints = {
-    required: { value: true, message: 'Full Name is required' },
-    minLength: {
-      value: 5,
-      message: 'Full Name is min 5 characters',
-    },
-  };
-  const passwordConstraints = {
-    required: { value: true, message: 'Password is required' },
-    minLength: {
-      value: 8,
-      message: 'Password is min 8 characters',
-    },
-  };
-  const passwordConfirmConstraints = {
-    required: { value: true, message: 'Confirm Password is required' },
-    validate: (value): string | undefined => {
-      if (watch('newPassword') !== value) {
-        return 'Passwords do no match';
-      }
-    },
+  //----------------- Delete Profile -------------------
+  const handleLogout = async (): Promise<void> => {
+    await logout();
+    useUserStore.getState().setUser(null);
+    clearAuthentication();
+    // googleLogout();
   };
 
-  const loading = mutationProfile.isPending || mutationPassword.isPending;
-  const btn = <button className='btn btn-primary'>Save</button>;
-  const btnDisabled = (
-    <button className='btn btn-disabled btn-primary'>Save</button>
-  );
-  const btnLoading = (
-    <button className='btn btn-disabled w-full'>
-      <span className='loading loading-spinner'></span>
-      Save
-    </button>
-  );
-  const editProfileButton = !isEditProfileValid
-    ? btnDisabled
-    : loading
-      ? btnLoading
-      : btn;
-  const changePasswordButton = !isChangePasswordValid
-    ? btnDisabled
-    : loading
-      ? btnLoading
-      : btn;
-  const uploadProgressStyle = {
-    '--size': '3.2rem',
-    '--value': uploadProgress,
-  } as React.CSSProperties;
+  const mutationDeleteProfile = useMutation({
+    mutationFn: () => onMutateDeleteProfile(),
+    async onSuccess(user, variables, context) {
+      toast('Profile successfully deleted!', {
+        type: 'success',
+        position: 'bottom-right',
+      });
+
+      router.push('/');
+    },
+    onError(error, variables, context) {
+      toast(error?.message, {
+        type: 'error',
+        position: 'bottom-right',
+      });
+    },
+  });
+
+  const onMutateDeleteProfile = async (): Promise<IUser> => {
+    try {
+      const response = await deleteProfile();
+      if (response.status !== 200) {
+        throw new Error('Profile delete failed');
+      }
+      const user = response?.data;
+      if (!user) {
+        throw new Error('Profile delete failed');
+      }
+      await handleLogout();
+      return user;
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.data.message) {
+        throw new Error(error.response.data.message);
+      }
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error('Profile delete failed');
+    }
+  };
+
+  const onProfileDeleted = async (): Promise<void> => {
+    mutationDeleteProfile.mutate();
+  };
+  // ------------------------------------------------
+
+  const shouldShowChangePasswordForm =
+    !user.providers || user.providers?.length <= 0;
+
+  const loading = mutationProfile.isPending || mutationPassword.isPending || mutationDeleteProfile.isPending;
 
   return (
     <section className='min-h-screen bg-slate-200'>
-      <FormProvider {...editProfileMethods}>
-        <form
-          onSubmit={handleEditProfile(onProfileEdited)}
-          className='mx-auto flex max-w-2xl flex-col items-center overflow-hidden pt-10'
-        >
-          <div className='card w-3/4 bg-slate-50 shadow-xl'>
-            <div className='card-body'>
-              <div className='card-title'>
-                <h1>Edit my Profile</h1>
-              </div>
-              <FormInput
-                label='Full Name'
-                name='name'
-                constraints={nameConstraints}
-              />
-              Image
-              <DropBox onDrop={onDrop} imgSrc={user.imageUrl} />
-              {/* <FormInput label='Image' name='image' type='file' /> */}
-              <div className='card-actions justify-end'>
-                {uploadProgress > 0 && (
-                  <div className='radial-progress' style={uploadProgressStyle}>
-                    {uploadProgress}%
-                  </div>
-                )}
-                <div>{editProfileButton}</div>
-                <div>
-                  <button
-                    type='button'
-                    className={`btn btn-outline btn-accent ${
-                      loading ? 'btn-disabled' : ''
-                    }`}
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
-      </FormProvider>
+      <EditProfileForm
+        user={user}
+        editProfileMethods={editProfileMethods}
+        loading={loading}
+        onEditProfile={handleEditProfile(onProfileEdited)}
+        onDrop={onDrop}
+        onCancel={handleCancel}
+      />
 
-      <FormProvider {...changePasswordMethods}>
-        <form
-          onSubmit={handleChangePassword(onPasswordChanged)}
-          className='mx-auto flex max-w-2xl flex-col items-center overflow-hidden py-5'
-        >
-          <div className='card w-3/4 bg-slate-50 shadow-xl'>
-            <div className='card-body'>
-              <div className='card-title'>
-                <h1>Change my Password</h1>
-              </div>
-              <FormInput
-                label='Current Password'
-                name='oldPassword'
-                type='password'
-                constraints={passwordConstraints}
-              />
-              <FormInput
-                label='New Password'
-                name='newPassword'
-                type='password'
-                constraints={passwordConstraints}
-              />
-              <FormInput
-                label='Confirm New Password'
-                name='newPasswordConfirm'
-                type='password'
-                constraints={passwordConfirmConstraints}
-              />
-              <div className='card-actions justify-end'>
-                <div>{changePasswordButton}</div>
-                <div>
-                  <button
-                    type='button'
-                    className={`btn btn-outline btn-accent ${
-                      loading ? 'btn-disabled' : ''
-                    }`}
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
-      </FormProvider>
+      {shouldShowChangePasswordForm && (
+        <ChangePasswordForm
+          changePasswordMethods={changePasswordMethods}
+          loading={loading}
+          onPasswordChanged={handleChangePassword(onPasswordChanged)}
+          onCancel={handleCancel}
+        />
+      )}
+
+      <DeleteProfileForm
+        onDeleteProfile={onProfileDeleted}
+        onCancel={handleCancel}
+        loading={loading}
+      />
     </section>
   );
 }
