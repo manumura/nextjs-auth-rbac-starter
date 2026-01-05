@@ -79,7 +79,7 @@ export default function RegisterPage(): React.ReactElement {
       throw new Error('Captcha validation failed');
     }
 
-    const { isValid: isPasswordValid, message } = validatePassword(password);
+    const { isValid: isPasswordValid, errors } = validatePassword(password);
     if (!isPasswordValid) {
       throw new Error(
         'Password must be at least 8 characters long, and contain at least 1 number, 1 uppercase letter, 1 lowercase letter, and 1 special character',
@@ -133,8 +133,12 @@ export default function RegisterPage(): React.ReactElement {
       message: 'Password is max 70 characters',
     },
     validate: (value: string): string | undefined => {
-      const { isValid, message } = validatePassword(value);
+      const { isValid, errors } = validatePassword(value);
       if (!isValid) {
+        let message = '';
+        if (errors.length > 0) {
+          message = errors.join('\n');
+        }
         return message || 'Password is invalid';
       }
       if (watch('passwordConfirm') && watch('passwordConfirm') !== value) {

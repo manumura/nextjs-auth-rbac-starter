@@ -13,7 +13,10 @@ import appConfig from '../../config/config';
 import { appConstant } from '../../config/constant';
 import { subscribe } from '../../lib/sse';
 import { getSavedUserEvents, saveUserEvents } from '../../lib/storage';
-import { IUser } from '../../types/custom-types';
+import { IOauthProvider, IUser } from '../../types/custom-types';
+import { FaFacebook, FaUserAltSlash } from 'react-icons/fa';
+import { OauthProvider } from '../../types/provider.model';
+import { FcGoogle } from 'react-icons/fc';
 
 export default function UsersPage({
   users,
@@ -165,7 +168,9 @@ export default function UsersPage({
     );
 
     return () => {
-      userChangeEventAbortController.abort('User change event subscription aborted');
+      userChangeEventAbortController.abort(
+        'User change event subscription aborted',
+      );
       console.log(
         `===== Unsubscribed to user change events - signal aborted: ${userChangeEventAbortController.signal.aborted} =====`,
       );
@@ -185,13 +190,17 @@ export default function UsersPage({
   const onCloseDeleteModal = async (success: boolean): Promise<void> => {
     setIsDeleteModalOpen(false);
     if (success) {
-      queryClient.refetchQueries({ queryKey: ['users', page, pageSize, role] }).then(() => {
-        console.log(`users refetched for page, pageSize, role: ${page}, ${pageSize}, ${role}`);
-        // const t = new Date().getTime();
-        // router.replace(`users?page=${page}&t=${t}`);
-        // router.refresh(); // NOT WORKING
-        window.location.reload();
-      });
+      queryClient
+        .refetchQueries({ queryKey: ['users', page, pageSize, role] })
+        .then(() => {
+          console.log(
+            `users refetched for page, pageSize, role: ${page}, ${pageSize}, ${role}`,
+          );
+          // const t = new Date().getTime();
+          // router.replace(`users?page=${page}&t=${t}`);
+          // router.refresh(); // NOT WORKING
+          window.location.reload();
+        });
     }
   };
 
@@ -206,69 +215,97 @@ export default function UsersPage({
   const isUserListEmpty = !usersToDisplay || usersToDisplay.length <= 0;
   const noUserRow = (
     <tr>
-      <td colSpan={5} className='text-center font-bold'>
+      <td colSpan={6} className='text-center font-bold'>
         No Users found
       </td>
     </tr>
   );
 
-  const userRows = usersToDisplay?.map((user) => (
-    <tr key={user.uuid} id={`user-${user.uuid}`}>
-      <th>{user.uuid}</th>
-      <td>{user.name}</td>
-      <td>{user.email}</td>
-      <td>{user.role}</td>
-      <td>
-        <div className='flex justify-end space-x-1'>
-          <button
-            className='btn btn-primary btn-sm gap-2'
-            onClick={(): void => onEditUser(user.uuid)}
-          >
-            <FiEdit />
-            Edit
-          </button>
-          <button
-            className='btn btn-accent btn-sm gap-2'
-            onClick={(): void => openDeleteModal(user)}
-          >
-            <FiDelete />
-            Delete
-          </button>
+  const userRows = usersToDisplay?.map((user: IUser) => {
+    const providers = user.providers?.map((oauthProvider: IOauthProvider) => {
+      let icon;
+      if (oauthProvider.provider === OauthProvider.Facebook) {
+        icon = <FaFacebook className='text-2xl' />;
+      } else if (oauthProvider.provider === OauthProvider.Google) {
+        icon = <FcGoogle className='text-2xl' />;
+      }
+
+      return (
+        <div className='flex items-center' key={oauthProvider.externalUserId}>
+          {icon && <div className='pr-2'>{icon}</div>}
+          <div>{oauthProvider.email}</div>
         </div>
-      </td>
-    </tr>
-  ));
+      );
+    });
+
+    const email = user.email ? <div>{user.email}</div> : providers;
+
+    return (
+      <tr key={user.uuid} id={`user-${user.uuid}`}>
+        <th>
+          {!user.isActive ? (
+            <FaUserAltSlash size={24} color='red' title='Inactive user' />
+          ) : null}
+        </th>
+        <th>{user.uuid}</th>
+        <td>{user.name}</td>
+        <td>{email}</td>
+        <td>{user.role}</td>
+        <td>
+          <div className='flex justify-end space-x-1'>
+            <button
+              className='btn btn-primary btn-sm gap-2'
+              onClick={(): void => onEditUser(user.uuid)}
+            >
+              <FiEdit />
+              Edit
+            </button>
+            <button
+              className='btn btn-accent btn-sm gap-2'
+              onClick={(): void => openDeleteModal(user)}
+            >
+              <FiDelete />
+              Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    );
+  });
 
   const usersTable = (
-    <div className='mt-10 overflow-x-auto rounded-lg bg-slate-50 p-10 md:container md:mx-auto'>
-      <table className='table table-zebra w-full'>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>
-              <div className='flex justify-end space-x-1'>
-                <button className='btn gap-2' onClick={onCreateUser}>
-                  <FiPlusCircle />
-                  Create User
-                </button>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>{!isUserListEmpty ? userRows : noUserRow}</tbody>
-      </table>
-      <div className='flex justify-end'>
-        {!isUserListEmpty && (
-          <Pagination
-            currentPage={page}
-            onPageSelect={onPageSelect}
-            rowsPerPage={pageSize}
-            totalElements={totalElements}
-          />
-        )}
+    <div className='flex flex-col items-center'>
+      <div className='mt-10 overflow-x-auto rounded-lg bg-slate-50 p-10 md:container md:mx-auto'>
+        <table className='table-zebra table w-full'>
+          <thead>
+            <tr>
+              <th></th>
+              <th></th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>
+                <div className='flex justify-end space-x-1'>
+                  <button className='btn gap-2' onClick={onCreateUser}>
+                    <FiPlusCircle />
+                    Create User
+                  </button>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>{!isUserListEmpty ? userRows : noUserRow}</tbody>
+        </table>
+        <div className='flex justify-end'>
+          {!isUserListEmpty && (
+            <Pagination
+              currentPage={page}
+              onPageSelect={onPageSelect}
+              rowsPerPage={pageSize}
+              totalElements={totalElements}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

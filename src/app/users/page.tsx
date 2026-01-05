@@ -9,6 +9,7 @@ import { getUsers } from '../../lib/api';
 import useUserStore from '../../lib/user-store';
 import Error from '../error';
 import UsersPage from './users-page';
+import { isAdmin } from '../../lib/utils';
 
 function Users({ queryParams }) {
   const [isAuthChecked, setIsAuthChecked] = useState(false);
@@ -20,6 +21,9 @@ function Users({ queryParams }) {
       console.log('Current User in Users Page:', currentUser);
       if (!currentUser) {
         redirect('/login');
+      }
+      if (!isAdmin(currentUser)) {
+        redirect('/');
       }
       setIsAuthChecked(true);
     };

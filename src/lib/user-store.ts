@@ -1,9 +1,9 @@
 import { create } from 'zustand';
-import { IUser } from '../types/custom-types';
+import { IAuthenticatedUser } from '../types/custom-types';
 
 type UserState = {
-  user: IUser | null;
-  setUser: (user: IUser | null) => void; 
+  user: IAuthenticatedUser | null;
+  setUser: (user: IAuthenticatedUser | null) => void; 
 };
 
 const useUserStore = create<UserState>((set) => ({

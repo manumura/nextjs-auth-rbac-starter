@@ -6,11 +6,13 @@ import React, { useEffect, useState } from 'react';
 import logo from '../../public/next.svg';
 import useUserStore from '../lib/user-store';
 import { isAdmin } from '../lib/utils';
-import { IUser } from '../types/custom-types';
+import { IAuthenticatedUser } from '../types/custom-types';
 import LoginButton from './LoginButton';
 import LogoutButton from './LogoutButton';
 
-function getNavItems(user: IUser | null | undefined): React.JSX.Element[] {
+function getNavItems(
+  user: IAuthenticatedUser | null | undefined,
+): React.JSX.Element[] {
   const navItems: React.JSX.Element[] = [];
 
   if (!user) {

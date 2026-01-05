@@ -7,6 +7,7 @@ import { ToastContainer } from 'react-toastify';
 // To avoid tailwind to purge toastify styles
 // import 'react-toastify/dist/ReactToastify.min.css';
 import appConfig from '../config/config';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 export function Providers({ children }) {
   const queryClient = new QueryClient();
@@ -14,8 +15,10 @@ export function Providers({ children }) {
   return (
     <QueryClientProvider client={queryClient}>
       <GoogleReCaptchaProvider reCaptchaKey={appConfig.reCaptchaKey}>
-        {children}
-        <ToastContainer />
+        <GoogleOAuthProvider clientId={appConfig.googleClientId}>
+          {children}
+          <ToastContainer />
+        </GoogleOAuthProvider>
       </GoogleReCaptchaProvider>
     </QueryClientProvider>
   );

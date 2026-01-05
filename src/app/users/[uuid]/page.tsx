@@ -7,6 +7,7 @@ import { use, useEffect, useState, type JSX } from 'react';
 import LoadingOverlay from '../../../components/LoadingOverlay';
 import { getUserByUuid } from '../../../lib/api';
 import useUserStore from '../../../lib/user-store';
+import { isAdmin } from '../../../lib/utils';
 import Error from '../../error';
 import EditUserPage from './edit-user-page';
 
@@ -27,6 +28,9 @@ export default function EditUser({
     const checkAuth = async () => {
       if (!currentUser) {
         redirect('/login');
+      }
+      if (!isAdmin(currentUser)) {
+        redirect('/');
       }
       setIsAuthChecked(true);
     };

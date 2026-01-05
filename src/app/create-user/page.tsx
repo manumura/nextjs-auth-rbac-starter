@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import useUserStore from '../../lib/user-store';
+import { isAdmin } from '../../lib/utils';
 import CreateUserPage from './create-user-page';
 
 export default function CreateUser() {
@@ -14,6 +15,9 @@ export default function CreateUser() {
     const checkAuth = async () => {
       if (!currentUser) {
         redirect('/login');
+      }
+      if (!isAdmin(currentUser)) {
+        redirect('/');
       }
       setIsAuthChecked(true);
     };
