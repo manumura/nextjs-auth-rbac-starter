@@ -42,17 +42,19 @@ export default function OauthFacebookCallback({
       });
 
       if (!idToken || !accessToken || !refreshToken) {
+        console.error('Missing tokens in Facebook OAuth callback.');
         setError('Login failed. Please try again.');
         return;
       }
 
       try {
         const user = await getUserFromIdToken(idToken);
+        console.log('Facebook OAuth logged in user:', user);
         if (!user) {
+          console.error('Failed to extract user from ID token.');
           setError('Login failed. Please try again.');
           return;
         }
-        console.log('Facebook OAuth logged in user:', user);
 
         const accessTokenExpiresAt = new Date(expiresAt);
         saveAuthentication(

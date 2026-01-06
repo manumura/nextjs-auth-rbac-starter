@@ -7,7 +7,10 @@ export const sleep = async (ms): Promise<any> => {
   return new Promise((resolve, reject) => setTimeout(resolve, ms));
 };
 
-export const isAdmin = (user: IAuthenticatedUser): boolean => {
+export const isAdmin = (user: IAuthenticatedUser | null): boolean => {
+  if (!user) {
+    return false;
+  }
   return user && user.role === 'ADMIN';
 };
 
