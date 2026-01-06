@@ -67,7 +67,9 @@ export default function EditUserPage({ user }): React.ReactElement {
         position: 'bottom-right',
       });
 
-      await queryClient.invalidateQueries({ queryKey: ['userByUuid', user.uuid] });
+      await queryClient.invalidateQueries({
+        queryKey: ['userByUuid', user.uuid],
+      });
       router.back();
     },
     onError(error, variables, context) {
@@ -157,6 +159,9 @@ export default function EditUserPage({ user }): React.ReactElement {
     { label: 'User', value: 'USER' },
   ];
 
+  const shouldShowChangePasswordForm =
+    !user.providers || user.providers?.length <= 0;
+
   const editUserForm = (
     <div className='w-full py-10'>
       <FormProvider {...methods}>
@@ -170,24 +175,28 @@ export default function EditUserPage({ user }): React.ReactElement {
             name='name'
             constraints={nameConstraints}
           />
-          <FormInput
-            label='Email'
-            name='email'
-            type='email'
-            constraints={emailConstraints}
-          />
-          <FormInput
-            label='Password'
-            name='password'
-            type='password'
-            constraints={passwordConstraints}
-          />
-          <FormInput
-            label='Confirm Password'
-            name='passwordConfirm'
-            type='password'
-            constraints={passwordConfirmConstraints}
-          />
+          {shouldShowChangePasswordForm && (
+            <>
+              <FormInput
+                label='Email'
+                name='email'
+                type='email'
+                constraints={emailConstraints}
+              />
+              <FormInput
+                label='Password'
+                name='password'
+                type='password'
+                constraints={passwordConstraints}
+              />
+              <FormInput
+                label='Confirm Password'
+                name='passwordConfirm'
+                type='password'
+                constraints={passwordConfirmConstraints}
+              />
+            </>
+          )}
           <FormSelect
             label='Role'
             name='role'
