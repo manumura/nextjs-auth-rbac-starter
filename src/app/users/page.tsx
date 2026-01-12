@@ -81,7 +81,7 @@ export default function Page({
   const pageSize = appConfig.defaultRowsPerPage;
   // TODO filter by role
   const role = undefined;
-  const queryParams = { p, pageSize, role };
+  const queryParams = { page: p, pageSize, role };
 
   return (
     <Suspense fallback={<LoadingOverlay label='Fetching users...' />}>
