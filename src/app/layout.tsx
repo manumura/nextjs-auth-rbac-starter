@@ -35,12 +35,6 @@ export default function RootLayout({
     const checkAuth = async () => {
       console.log('Current User in Root Layout:', currentUser);
       if (!currentUser) {
-        // const currentUserFromLocalStorage = await getCurrentUserFromStorage();
-        // console.log(
-        //   'Current User from Local Storage in Root Layout:',
-        //   currentUserFromLocalStorage,
-        // );
-        // setUser(currentUserFromLocalStorage);
         try {
           const response = await getProfile();
           if (response.status === 200 && response.data) {
@@ -62,12 +56,12 @@ export default function RootLayout({
     checkAuth();
   }, [currentUser, setUser]);
 
-  const body = !isAuthChecked ? (
-    <LoadingOverlay label='Loading' />
-  ) : (
+  const body = isAuthChecked ? (
     <Providers>
       <Navbar>{children}</Navbar>
     </Providers>
+  ) : (
+    <LoadingOverlay label='Loading' />
   );
 
   return (

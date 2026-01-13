@@ -5,7 +5,7 @@ import { EventSourceMessage } from '@microsoft/fetch-event-source';
 import { useQueryClient } from '@tanstack/react-query';
 import { UUID } from 'crypto';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { FiDelete, FiEdit, FiPlusCircle } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import DeleteUserModal from '../../components/DeleteUserModal';
@@ -17,6 +17,7 @@ import { IOauthProvider, IUser } from '../../types/custom-types';
 import { FaFacebook, FaUserAltSlash } from 'react-icons/fa';
 import { OauthProvider } from '../../types/provider.model';
 import { FcGoogle } from 'react-icons/fc';
+import LoadingOverlay from '../../components/LoadingOverlay';
 
 export default function UsersPage({
   users,
@@ -113,7 +114,6 @@ export default function UsersPage({
       if (userIndex !== -1) {
         usersToDisplay[userIndex] = userFromEvent;
         setUsersToDisplay([...usersToDisplay]);
-
         hightlightRow(userFromEvent.uuid);
       }
     }
@@ -177,9 +177,11 @@ export default function UsersPage({
     };
   }, []);
 
+  const [isPending, startTransition] = useTransition();
   const onPageSelect = (pageSelected): void => {
-    router.replace(`users?page=${pageSelected}`);
-    // router.refresh();
+    startTransition(() => {
+      router.replace(`users?page=${pageSelected}`);
+    });
   };
 
   const openDeleteModal = (user): void => {
@@ -199,7 +201,7 @@ export default function UsersPage({
           // const t = new Date().getTime();
           // router.replace(`users?page=${page}&t=${t}`);
           // router.refresh(); // NOT WORKING
-          window.location.reload();
+          globalThis.location.reload();
         });
     }
   };
@@ -310,8 +312,10 @@ export default function UsersPage({
     </div>
   );
 
-  return (
-    <section className='h-section bg-slate-200'>
+  const body = isPending ? (
+    <LoadingOverlay label='Loading' />
+  ) : (
+    <>
       {usersTable}
       {selectedUser && (
         <DeleteUserModal
@@ -320,6 +324,8 @@ export default function UsersPage({
           onClose={onCloseDeleteModal}
         />
       )}
-    </section>
+    </>
   );
+
+  return <section className='h-section bg-slate-200'>{body}</section>;
 }
