@@ -189,21 +189,19 @@ export default function UsersPage({
     setIsDeleteModalOpen(true);
   };
 
-  const onCloseDeleteModal = async (success: boolean): Promise<void> => {
-    setIsDeleteModalOpen(false);
-    if (success) {
+  const onCloseDeleteModal = async (isUserDeleted: boolean): Promise<void> => {
+    if (isUserDeleted) {
       queryClient
         .refetchQueries({ queryKey: ['users', page, pageSize, role] })
         .then(() => {
           console.log(
             `users refetched for page, pageSize, role: ${page}, ${pageSize}, ${role}`,
-          );
-          // const t = new Date().getTime();
-          // router.replace(`users?page=${page}&t=${t}`);
-          // router.refresh(); // NOT WORKING
-          globalThis.location.reload();
+          );          
+          // globalThis.location.reload();
         });
     }
+    setSelectedUser(null);
+    setIsDeleteModalOpen(false);
   };
 
   const onEditUser = (userUuid): void => {

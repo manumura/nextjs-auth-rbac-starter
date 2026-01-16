@@ -1,12 +1,12 @@
 'use client';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { UUID } from 'crypto';
 import { toast } from 'react-toastify';
 import { deleteUser } from '../lib/api';
-import Modal from './Modal';
 import { IUser } from '../types/custom-types';
-import { AxiosError, AxiosResponse } from 'axios';
+import Modal from './Modal';
 
 const DeleteUserModal = ({
   user,
@@ -15,7 +15,7 @@ const DeleteUserModal = ({
 }: {
   user: IUser;
   isOpen: boolean;
-  onClose: (success: boolean) => Promise<void>;
+  onClose: (isUserDeleted: boolean) => Promise<void>;
 }) => {
   const onCancel = async (): Promise<void> => {
     onClose(false);
@@ -57,6 +57,7 @@ const DeleteUserModal = ({
 
   const onDelete = async (): Promise<void> => {
     if (!user?.uuid) {
+      console.error('No user uuid provided for deletion');
       return;
     }
 

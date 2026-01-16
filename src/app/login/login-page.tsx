@@ -188,7 +188,7 @@ export default function LoginPage({ error }): React.ReactElement {
       return;
     }
 
-    const time = new Date().getTime();
+    const time = Date.now();
     useMessageStore.getState().setMessage({
       type: appMessages.LOGIN_SUCCESS.type,
       text: appMessages.LOGIN_SUCCESS.text.replace('${name}', user.name),
