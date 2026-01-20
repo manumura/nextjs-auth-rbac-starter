@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { logout } from '../lib/api';
-import { clearAuthentication } from '../lib/storage';
+import { clearStorage } from '../lib/storage';
 import useUserStore from '../lib/user-store';
 
 const LogoutButton = ({ id }) => {
@@ -16,7 +16,7 @@ const LogoutButton = ({ id }) => {
     mutationFn: async () => onMutate(),
     onSuccess(data, variables, context) {
       userStore.setUser(null);
-      clearAuthentication();
+      clearStorage();
 
       toast('Logout successfull', {
         type: 'success',

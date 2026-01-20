@@ -1,7 +1,7 @@
 'use client';
 
 import FormInput from '@/components/FormInput';
-import { clearAuthentication, saveAuthentication } from '@/lib/storage';
+import { clearStorage } from '@/lib/storage';
 import { CredentialResponse } from '@react-oauth/google';
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -20,10 +20,7 @@ import { googleLogin, login, validateRecaptcha } from '../../lib/api';
 import { getUserFromIdToken } from '../../lib/jwt.utils';
 import useMessageStore from '../../lib/message-store';
 import useUserStore from '../../lib/user-store';
-import {
-  IAuthenticatedUser,
-  LoginResponse
-} from '../../types/custom-types';
+import { IAuthenticatedUser, LoginResponse } from '../../types/custom-types';
 
 export function LoginButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary w-full'>Login</button>;
@@ -49,7 +46,7 @@ export default function LoginPage({ error }): React.ReactElement {
   useEffect(() => {
     // Handle access token expired
     if (error === '401') {
-      clearAuthentication();
+      clearStorage();
       userStore.setUser(null);
       toast('Session expired, please login again.', {
         type: 'error',
@@ -222,7 +219,7 @@ export default function LoginPage({ error }): React.ReactElement {
   const getUserFromLoginResponse = async (
     response: LoginResponse,
   ): Promise<IAuthenticatedUser | null> => {
-    const { accessToken, accessTokenExpiresAt, refreshToken, idToken } =
+    const { accessToken, refreshToken, idToken } =
       response;
     if (!idToken || !accessToken || !refreshToken) {
       return null;
@@ -233,12 +230,6 @@ export default function LoginPage({ error }): React.ReactElement {
       return null;
     }
 
-    saveAuthentication(
-      accessToken,
-      accessTokenExpiresAt,
-      refreshToken,
-      idToken,
-    );
     return user;
   };
 

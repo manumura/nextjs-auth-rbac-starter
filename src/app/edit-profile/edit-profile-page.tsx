@@ -16,9 +16,9 @@ import {
   updateProfile,
   updateProfileImage,
 } from '../../lib/api';
-import { IUser } from '../../types/custom-types';
-import { clearAuthentication } from '../../lib/storage';
+import { clearStorage } from '../../lib/storage';
 import useUserStore from '../../lib/user-store';
+import { IUser } from '../../types/custom-types';
 
 export default function EditProfilePage({ user }) {
   const router = useRouter();
@@ -213,7 +213,7 @@ export default function EditProfilePage({ user }) {
   const handleLogout = async (): Promise<void> => {
     await logout();
     useUserStore.getState().setUser(null);
-    clearAuthentication();
+    clearStorage();
     // googleLogout();
   };
 

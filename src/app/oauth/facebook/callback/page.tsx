@@ -7,7 +7,6 @@ import LoadingOverlay from '../../../../components/LoadingOverlay';
 import { appMessages } from '../../../../config/constant';
 import { getUserFromIdToken } from '../../../../lib/jwt.utils';
 import useMessageStore from '../../../../lib/message-store';
-import { saveAuthentication } from '../../../../lib/storage';
 import useUserStore from '../../../../lib/user-store';
 
 export default function OauthFacebookCallback({
@@ -56,13 +55,6 @@ export default function OauthFacebookCallback({
           return;
         }
 
-        const accessTokenExpiresAt = new Date(expiresAt);
-        saveAuthentication(
-          accessToken,
-          accessTokenExpiresAt,
-          refreshToken,
-          idToken,
-        );
         useUserStore.getState().setUser(user);
         const time = Date.now();
 

@@ -10,63 +10,63 @@ const KEY = {
 
 // Map of user UUID to list of events
 export const saveUserEvents = (userEventsMap: Map<UUID, string[]>): void => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return;
   }
 
-  window.localStorage.setItem(KEY.USER_EVENTS, JSON.stringify([...userEventsMap]));
+  globalThis.localStorage.setItem(KEY.USER_EVENTS, JSON.stringify([...userEventsMap]));
 };
 
 export const getSavedUserEvents = (): Map<UUID, string[]> => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return new Map<UUID, string[]>();
   }
   
-  const mapAsString = window.localStorage.getItem(KEY.USER_EVENTS);
+  const mapAsString = globalThis.localStorage.getItem(KEY.USER_EVENTS);
   return mapAsString ? new Map(JSON.parse(mapAsString)) : new Map<UUID, string[]>();
 };
 
 export const saveIdToken = (idToken): void => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return;
   }
 
-  window.localStorage.setItem(KEY.ID_TOKEN, idToken);
+  globalThis.localStorage.setItem(KEY.ID_TOKEN, idToken);
 };
 
 export const getSavedIdToken = (): string | null => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return null;
   }
 
-  return window.localStorage.getItem(KEY.ID_TOKEN);
+  return globalThis.localStorage.getItem(KEY.ID_TOKEN);
 };
 
 export const saveAccessToken = (accessToken): void => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return;
   }
 
-  window.localStorage.setItem(KEY.ACCESS_TOKEN, accessToken);
+  globalThis.localStorage.setItem(KEY.ACCESS_TOKEN, accessToken);
 };
 
 export const getAccessToken = (): string | null => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return null;
   }
 
-  const accessToken = window.localStorage.getItem(KEY.ACCESS_TOKEN);
+  const accessToken = globalThis.localStorage.getItem(KEY.ACCESS_TOKEN);
   return accessToken;
 };
 
 export const saveAccessTokenExpiresAt = (accessTokenExpiresAt: Date): void => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return;
   }
@@ -76,40 +76,40 @@ export const saveAccessTokenExpiresAt = (accessTokenExpiresAt: Date): void => {
     return;
   }
 
-  window.localStorage.setItem(
+  globalThis.localStorage.setItem(
     KEY.ACCESS_TOKEN_EXPIRES_AT,
     accessTokenExpiresAt.toString()
   );
 };
 
 export const getAccessTokenExpiresAt = (): Date | null => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return null;
   }
 
-  const accessTokenExpiresAt = window.localStorage.getItem(
+  const accessTokenExpiresAt = globalThis.localStorage.getItem(
     KEY.ACCESS_TOKEN_EXPIRES_AT
   );
   return accessTokenExpiresAt ? new Date(accessTokenExpiresAt) : null;
 };
 
 export const saveRefreshToken = (refreshToken): void => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return;
   }
 
-  window.localStorage.setItem(KEY.REFRESH_TOKEN, refreshToken);
+  globalThis.localStorage.setItem(KEY.REFRESH_TOKEN, refreshToken);
 };
 
 export const getRefreshToken = (): string | null => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return null;
   }
 
-  const refreshToken = window.localStorage.getItem(KEY.REFRESH_TOKEN);
+  const refreshToken = globalThis.localStorage.getItem(KEY.REFRESH_TOKEN);
   return refreshToken;
 };
 
@@ -119,7 +119,7 @@ export const saveAuthentication = (
   refreshToken: string,
   idToken: string
 ): void => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return;
   }
@@ -131,7 +131,7 @@ export const saveAuthentication = (
 };
 
 export const clearAuthentication = (): void => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis.window === 'undefined') {
     console.error('window is undefined');
     return;
   }
