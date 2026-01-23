@@ -8,6 +8,7 @@ export const appConstant = {
   // https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
   EMAIL_VALIDATION_REGEX:
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+  CSRF_COOKIE_NAME: 'csrf_token',
 };
 
 export const errorMessages = {

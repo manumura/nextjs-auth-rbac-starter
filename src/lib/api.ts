@@ -1,6 +1,11 @@
-import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import { UUID } from 'node:crypto';
 import appConfig from '../config/config';
+import { appConstant } from '../config/constant';
 import {
   IGetUsersResponse,
   InfoResponse,
@@ -8,7 +13,7 @@ import {
   LoginResponse,
   MessageResponse,
 } from '../types/custom-types';
-import useCsrfTokenStore from './csrf-token-store';
+import { getCookie } from './cookies.utils.';
 import { clearStorage } from './storage';
 import useUserStore from './user-store';
 
@@ -63,9 +68,9 @@ axiosInstance.interceptors.response.use(
       }
 
       // Update the CSRF token in the retry request headers
-      const newCsrfToken = useCsrfTokenStore.getState().csrfToken;
+      const newCsrfToken = getCookie(appConstant.CSRF_COOKIE_NAME);
       if (newCsrfToken && config.headers) {
-        config.headers["X-CSRF-Token"] = newCsrfToken;
+        config.headers['X-CSRF-Token'] = newCsrfToken;
       }
 
       // retun config;
@@ -90,11 +95,11 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // Only add for non-GET requests
   if (
     config.method &&
-    !["GET", "HEAD", "OPTIONS"].includes(config.method.toUpperCase())
+    !['GET', 'HEAD', 'OPTIONS'].includes(config.method.toUpperCase())
   ) {
-    const token = useCsrfTokenStore.getState().csrfToken;
-    if (token && config.headers) {
-      config.headers["X-CSRF-Token"] = token;
+    const csrfToken = getCookie(appConstant.CSRF_COOKIE_NAME);
+    if (csrfToken && config.headers) {
+      config.headers['X-CSRF-Token'] = csrfToken;
     }
   }
   return config;
@@ -103,26 +108,16 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 ////////////////////////////////////////////////////////////////
 // Refresh token API
 const postRefreshToken = async (): Promise<AxiosResponse<LoginResponse>> => {
-  return await axiosPublicInstance
-    .post(
-      REFRESH_TOKEN_ENDPOINT,
-      {},
-      {
-        headers: {
-          'X-CSRF-Token': useCsrfTokenStore.getState().csrfToken,
-        },
+  const csrfToken = getCookie(appConstant.CSRF_COOKIE_NAME);
+  return await axiosPublicInstance.post(
+    REFRESH_TOKEN_ENDPOINT,
+    {},
+    {
+      headers: {
+        'X-CSRF-Token': csrfToken,
       },
-    )
-    .then((response) => {
-      const headers = response?.headers;
-      const csrfToken = headers['x-csrf-token'];
-      if (csrfToken) {
-        useCsrfTokenStore.getState().setCsrfToken(csrfToken);
-      } else {
-        console.error('No CSRF token in refresh token response');
-      }
-      return response;
-    });
+    },
+  );
 };
 
 ////////////////////////////////////////////////////////////////
@@ -139,18 +134,7 @@ export const login = async (
   email: string,
   password: string,
 ): Promise<AxiosResponse<LoginResponse>> => {
-  return axiosPublicInstance
-    .post('/v1/login', { email, password })
-    .then((response) => {
-      const headers = response?.headers;
-      const csrfToken = headers['x-csrf-token'];
-      if (csrfToken) {
-        useCsrfTokenStore.getState().setCsrfToken(csrfToken);
-      } else {
-        console.error('No CSRF token in refresh token response');
-      }
-      return response;
-    });
+  return axiosPublicInstance.post('/v1/login', { email, password });
 };
 
 export const googleLogin = async (
@@ -201,10 +185,7 @@ export const validateRecaptcha = async (
 ////////////////////////////////////////////////////////////////
 // Authenticated-only APIs
 export const logout = async (): Promise<AxiosResponse> => {
-  return axiosInstance.post(
-    '/v1/logout',
-    {},
-  );
+  return axiosInstance.post('/v1/logout', {});
 };
 
 export const getProfile = async (): Promise<AxiosResponse<IUser>> => {
@@ -214,12 +195,9 @@ export const getProfile = async (): Promise<AxiosResponse<IUser>> => {
 export const updateProfile = async (
   name: string,
 ): Promise<AxiosResponse<IUser>> => {
-  return axiosInstance.put(
-    '/v1/profile',
-    {
-      name,
-    },
-  );
+  return axiosInstance.put('/v1/profile', {
+    name,
+  });
 };
 
 export const deleteProfile = async (): Promise<AxiosResponse<IUser>> => {
@@ -230,13 +208,10 @@ export const updatePassword = async (
   oldPassword: string,
   newPassword: string,
 ): Promise<AxiosResponse<IUser>> => {
-  return axiosInstance.put(
-    '/v1/profile/password',
-    {
-      oldPassword,
-      newPassword,
-    },
-  );
+  return axiosInstance.put('/v1/profile/password', {
+    oldPassword,
+    newPassword,
+  });
 };
 
 export const updateProfileImage = async (
@@ -282,10 +257,7 @@ export const createUser = async (
   name: string,
   role: string,
 ): Promise<AxiosResponse<IUser>> => {
-  return axiosInstance.post(
-    '/v1/users',
-    { email, name, role },
-  );
+  return axiosInstance.post('/v1/users', { email, name, role });
 };
 
 export const updateUser = async (
@@ -295,15 +267,12 @@ export const updateUser = async (
   role: string,
   password?: string,
 ): Promise<AxiosResponse<IUser>> => {
-  return axiosInstance.put(
-    `/v1/users/${uuid}`,
-    {
-      name,
-      email,
-      role,
-      ...(password ? { password } : {}),
-    },
-  );
+  return axiosInstance.put(`/v1/users/${uuid}`, {
+    name,
+    email,
+    role,
+    ...(password ? { password } : {}),
+  });
 };
 
 export const deleteUser = async (
