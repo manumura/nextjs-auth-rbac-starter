@@ -90,7 +90,7 @@ axiosInstance.interceptors.response.use(
   },
 );
 
-// Add CSRF token interceptor
+// Interceptor to add CSRF token in request headers
 axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // Only add for non-GET requests
   if (
