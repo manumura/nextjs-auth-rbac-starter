@@ -13,35 +13,21 @@ export default function OauthFacebookCallback({
   searchParams,
 }: {
   readonly searchParams: Promise<{
-    access_token: string;
-    refresh_token: string;
     id_token: string;
-    expires_at: string;
-    token_type: string;
   }>;
 }) {
-  const {
-    access_token: accessToken,
-    refresh_token: refreshToken,
-    id_token: idToken,
-    expires_at: expiresAt,
-    token_type: tokenType,
-  } = use(searchParams);
+  const { id_token: idToken } = use(searchParams);
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function handleAuth() {
       console.log('Facebook OAuth callback params:', {
-        accessToken,
-        refreshToken,
         idToken,
-        expiresAt,
-        tokenType,
       });
 
-      if (!idToken || !accessToken || !refreshToken) {
-        console.error('Missing tokens in Facebook OAuth callback.');
+      if (!idToken) {
+        console.error('Missing ID token in Facebook OAuth callback.');
         setError('Login failed. Please try again.');
         return;
       }
@@ -72,7 +58,7 @@ export default function OauthFacebookCallback({
     }
 
     handleAuth();
-  }, [accessToken, refreshToken, idToken, expiresAt, tokenType, router]);
+  }, [idToken, router]);
 
   if (error) {
     return (

@@ -219,9 +219,9 @@ export default function LoginPage({ error }): React.ReactElement {
   const getUserFromLoginResponse = async (
     response: LoginResponse,
   ): Promise<IAuthenticatedUser | null> => {
-    const { accessToken, refreshToken, idToken } =
+    const { idToken } =
       response;
-    if (!idToken || !accessToken || !refreshToken) {
+    if (!idToken) {
       return null;
     }
 
