@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useRef } from 'react';
-import useClickAway from 'react-use/lib/useClickAway';
+import { useClickAway } from 'react-use';
 
 const Modal = ({ title, body, footer, isOpen, onClose }) => {
   const ref = useRef(null);
