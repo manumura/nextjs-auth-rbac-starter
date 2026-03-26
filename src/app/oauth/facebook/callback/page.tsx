@@ -1,22 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { use, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import LoadingOverlay from '../../../../components/LoadingOverlay';
 import { appMessages } from '../../../../config/constant';
 import { getUserFromIdToken } from '../../../../lib/jwt.utils';
 import useMessageStore from '../../../../lib/message-store';
 import useUserStore from '../../../../lib/user-store';
 
-export default function OauthFacebookCallback({
-  searchParams,
-}: {
-  readonly searchParams: Promise<{
-    id_token: string;
-  }>;
-}) {
-  const { id_token: idToken } = use(searchParams);
+export default function OauthFacebookCallback() {
+  const searchParams = useSearchParams();
+  const idToken = searchParams.get('id_token') ?? undefined;
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
