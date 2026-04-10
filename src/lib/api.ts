@@ -18,12 +18,12 @@ const REFRESH_TOKEN_ENDPOINT = 'v1/refresh-token';
 
 // No interceptor for refresh token
 const httpClientPublicInstance: KyInstance = ky.create({
-  baseUrl: `${BASE_URL}/api/`,
+  prefix: `${BASE_URL}/api/`,
   credentials: 'include',
 });
 
 export const httpClientInstance: KyInstance = ky.create({
-  baseUrl: `${BASE_URL}/api/`,
+  prefix: `${BASE_URL}/api/`,
   credentials: 'include',
   headers: {
     'Cache-Control': 'no-cache',
