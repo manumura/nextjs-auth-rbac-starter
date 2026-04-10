@@ -41,7 +41,7 @@ export default function ResetPassword({
     data: user,
   } = useQuery({
     queryKey: ['userByToken'],
-    queryFn: () => getUserFromToken(token).then((res) => res.data),
+    queryFn: () => getUserFromToken(token),
     retry: false,
     enabled: isAuthChecked, // Only fetch when auth is confirmed
   });

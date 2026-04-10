@@ -38,7 +38,7 @@ function UsersContent() {
   }, [currentUser, setUser]);
 
   const queryFunction = async () => {
-    const data = await getUsers(page, pageSize, role).then((res) => res.data);
+    const data = await getUsers(page, pageSize, role);
     const users = data.elements;
     const totalElements = data.totalElements;
     return { users, totalElements };

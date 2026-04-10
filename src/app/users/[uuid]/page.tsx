@@ -44,7 +44,7 @@ export default function EditUser({
     data: user,
   } = useQuery({
     queryKey: ['userByUuid', uuid],
-    queryFn: () => getUserByUuid(uuid).then((res) => res.data),
+    queryFn: () => getUserByUuid(uuid),
     retry: false,
     enabled: isAuthChecked, // Only fetch when auth is confirmed
   });

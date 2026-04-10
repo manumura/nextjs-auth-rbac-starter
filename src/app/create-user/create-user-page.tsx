@@ -2,7 +2,7 @@
 
 import FormInput from '@/components/FormInput';
 import { useMutation } from '@tanstack/react-query';
-import { AxiosError, AxiosResponse } from 'axios';
+import { HTTPError } from 'ky';
 import { useRouter } from 'next/navigation';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -64,12 +64,12 @@ export default function CreateUserPage(): React.ReactElement {
 
   const onMutate = async (email, name, role): Promise<IUser> => {
     try {
-      const response = await createUser(email, name, role);
-      const user = response.data;
+      const user = await createUser(email, name, role);
       return user;
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.data.message) {
-        throw new Error(error.response.data.message);
+      if (error instanceof HTTPError) {
+        const body = await error.response.json<{ message?: string }>();
+        if (body.message) throw new Error(body.message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);

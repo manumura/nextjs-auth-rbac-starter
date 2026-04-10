@@ -37,10 +37,7 @@ const LogoutButton = ({ id }) => {
   });
 
   const onMutate = async (): Promise<void> => {
-    const response = await logout();
-    if (response.status !== 204) {
-      throw new Error('Logout failed');
-    }
+    await logout();
   };
 
   const handleLogout = async (): Promise<void> => {

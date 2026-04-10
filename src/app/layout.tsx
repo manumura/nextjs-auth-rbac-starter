@@ -36,9 +36,8 @@ export default function RootLayout({
       console.log('Current User in Root Layout:', currentUser);
       if (!currentUser) {
         try {
-          const response = await getProfile();
-          if (response.status === 200 && response.data) {
-            const currentUserFromAPI = response.data;
+          const currentUserFromAPI = await getProfile();
+          if (currentUserFromAPI) {
             console.log(
               'Fetched Current User from API in Root Layout:',
               currentUserFromAPI,

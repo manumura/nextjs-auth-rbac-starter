@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { resetPassword } from '../../lib/api';
-import { AxiosError, AxiosResponse } from 'axios';
+import { HTTPError } from 'ky';
 import { IUser } from '../../types/custom-types';
 
 export function SubmitButton({ isValid, isLoading }): React.ReactElement {
@@ -56,12 +56,12 @@ export default function ResetPasswordPage({ token }): React.ReactElement {
 
   const onMutate = async (password, token): Promise<IUser> => {
     try {
-      const response = await resetPassword(password, token);
-      const user = response.data;
+      const user = await resetPassword(password, token);
       return user;
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.data.message) {
-        throw new Error(error.response.data.message);
+      if (error instanceof HTTPError) {
+        const body = await error.response.json<{ message?: string }>();
+        if (body.message) throw new Error(body.message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);

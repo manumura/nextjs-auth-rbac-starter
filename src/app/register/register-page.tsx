@@ -10,7 +10,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { register, validateRecaptcha } from '../../lib/api';
 import { IUser } from '../../types/custom-types';
-import { AxiosError } from 'axios';
+import { HTTPError } from 'ky';
 import { validatePassword } from '../../lib/utils';
 
 export function RegisterButton({ isValid, isLoading }): React.ReactElement {
@@ -87,11 +87,11 @@ export default function RegisterPage(): React.ReactElement {
     }
 
     try {
-      const response = await register(email, password, name);
-      return response.data;
+      return await register(email, password, name);
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.data.message) {
-        throw new Error(error.response.data.message);
+      if (error instanceof HTTPError) {
+        const body = await error.response.json<{ message?: string }>();
+        if (body.message) throw new Error(body.message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);

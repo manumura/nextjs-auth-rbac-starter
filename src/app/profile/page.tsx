@@ -30,7 +30,7 @@ export default function Profile() {
     data: user,
   } = useQuery({
     queryKey: ['profile'],
-    queryFn: () => getProfile().then((res) => res.data),
+    queryFn: () => getProfile(),
     retry: false,
     enabled: isAuthChecked, // Only fetch when auth is confirmed
   });

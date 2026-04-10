@@ -4,7 +4,7 @@ import FormInput from '@/components/FormInput';
 import { clearStorage } from '@/lib/storage';
 import { CredentialResponse } from '@react-oauth/google';
 import { useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
+import { HTTPError } from 'ky';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -113,9 +113,9 @@ export default function LoginPage({ error }): React.ReactElement {
     }
 
     try {
-      const response = await login(email, password);
+      const loginResponse = await login(email, password);
 
-      const user = await getUserFromLoginResponse(response.data);
+      const user = await getUserFromLoginResponse(loginResponse);
       if (!user) {
         throw new Error('Invalid user');
       }
@@ -123,8 +123,9 @@ export default function LoginPage({ error }): React.ReactElement {
     } catch (error) {
       console.error(error);
       let message = 'Unknown error';
-      if (error instanceof AxiosError && error.response?.data) {
-        const msg = error.response.data.message;
+      if (error instanceof HTTPError) {
+        const body = await error.response.json<{ message?: string }>();
+        const msg = body.message ?? '';
         if (msg === errorMessages.INVALID_EMAIL_OR_PASSWORD.code) {
           message = errorMessages.INVALID_EMAIL_OR_PASSWORD.text;
         } else if (msg === errorMessages.EMAIL_NOT_VERIFIED.code) {
@@ -204,12 +205,12 @@ export default function LoginPage({ error }): React.ReactElement {
     }
 
     try {
-      const response = await googleLogin(token);
-      if (!response?.data) {
+      const loginResponse = await googleLogin(token);
+      if (!loginResponse) {
         return null;
       }
 
-      return getUserFromLoginResponse(response.data);
+      return getUserFromLoginResponse(loginResponse);
     } catch (error) {
       console.error(error);
       return null;

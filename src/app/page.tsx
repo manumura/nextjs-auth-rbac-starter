@@ -14,7 +14,7 @@ export default function Home() {
     data: information,
   } = useQuery({
     queryKey: ['info'],
-    queryFn: () => info().then((res) => res.data),
+    queryFn: () => info(),
     initialData: {} as InfoResponse,
   });
 
@@ -24,7 +24,7 @@ export default function Home() {
     data: msg,
   } = useQuery({
     queryKey: ['welcome'],
-    queryFn: () => welcome().then((res) => res.data),
+    queryFn: () => welcome(),
     initialData: { message: 'Loading...' },
   });
 

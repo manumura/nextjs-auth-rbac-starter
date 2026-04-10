@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
+import { HTTPError } from 'ky';
 import { UUID } from 'crypto';
 import { toast } from 'react-toastify';
 import { deleteUser } from '../lib/api';
@@ -41,12 +41,12 @@ const DeleteUserModal = ({
 
   const onMutate = async (userUuid): Promise<IUser> => {
     try {
-      const response = await deleteUser(userUuid);
-      const user = response.data;
+      const user = await deleteUser(userUuid);
       return user;
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.data.message) {
-        throw new Error(error.response.data.message);
+      if (error instanceof HTTPError) {
+        const body = await error.response.json<{ message?: string }>();
+        if (body.message) throw new Error(body.message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);

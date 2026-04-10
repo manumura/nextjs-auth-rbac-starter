@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
+import { HTTPError } from 'ky';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -92,8 +92,7 @@ export default function EditProfilePage({ user }) {
 
   const onMutateProfile = async (name): Promise<IUser> => {
     try {
-      const response = await updateProfile(name);
-      const user = response.data;
+      const user = await updateProfile(name);
 
       if (images.length <= 0) {
         return user;
@@ -104,17 +103,12 @@ export default function EditProfilePage({ user }) {
       const formData = new FormData();
       formData.append('image', images[0]);
 
-      const uploadResponse = await updateProfileImage(
-        formData,
-        onUploadProgress,
-      );
-      if (uploadResponse.status !== 200) {
-        throw new Error('Profile image upload failed');
-      }
+      await updateProfileImage(formData);
       return user;
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.data.message) {
-        throw new Error(error.response.data.message);
+      if (error instanceof HTTPError) {
+        const body = await error.response.json<{ message?: string }>();
+        if (body.message) throw new Error(body.message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);
@@ -177,12 +171,12 @@ export default function EditProfilePage({ user }) {
 
   const onMutatePassword = async (oldPassword, newPassword): Promise<IUser> => {
     try {
-      const response = await updatePassword(oldPassword, newPassword);
-      const user = response?.data;
+      const user = await updatePassword(oldPassword, newPassword);
       return user;
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.data.message) {
-        throw new Error(error.response.data.message);
+      if (error instanceof HTTPError) {
+        const body = await error.response.json<{ message?: string }>();
+        if (body.message) throw new Error(body.message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);
@@ -237,19 +231,16 @@ export default function EditProfilePage({ user }) {
 
   const onMutateDeleteProfile = async (): Promise<IUser> => {
     try {
-      const response = await deleteProfile();
-      if (response.status !== 200) {
-        throw new Error('Profile delete failed');
-      }
-      const user = response?.data;
+      const user = await deleteProfile();
       if (!user) {
         throw new Error('Profile delete failed');
       }
       await handleLogout();
       return user;
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.data.message) {
-        throw new Error(error.response.data.message);
+      if (error instanceof HTTPError) {
+        const body = await error.response.json<{ message?: string }>();
+        if (body.message) throw new Error(body.message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);

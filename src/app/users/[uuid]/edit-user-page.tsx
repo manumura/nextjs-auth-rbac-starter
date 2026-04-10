@@ -9,7 +9,7 @@ import FormInput from '../../../components/FormInput';
 import FormSelect from '../../../components/FormSelect';
 import { updateUser } from '../../../lib/api';
 import { IUser } from '../../../types/custom-types';
-import { AxiosError, AxiosResponse } from 'axios';
+import { HTTPError } from 'ky';
 
 export function SaveButton({ isValid, isLoading }): React.ReactElement {
   const btn = <button className='btn btn-primary mx-1'>Save</button>;
@@ -88,12 +88,12 @@ export default function EditUserPage({ user }): React.ReactElement {
     password,
   ): Promise<IUser> => {
     try {
-      const response = await updateUser(uuid, name, email, role, password);
-      const user = response.data;
+      const user = await updateUser(uuid, name, email, role, password);
       return user;
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.data.message) {
-        throw new Error(error.response.data.message);
+      if (error instanceof HTTPError) {
+        const body = await error.response.json<{ message?: string }>();
+        if (body.message) throw new Error(body.message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);

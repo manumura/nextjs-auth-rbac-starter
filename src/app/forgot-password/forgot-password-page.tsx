@@ -8,7 +8,7 @@ import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { forgotPassword, validateRecaptcha } from '../../lib/api';
-import { AxiosError, AxiosResponse } from 'axios';
+import { HTTPError } from 'ky';
 import { MessageResponse } from '../../types/custom-types';
 
 export function SubmitButton({ isValid, isLoading }): React.ReactElement {
@@ -68,10 +68,11 @@ export default function ForgotPasswordPage(): React.ReactElement {
     
     try {
       const response = await forgotPassword(email);
-      return response.data.message;
+      return response.message;
     } catch (error) {
-      if (error instanceof AxiosError && error.response?.data.message) {
-        throw new Error(error.response.data.message);
+      if (error instanceof HTTPError) {
+        const body = await error.response.json<{ message?: string }>();
+        if (body.message) throw new Error(body.message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);
