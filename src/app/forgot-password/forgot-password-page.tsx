@@ -71,8 +71,8 @@ export default function ForgotPasswordPage(): React.ReactElement {
       return response.message;
     } catch (error) {
       if (error instanceof HTTPError) {
-        const body = await error.response.json<{ message?: string }>();
-        if (body.message) throw new Error(body.message);
+        const message = error.data?.message ?? 'Create user failed';
+        throw new Error(message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);

@@ -124,8 +124,7 @@ export default function LoginPage({ error }): React.ReactElement {
       console.error(error);
       let message = 'Unknown error';
       if (error instanceof HTTPError) {
-        const body = await error.response.json<{ message?: string }>();
-        const msg = body.message ?? '';
+        const msg = error.data?.message ?? 'Create user failed';
         if (msg === errorMessages.INVALID_EMAIL_OR_PASSWORD.code) {
           message = errorMessages.INVALID_EMAIL_OR_PASSWORD.text;
         } else if (msg === errorMessages.EMAIL_NOT_VERIFIED.code) {

@@ -51,6 +51,7 @@ export const httpClientInstance: KyInstance = ky.create({
 
         // Avoid infinite loop on refresh token endpoint
         if (request.url.includes(REFRESH_TOKEN_ENDPOINT)) {
+          console.error("Refresh token request failed with 401, logging out user");
           useUserStore.getState().setUser(null);
           clearStorage();
           return;
@@ -71,15 +72,14 @@ export const httpClientInstance: KyInstance = ky.create({
             retryRequest.url,
           );
           return httpClientInstance(retryRequest);
-        } catch (refreshError) {
-          if (
-            refreshError instanceof HTTPError &&
-            refreshError.response.status === 401
-          ) {
+        } catch (error) {
+          const err = error as HTTPError;
+          console.error('after response hook error:', err);
+          if (err?.response?.status === 401) {
             useUserStore.getState().setUser(null);
             clearStorage();
           }
-          throw refreshError;
+          throw err;
         }
       },
     ],

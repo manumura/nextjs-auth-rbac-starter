@@ -90,8 +90,8 @@ export default function RegisterPage(): React.ReactElement {
       return await register(email, password, name);
     } catch (error) {
       if (error instanceof HTTPError) {
-        const body = await error.response.json<{ message?: string }>();
-        if (body.message) throw new Error(body.message);
+        const message = error.data?.message ?? 'Create user failed';
+        throw new Error(message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);
