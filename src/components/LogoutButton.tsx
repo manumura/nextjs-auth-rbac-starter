@@ -26,7 +26,8 @@ const LogoutButton = ({ id }) => {
       if (pathname !== '/') {
         router.push('/');
       }
-      router.refresh();
+      // Redirect to home page after logout is done in Navbar component's useEffect when user state changes to null
+      // router.refresh();
     },
     onError(error, variables, context) {
       toast(error?.message, {

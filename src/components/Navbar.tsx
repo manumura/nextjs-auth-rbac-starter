@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import logo from '../../public/next.svg';
 import useUserStore from '../lib/user-store';
@@ -47,18 +48,25 @@ function getNavItems(
 }
 
 export default function Navbar({ children }) {
-  const currentUser = useUserStore((state) => state.user);
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const toggleDrawer = (): void => setOpen(!open);
+  const currentUser = useUserStore((state) => state.user);
   const [navItems, setNavItems] = useState<React.JSX.Element[]>(
     getNavItems(currentUser),
   );
-  const toggleDrawer = (): void => setOpen(!open);
 
   useEffect(() => {
     // Re-render navItems when user changes
     const unsubscribe = useUserStore.subscribe((userState) => {
       console.log('Navbar user updated', userState.user);
       setNavItems(getNavItems(userState.user));
+
+      // Redirect to home page on logout
+      if (!userState.user) {
+        console.log('User logged out, redirecting to home page');
+        router.push('/');
+      }
     });
 
     return () => {
