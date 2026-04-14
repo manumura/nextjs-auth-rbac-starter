@@ -65,7 +65,7 @@ export const httpClientInstance: KyInstance = ky.create({
 
         try {
           await postRefreshToken();
-          console.log('Token refreshed successfully');
+          console.log('Token successfully refreshed. Retrying original request...');
           const newCsrfToken = getCookie(appConstant.CSRF_COOKIE_NAME);
           // Retry original request with updated CSRF token
           const retryRequest = request.clone();

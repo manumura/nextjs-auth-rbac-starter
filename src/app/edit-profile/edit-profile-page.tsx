@@ -74,7 +74,7 @@ export default function EditProfilePage({ user }) {
   const mutationProfile = useMutation({
     mutationFn: ({ name }: { name: string }) => onMutateProfile(name),
     async onSuccess(user, variables, context) {
-      toast('Profile successfully updated!', {
+      toast(`Profile successfully updated : ${user?.name}.`, {
         type: 'success',
         position: 'bottom-right',
       });
@@ -154,7 +154,7 @@ export default function EditProfilePage({ user }) {
       newPassword: string;
     }) => onMutatePassword(oldPassword, newPassword),
     async onSuccess(user, variables, context) {
-      toast(`${user.name} successfully changed password!`, {
+      toast(`Password successfully changed : ${user?.name}.`, {
         type: 'success',
         position: 'bottom-right',
       });
@@ -214,7 +214,7 @@ export default function EditProfilePage({ user }) {
   const mutationDeleteProfile = useMutation({
     mutationFn: () => onMutateDeleteProfile(),
     async onSuccess(user, variables, context) {
-      toast('Profile successfully deleted!', {
+      toast(`Profile successfully deleted : ${user?.name}.`, {
         type: 'success',
         position: 'bottom-right',
       });

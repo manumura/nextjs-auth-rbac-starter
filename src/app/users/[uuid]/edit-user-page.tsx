@@ -62,7 +62,7 @@ export default function EditUserPage({ user }): React.ReactElement {
       password: string;
     }) => onMutate(uuid, name, email, role, password),
     async onSuccess(userUpdated, variables, context) {
-      toast(`User updated successfully ${userUpdated?.name}!`, {
+      toast(`User successfully updated : ${userUpdated?.name}.`, {
         type: 'success',
         position: 'bottom-right',
       });

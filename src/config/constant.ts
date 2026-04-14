@@ -33,27 +33,27 @@ export const appMessages = {
   },
   PROFILE_UPDATE_SUCCESS: {
     type: 'PROFILE_UPDATE_SUCCESS',
-    text: 'Profile successfully updated!',
+    text: 'Profile successfully updated.',
   },
   PROFILE_DELETE_SUCCESS: {
     type: 'PROFILE_DELETE_SUCCESS',
-    text: 'Profile successfully deleted!',
+    text: 'Profile successfully deleted.',
   },
   PASSWORD_CHANGE_SUCCESS: {
     type: 'PASSWORD_CHANGE_SUCCESS',
-    text: 'Password successfully updated!',
+    text: 'Password successfully updated.',
   },
   USER_CREATE_SUCCESS: {
     type: 'USER_CREATE_SUCCESS',
-    text: 'User successfully created!',
+    text: 'User successfully created.',
   },
   USER_UPDATE_SUCCESS: {
     type: 'USER_UPDATE_SUCCESS',
-    text: 'User successfully updated!',
+    text: 'User successfully updated.',
   },
   USER_DELETE_SUCCESS: {
     type: 'USER_DELETE_SUCCESS',
-    text: 'User successfully deleted!',
+    text: 'User successfully deleted.',
   },
   LOGIN_SUCCESS: {
     type: 'LOGIN_SUCCESS',

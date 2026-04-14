@@ -24,7 +24,7 @@ const DeleteUserModal = ({
   const mutation = useMutation({
     mutationFn: ({ userUuid }: { userUuid: UUID }) => onMutate(userUuid),
     async onSuccess(user, variables, context) {
-      toast(`User deleted successfully ${user?.name}`, {
+      toast(`User successfully deleted : ${user?.name}.`, {
         type: 'success',
         position: 'bottom-right',
       });

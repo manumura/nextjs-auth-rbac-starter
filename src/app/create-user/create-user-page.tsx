@@ -47,7 +47,7 @@ export default function CreateUserPage(): React.ReactElement {
       role: string;
     }) => onMutate(email, name, role),
     async onSuccess(user, variables, context) {
-      toast(`User created successfully ${user?.name}`, {
+      toast(`User successfully created : ${user?.name}.`, {
         type: 'success',
         position: 'bottom-right'
       });

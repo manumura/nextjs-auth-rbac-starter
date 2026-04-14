@@ -6,8 +6,8 @@ export default function VerifyEmailPage({ result }): React.ReactElement {
   console.log('result', result);
   const success = result === 'success';
   const message = success
-    ? 'Email verified successfully'
-    : 'Email verification failed';
+    ? 'Email verified successfully.'
+    : 'Email verification failed.';
 
   const messageBaseClasses = 'text-2xl font-semibold';
   const messageClasses = success

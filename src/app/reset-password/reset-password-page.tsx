@@ -39,7 +39,7 @@ export default function ResetPasswordPage({ token }): React.ReactElement {
     mutationFn: ({ password, token }: { password: string; token: string; }) =>
       onMutate(password, token),
     async onSuccess(user, variables, context) {
-      toast('Password successfully updated!', {
+      toast(`Password successfully updated : ${user?.name}.`, {
         type: 'success',
         position: 'bottom-right',
       });
@@ -60,13 +60,13 @@ export default function ResetPasswordPage({ token }): React.ReactElement {
       return user;
     } catch (error) {
       if (error instanceof HTTPError) {
-        const message = error.data?.message ?? 'Create user failed';
+        const message = error.data?.message ?? 'Reset password failed.';
         throw new Error(message);
       }
       if (error instanceof Error) {
         throw new Error(error.message);
       }
-      throw new Error('Reset password failed');
+      throw new Error('Reset password failed.');
     }
   };
 
