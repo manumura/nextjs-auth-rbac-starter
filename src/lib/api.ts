@@ -26,15 +26,15 @@ const httpClientPublicInstance: KyInstance = ky.create({
 export const httpClientInstance: KyInstance = ky.create({
   prefix: `${BASE_URL}/api/`,
   credentials: 'include',
-  retry: {
-    limit: 1,
-    statusCodes: [401],
-    methods: ["get", "post", "put", "delete", "patch", "head"],
-  },
   headers: {
     'Cache-Control': 'no-cache',
     Pragma: 'no-cache',
     Expires: '0',
+  },
+  retry: {
+    limit: 1,
+    statusCodes: [401],
+    methods: ["get", "post", "put", "delete", "patch", "head"],
   },
   hooks: {
     beforeRequest: [
