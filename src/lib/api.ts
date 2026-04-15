@@ -20,16 +20,16 @@ const REFRESH_TOKEN_ENDPOINT = 'v1/refresh-token';
 const httpClientPublicInstance: KyInstance = ky.create({
   prefix: `${BASE_URL}/api/`,
   credentials: 'include',
-  retry: {
-    limit:1,
-  }
+  retry: 0,
 });
 
 export const httpClientInstance: KyInstance = ky.create({
   prefix: `${BASE_URL}/api/`,
   credentials: 'include',
   retry: {
-    limit:1,
+    limit: 1,
+    statusCodes: [401],
+    methods: ["get", "post", "put", "delete", "patch", "head"],
   },
   headers: {
     'Cache-Control': 'no-cache',
@@ -49,9 +49,11 @@ export const httpClientInstance: KyInstance = ky.create({
         }
       },
     ],
-    afterResponse: [
-      async ({ request, response }) => {
-        if (response.status !== 401) {
+    beforeRetry: [
+      async ({ request, retryCount }) => {
+        console.log(`Request failed with 401, retry attempt ${retryCount}`);
+        if (retryCount !== 1) {
+          console.error(`Unexpected retry count ${retryCount}, expected 1. Not retrying request.`);
           return;
         }
 
@@ -68,16 +70,14 @@ export const httpClientInstance: KyInstance = ky.create({
           console.log('Token successfully refreshed. Retrying original request...');
           const newCsrfToken = getCookie(appConstant.CSRF_COOKIE_NAME);
           // Retry original request with updated CSRF token
-          const retryRequest = request.clone();
           if (newCsrfToken) {
-            retryRequest.headers.set('X-CSRF-Token', newCsrfToken);
+            request.headers.set('X-CSRF-Token', newCsrfToken);
           }
           console.log(
             'Retrying original request after token refresh:',
-            retryRequest.method,
-            retryRequest.url,
+            request.method,
+            request.url,
           );
-          return httpClientInstance(retryRequest);
         } catch (error) {
           const err = error as HTTPError;
           console.error('after response hook error:', err);
