@@ -63,10 +63,10 @@ export default function Navbar({ children }) {
       setNavItems(getNavItems(userState.user));
 
       // Redirect to home page on logout
-      if (!userState.user) {
-        console.log('User logged out, redirecting to home page');
-        router.push('/');
-      }
+      // if (!userState.user) {
+      //   console.log('User logged out, redirecting to home page');
+      //   router.push('/');
+      // }
     });
 
     return () => {

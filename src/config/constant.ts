@@ -24,6 +24,10 @@ export const errorMessages = {
     code: 'user_delete_failed',
     text: 'Failed to delete user.',
   },
+  INVALID_REFRESH_TOKEN: {
+    code: 'invalid_refresh_token',
+    text: 'Session expired. Please log in again.',
+  },
 };
 
 export const appMessages = {

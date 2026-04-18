@@ -16,7 +16,8 @@ export default function Profile() {
   useEffect(() => {
     const checkAuth = async () => {
       if (!currentUser) {
-        redirect('/login');
+        console.log('User not authenticated, redirecting to home page');
+        redirect('/');
       }
       setIsAuthChecked(true);
     };

@@ -84,7 +84,7 @@ export default function LoginPage({ error }): React.ReactElement {
     onSuccess(user, variables, context) {
       userStore.setUser(user);
 
-      toast(`Welcome ${user?.name}!`, {
+      toast(`Welcome ${user?.name}.`, {
         type: 'success',
         position: 'bottom-right',
       });

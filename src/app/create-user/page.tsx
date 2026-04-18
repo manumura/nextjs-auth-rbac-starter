@@ -14,9 +14,13 @@ export default function CreateUser() {
   useEffect(() => {
     const checkAuth = async () => {
       if (!currentUser) {
-        redirect('/login');
+        console.log('User not authenticated, redirecting to home page');
+        redirect('/');
       }
       if (!isAdmin(currentUser)) {
+        console.log(
+          'User does not have admin privileges, redirecting to home page',
+        );
         redirect('/');
       }
       setIsAuthChecked(true);

@@ -69,3 +69,9 @@ export type IMessage = {
   type: string;
   text: string;
 };
+
+export type ErrorResponse = {
+  message: string;
+  error?: string;
+  statusCode?: number;
+};

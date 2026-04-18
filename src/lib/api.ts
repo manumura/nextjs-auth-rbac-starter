@@ -1,8 +1,9 @@
 import ky, { HTTPError, type KyInstance } from 'ky';
 import { UUID } from 'node:crypto';
 import appConfig from '../config/config';
-import { appConstant } from '../config/constant';
+import { appConstant, errorMessages } from '../config/constant';
 import {
+  ErrorResponse,
   IGetUsersResponse,
   InfoResponse,
   IUser,
@@ -34,7 +35,7 @@ export const httpClientInstance: KyInstance = ky.create({
   retry: {
     limit: 1,
     statusCodes: [401],
-    methods: ["get", "post", "put", "delete", "patch", "head"],
+    methods: ['get', 'post', 'put', 'delete', 'patch', 'head'],
   },
   hooks: {
     beforeRequest: [
@@ -53,13 +54,17 @@ export const httpClientInstance: KyInstance = ky.create({
       async ({ request, retryCount }) => {
         console.log(`Request failed with 401, retry attempt ${retryCount}`);
         if (retryCount !== 1) {
-          console.error(`Unexpected retry count ${retryCount}, expected 1. Not retrying request.`);
+          console.error(
+            `Unexpected retry count ${retryCount}, expected 1. Not retrying request.`,
+          );
           return;
         }
 
         // Avoid infinite loop on refresh token endpoint
         if (request.url.includes(REFRESH_TOKEN_ENDPOINT)) {
-          console.error("Refresh token request failed with 401, logging out user");
+          console.error(
+            'Refresh token request failed with 401, logging out user',
+          );
           useUserStore.getState().setUser(null);
           clearStorage();
           return;
@@ -67,7 +72,9 @@ export const httpClientInstance: KyInstance = ky.create({
 
         try {
           await postRefreshToken();
-          console.log('Token successfully refreshed. Retrying original request...');
+          console.log(
+            'Token successfully refreshed. Retrying original request...',
+          );
           const newCsrfToken = getCookie(appConstant.CSRF_COOKIE_NAME);
           // Retry original request with updated CSRF token
           if (newCsrfToken) {
@@ -80,12 +87,17 @@ export const httpClientInstance: KyInstance = ky.create({
           );
         } catch (error) {
           const err = error as HTTPError;
-          console.error('after response hook error:', err);
+          console.error('beforeRetry hook error:', err);
           if (err?.response?.status === 401) {
             useUserStore.getState().setUser(null);
             clearStorage();
           }
-          throw err;
+          const data = err?.data as ErrorResponse | undefined;
+          const message =
+            data?.message === errorMessages.INVALID_REFRESH_TOKEN.code
+              ? errorMessages.INVALID_REFRESH_TOKEN.text
+              : data?.message;
+          throw new Error(message, { cause: err });
         }
       },
     ],

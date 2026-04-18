@@ -23,10 +23,11 @@ const LogoutButton = ({ id }) => {
         position: 'bottom-right',
       });
 
-      if (pathname !== '/') {
-        router.push('/');
-      }
-      // Redirect to home page after logout is done in Navbar component's useEffect when user state changes to null
+      // Redirect to home page for unauthenticated users is handled in other components, so we don't need to do it here
+      console.log('User logged out successfully');
+      // if (pathname !== '/') {
+      //   router.push('/');
+      // }
       // router.refresh();
     },
     onError(error, variables, context) {

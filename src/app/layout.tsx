@@ -27,6 +27,7 @@ export default function RootLayout({
 }: {
   readonly children: React.ReactNode;
 }) {
+  // If user reloads the page, we need to check if they are authenticated
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const currentUser = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
